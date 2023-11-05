@@ -1,7 +1,7 @@
 {
-  "name": "chessroulette",
+  "name": "chessroulette-web",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "apps/chessroulette",
+  "sourceRoot": "apps/chessroulette-web",
   "projectType": "application",
   "targets": {
     "build": {
@@ -9,11 +9,11 @@
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
       "options": {
-        "outputPath": "dist/apps/chessroulette"
+        "outputPath": "dist/apps/chessroulette-web"
       },
       "configurations": {
         "development": {
-          "outputPath": "apps/chessroulette"
+          "outputPath": "apps/chessroulette-web"
         },
         "production": {}
       }
@@ -22,16 +22,16 @@
       "executor": "@nx/next:server",
       "defaultConfiguration": "development",
       "options": {
-        "buildTarget": "chessroulette:build",
+        "buildTarget": "chessroulette-web:build",
         "dev": true
       },
       "configurations": {
         "development": {
-          "buildTarget": "chessroulette:build:development",
+          "buildTarget": "chessroulette-web:build:development",
           "dev": true
         },
         "production": {
-          "buildTarget": "chessroulette:build:production",
+          "buildTarget": "chessroulette-web:build:production",
           "dev": false
         }
       }
@@ -39,14 +39,14 @@
     "export": {
       "executor": "@nx/next:export",
       "options": {
-        "buildTarget": "chessroulette:build:production"
+        "buildTarget": "chessroulette-web:build:production"
       }
     },
     "test": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
       "options": {
-        "jestConfig": "apps/chessroulette/jest.config.ts",
+        "jestConfig": "apps/chessroulette-web/jest.config.ts",
         "passWithNoTests": true
       },
       "configurations": {
@@ -60,7 +60,7 @@
       "executor": "@nx/eslint:lint",
       "outputs": ["{options.outputFile}"],
       "options": {
-        "lintFilePatterns": ["apps/chessroulette/**/*.{ts,tsx,js,jsx}"]
+        "lintFilePatterns": ["apps/chessroulette-web/**/*.{ts,tsx,js,jsx}"]
       }
     }
   },

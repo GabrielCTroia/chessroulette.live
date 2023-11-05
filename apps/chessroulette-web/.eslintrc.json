@@ -18,7 +18,7 @@
       "rules": {
         "@next/next/no-html-link-for-pages": [
           "error",
-          "apps/chessroulette/pages"
+          "apps/chessroulette-web/pages"
         ]
       }
     },
