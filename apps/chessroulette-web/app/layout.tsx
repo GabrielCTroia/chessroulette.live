@@ -1,5 +1,7 @@
 import { Metadata } from 'next';
 import '../styles.css';
+import MovexProvider from '../providers/MovexProvider';
+import Header from '../components/Header';
 
 export const metadata: Metadata = {
   title: 'Home',
@@ -15,7 +17,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <MovexProvider>{children}</MovexProvider>
+      </body>
     </html>
   );
 }

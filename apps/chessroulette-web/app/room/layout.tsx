@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import '../../styles.css';
-import { Logo } from 'apps/chessroulette-web/components/Logo';
-import Link from 'next/link';
+import Header from '../../components/Header';
 
 export const metadata: Metadata = {
   title: 'Room',
@@ -20,9 +19,7 @@ export default function RootLayout({
       id="room-layout"
       className="gap-2 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)]"
     >
-      <header className="pt-4 pb-4">
-        <Link href="/"><Logo /></Link>
-      </header>
+      <Header />
       {children}
     </div>
   );

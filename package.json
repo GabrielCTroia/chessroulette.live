@@ -10,10 +10,17 @@
     "@vercel/analytics": "^1.1.1",
     "chess.js": "^1.0.0-beta.6",
     "chessterrain-react": "^0.0.0-2",
-    "movex": "^0.1.3-11",
+    "movex": "file:.yalc/movex",
+    "movex-core-util": "file:.yalc/movex-core-util",
+    "movex-master": "file:.yalc/movex-master",
+    "movex-react": "file:.yalc/movex-react",
+    "movex-server": "file:.yalc/movex-server",
+    "movex-service": "file:.yalc/movex-service",
+    "movex-store": "file:.yalc/movex-store",
     "next": "^14.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "server-only": "^0.0.1",
     "tslib": "^2.3.0"
   },
   "devDependencies": {

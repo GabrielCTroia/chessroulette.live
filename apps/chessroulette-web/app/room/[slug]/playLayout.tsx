@@ -21,9 +21,13 @@ export function PlayLayout({
   return (
     <section className={`flex gap-6 ${containerClassName}`}>
       {leftSideComponent && (
-        <aside id="left-side" className="" style={{
-          flex: 2.5,
-        }}>
+        <aside
+          id="left-side"
+          className=""
+          style={{
+            flex: 2.5,
+          }}
+        >
           {leftSideComponent}
         </aside>
       )}
