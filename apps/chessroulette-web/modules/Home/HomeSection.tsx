@@ -50,7 +50,7 @@ export default () => {
 
             roomResource?.create(initialRoomState).map((s) => {
               router.push(
-                `room/${toRidAsStr(s.rid)}?userId=${getRandomInt(0, 999)}`
+                `play/${toRidAsStr(s.rid)}?userId=${getRandomInt(0, 999)}`
               );
             });
           }}

@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { PlayLayout } from './playLayout';
+import Template from './PlayTemplate';
 import { NoSSR } from 'apps/chessroulette-web/components/NoSSR';
 import { PlayerBox } from 'apps/chessroulette-web/components/PlayerBox';
 import { ChessGame } from 'apps/chessroulette-web/modules/ChessGame/ChessGame';
@@ -27,7 +27,6 @@ export default function Page({ params }: { params: { slug: string } }) {
   //   return <div>Error - Rid not valid</div>;
   // }
 
-  
   // console.log('searchParams', searchParams);
 
   const slug = decodeURIComponent(params.slug);
@@ -83,9 +82,9 @@ export default function Page({ params }: { params: { slug: string } }) {
     //   );
     // }}
     // />
-    <PlayLayout
+    <Template
       leftSideComponent={
-        <div className="flex space-between flex-col gap-6 h-full nbg-red-100">
+        <div className="flex space-between flex-col gap-6 h-full sbg-red-100">
           <div className="flex-1 flex items-end justify-end">
             <PlayerBox />
           </div>
@@ -94,26 +93,13 @@ export default function Page({ params }: { params: { slug: string } }) {
           </div>
         </div>
       }
-      main={
-        // <div className="bg-indigo-500 p-2 font-mono">
-        // <NoSSR>
-        <>
-          {/* <NoSSR> */}
-          <div
-            style={{
-              width: 900,
-              height: 900,
-            }}
-          >
-            <NoSSR>
-              <MainActivity rid={rid} />
-            </NoSSR>
-          </div>
-          {/* </NoSSR> */}
-        </>
-        // </div>
+      // mainContainerClass="flex items-center"
+      mainComponent={
+        <NoSSR>
+          <MainActivity rid={rid} />
+        </NoSSR>
       }
-      rightSideComponent={<RoomParticipants rid={rid} />}
+      // rightSideComponent={<RoomParticipants rid={rid} />}
     />
   );
 }

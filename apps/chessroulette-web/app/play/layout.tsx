@@ -1,9 +1,11 @@
 import { Metadata } from 'next';
 import '../../styles.css';
 import Header from '../../components/Header';
+import { Avatar } from 'apps/chessroulette-web/components/Avatar';
+import RoomTemplate from 'apps/chessroulette-web/templates/RoomTemplate';
 
 export const metadata: Metadata = {
-  title: 'Room',
+  title: 'Play Room',
   description: 'Welcome to Chessroulette',
 };
 
@@ -14,13 +16,5 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div
-      id="room-layout"
-      className="gap-2 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)]"
-    >
-      <Header />
-      {children}
-    </div>
-  );
+  return <RoomTemplate>{children}</RoomTemplate>;
 }

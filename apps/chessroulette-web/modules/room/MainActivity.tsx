@@ -6,6 +6,7 @@ import { MovexBoundResource } from 'movex-react';
 import { ChessGame } from '../ChessGame/ChessGame';
 import { NoSSR } from 'apps/chessroulette-web/components/NoSSR';
 import { useSearchParams } from 'next/navigation';
+import { ContainerWithDimensions } from 'apps/chessroulette-web/components/ContainerWithDimensions';
 
 type Props = {
   rid: ResourceIdentifier<'room'>;
@@ -19,9 +20,22 @@ export default (props: Props) => {
         rid={props.rid}
         render={({ boundResource: { state, dispatch } }) => {
           return (
-            <div>
-              <ChessGame sizePx={900} />
-            </div>
+            <ContainerWithDimensions
+              className="h-full w-full"
+              render={(s) => (
+                // <div
+                //   className="h-full bg-blue-100 w-full flex justify-center content-center items-center"
+                //   style={{
+                //     height: s.height,
+                //     width: s.width,
+                //     background: 'green',
+                //   }}
+                // >
+
+                <ChessGame sizePx={s.height} />
+                // </div>
+              )}
+            />
           );
         }}
         // If there is a given slot just show the ChatBox

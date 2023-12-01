@@ -6,36 +6,47 @@ export const metadata: Metadata = {
 };
 
 export type Props = {
-  main: React.ReactNode;
+  mainComponent: React.ReactNode;
+  mainContainerClass?: string;
   leftSideComponent?: React.ReactNode;
   rightSideComponent?: React.ReactNode;
   containerClassName?: string;
 };
 
-export function PlayLayout({
+// TODO Not sure if this should be a next template or not
+
+export default function PlayTemplate({
   leftSideComponent,
-  main,
+  mainComponent,
+  mainContainerClass = '',
   rightSideComponent,
   containerClassName,
 }: Props) {
   return (
-    <section className={`flex gap-6 ${containerClassName}`}>
+    <section
+      className={`flex h-full gap-6 ${containerClassName} flex-1 nobg-red-400`}
+      style={
+        {
+          // aspectRatio: 16 / 9,
+        }
+      }
+    >
       {leftSideComponent && (
         <aside
           id="left-side"
-          className=""
+          className="grow"
           style={{
-            flex: 2.5,
+            flex: 0.5,
           }}
         >
           {leftSideComponent}
         </aside>
       )}
-      <main id="main" className="grow">
-        {main}
+      <main id="main" className={`flex-1 grow ${mainContainerClass}`}>
+        {mainComponent}
       </main>
       {rightSideComponent && (
-        <aside id="right-side" className="grow">
+        <aside id="right-side" className="grow-no">
           {rightSideComponent}
         </aside>
       )}
