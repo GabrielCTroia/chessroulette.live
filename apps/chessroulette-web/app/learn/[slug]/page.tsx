@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import Template from './PlayTemplate';
+import Template from './LearnTemplate';
 import { NoSSR } from 'apps/chessroulette-web/components/NoSSR';
 import { PlayerBox } from 'apps/chessroulette-web/components/PlayerBox';
 import { ChessGame } from 'apps/chessroulette-web/modules/ChessGame/ChessGame';
@@ -13,6 +13,7 @@ import {
   toResourceIdentifierObj,
 } from 'movex-core-util';
 import RoomParticipants from 'apps/chessroulette-web/modules/room/RoomParticipants';
+import LearnActivity from 'apps/chessroulette-web/modules/room/LearnActivity';
 
 export const metadata: Metadata = {
   title: 'Chessroulette | Room',
@@ -83,12 +84,9 @@ export default function Page({ params }: { params: { slug: string } }) {
     // }}
     // />
     <Template
-      leftSideComponent={
-        <div className="flex space-between flex-col gap-6 h-full sbg-red-100">
-          <div className="flex-1 flex items-end justify-end">
-            <PlayerBox />
-          </div>
-          <div className="flex-1">
+      rightSideComponent={
+        <div className="flex space-between flex-col gap-6 h-full">
+          <div className="flex-1 flex">
             <PlayerBox />
           </div>
         </div>
@@ -96,7 +94,7 @@ export default function Page({ params }: { params: { slug: string } }) {
       // mainContainerClass="flex items-center"
       mainComponent={
         <NoSSR>
-          <MainActivity rid={rid} />
+          <LearnActivity rid={rid} playingColor='black' fen='rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w KQkq - 0 1'/>
         </NoSSR>
       }
       // rightSideComponent={<RoomParticipants rid={rid} />}

@@ -43,19 +43,36 @@ export default () => {
           // });
         }}
       /> */}
-      <main>
+      <main className='flex gap-6'>
         <Button
           onClick={() => {
             // console.log('works', roomResource);
 
-            roomResource?.create(initialRoomState).map((s) => {
-              router.push(
-                `play/${toRidAsStr(s.rid)}?userId=${getRandomInt(0, 999)}`
-              );
-            });
+            roomResource
+              ?.create({ ...initialRoomState, activity: 'play' })
+              .map((s) => {
+                router.push(
+                  `play/${toRidAsStr(s.rid)}?userId=${getRandomInt(0, 999)}`
+                );
+              });
           }}
         >
           Play
+        </Button>
+        <Button
+          onClick={() => {
+            // console.log('works', roomResource);
+
+            roomResource
+              ?.create({ ...initialRoomState, activity: 'learn' })
+              .map((s) => {
+                router.push(
+                  `learn/${toRidAsStr(s.rid)}?userId=${getRandomInt(0, 999)}`
+                );
+              });
+          }}
+        >
+          Learn
         </Button>
       </main>
     </>

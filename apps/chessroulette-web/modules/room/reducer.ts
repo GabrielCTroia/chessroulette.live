@@ -24,7 +24,7 @@ export type RoomState = {
   //   [slot in UserSlot]: boolean;
   // };
   participants: Record<ParticipantId, unknown>;
-  activity: 'play' | 'analysis' | 'meetup' | 'none';
+  activity: 'play' | 'analysis' | 'meetup' | 'learn' | 'none';
   counter: number;
   // messages: ChatMsg[];
 };
