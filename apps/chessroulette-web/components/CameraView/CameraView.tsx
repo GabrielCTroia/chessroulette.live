@@ -1,13 +1,4 @@
 'use client';
-
-import {
-  ChessTerrain,
-  ChessBoard,
-  FENToChessBoard,
-  chessBoardToPieceLayout,
-} from 'chessterrain-react';
-import { Chess } from 'chess.js';
-import { JitsiMeeting } from '@jitsi/react-sdk';
 import { CSSProperties } from 'react';
 
 import demo1 from './assets/1.jpg';

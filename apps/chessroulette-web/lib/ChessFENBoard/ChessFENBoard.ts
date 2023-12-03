@@ -1,4 +1,5 @@
-import { ChessFEN } from 'chessterrain-react';
+// import { ChessFEN } from 'chessterrain-react';
+import { ChessFEN } from 'apps/chessroulette-web/components/Chessboard/type';
 import {
   FENBoard,
   FenBoardPieceSymbol,
@@ -8,7 +9,7 @@ import {
 import { Square } from 'chess.js';
 
 export default class ChessFENBoard {
-  static STARTING_FEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
+  static STARTING_FEN: ChessFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
 
   private _state: {
     board: FENBoard;
