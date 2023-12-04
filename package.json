@@ -9,6 +9,7 @@
   "dependencies": {
     "@jitsi/react-sdk": "^1.4.0",
     "@nx/next": "17.0.3",
+    "@prisma/client": "^5.1.1",
     "@vercel/analytics": "^1.1.1",
     "chess.js": "^1.0.0-beta.6",
     "chessterrain-react": "^0.0.1",
@@ -28,6 +29,7 @@
     "tslib": "^2.3.0"
   },
   "devDependencies": {
+    "@nx-tools/nx-prisma": "^5.1.0",
     "@nx/cypress": "17.0.3",
     "@nx/eslint": "17.0.3",
     "@nx/eslint-plugin": "17.0.3",
@@ -69,6 +71,7 @@
     "nx": "17.0.3",
     "postcss": "8.4.21",
     "prettier": "^2.6.2",
+    "prisma": "^5.1.1",
     "tailwindcss": "3.2.7",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
