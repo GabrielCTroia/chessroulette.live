@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { ChessFEN } from './type';
 import { ChessBoardAsClass } from './ChessBoardAsClass';
 import { Color, toLongColor } from 'chessterrain-react';
-import { Chess } from 'chess.js';
+import { Chess, Square } from 'chess.js';
 
 type Props = {
   sizePx: number;
@@ -17,11 +17,15 @@ const calcState = (fen?: ChessFEN) => {
     game: chess,
     fen: chess.fen(),
     turn: toLongColor(chess.turn()),
+    // movable: chess.moves(),
   };
 };
 
 export const Playboard = (props: Props) => {
   const [boardState, setBoardState] = useState(calcState(props.fen));
+  const [movable, setMovable] = useState<Square[]>();
+
+  // console.log('movable', movable);
 
   return (
     <ChessBoardAsClass
@@ -30,11 +34,21 @@ export const Playboard = (props: Props) => {
       fen={boardState.fen}
       orientation={boardState.turn}
       showAnnotations
+      movable={movable}
+      onPieceTouched={(p) => {
+        // console.log('touched', p);
+        setMovable(
+          boardState.game
+            .moves({ square: p.square, verbose: true })
+            .map((s) => s.to)
+        );
+      }}
       onMove={(p) => {
         try {
           boardState.game.move(p.move);
 
           setBoardState(calcState(boardState.game.fen()));
+          setMovable(undefined);
         } catch (e) {
           console.error(e);
         }

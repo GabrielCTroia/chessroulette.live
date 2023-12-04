@@ -6,11 +6,17 @@ export const hoveredOwnPieceSquareStyle: CSSProperties = {
   transform: 'scale(.925)',
 };
 
+export const movableSquareStyle: CSSProperties = {
+  background: 'rgba(0, 163, 255, .6)',
+  borderRadius: '50%',
+  transform: 'scale(.6)',
+};
+
 export const touchedPieceSquareStyle: CSSProperties = {
   background: 'rgba(0, 163, 255, .6)',
   borderRadius: '20%',
   // scale: '.9',
-  transform: 'scale(.9)',
+  transform: 'scale(.925)',
   // background: 'rgba(255, 0, 255)',
   // transform: 'scale(.3)',
   // transform: 'skew(100deg)',
