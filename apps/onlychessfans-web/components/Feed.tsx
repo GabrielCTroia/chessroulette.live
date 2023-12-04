@@ -12,6 +12,8 @@ type Props = {
 };
 
 export const Feed = (props: Props) => {
+  console.log('feed posts', props.posts);
+
   return (
     <ContainerWithDimensions
       className="w-full"
@@ -29,6 +31,7 @@ export const Feed = (props: Props) => {
                           @{post.author.username}
                         </a>
                       </div>
+                      <div>{post.createdAt.toLocaleDateString()}</div>
                       {/* <div>
                         {header.white} ({header.whiteElo}) - {header.black} (
                         {header.blackElo})
@@ -52,7 +55,7 @@ export const Feed = (props: Props) => {
                     </main>
                     <footer className="mt-4 flex justify-between">
                       <div>
-                        <button className="text-2xl">♡</button>
+                        <button className="text-2xl">♡ {post.likes}</button>
                         {/* <a href="#"></a> */}
                       </div>
                       <div>
@@ -73,18 +76,24 @@ export const Feed = (props: Props) => {
 
               return (
                 <article className="mb-10" key={i}>
-                  <header className="mb-2 flex justify-between">
-                    <div>
-                      By{' '}
-                      <a href={`u/${post.author.username}`}>
-                        @{post.author.username}
-                      </a>
+                  <header className="mb-2">
+                    <div className="flex justify-between">
+                      <div>
+                        By{' '}
+                        <a href={`u/${post.author.username}`}>
+                          @{post.author.username}
+                        </a>
+                      </div>
+                      <div>{post.createdAt.toLocaleDateString()}</div>
                     </div>
-                    <div>
-                      {header.white} ({header.whiteElo}) - {header.black} (
-                      {header.blackElo})
+
+                    <div className="flex justify-between">
+                      <div>
+                        {header.white} ({header.whiteElo}) - {header.black} (
+                        {header.blackElo})
+                      </div>
+                      <div>{header.result}</div>
                     </div>
-                    <div>{header.result}</div>
                   </header>
                   <main className="bg-white overflow-hidden rounded-lg">
                     <Chessboard
@@ -103,7 +112,7 @@ export const Feed = (props: Props) => {
                   </main>
                   <footer className="mt-4 flex justify-between">
                     <div>
-                      <button className="text-2xl">♡</button>
+                      <button className="text-2xl">♡ {post.likes} </button>
                       {/* <a href="#"></a> */}
                     </div>
                     <div>

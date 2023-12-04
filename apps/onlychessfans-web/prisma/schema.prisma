@@ -35,6 +35,10 @@ model Post {
   // published Boolean @default(false)
   author         User   @relation(fields: [authorUsername], references: [username])
   authorUsername String
+  likedBy        User[] @relation("likes")
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  // PostLikes      PostLikes[]
 }
 
 model User {
@@ -46,6 +50,18 @@ model User {
   createdAt DateTime @default(now()) @map(name: "created_at")
   updatedAt DateTime @updatedAt @map(name: "updated_at")
   posts     Post[]
+  liked     Post[]   @relation("likes")
+  // PostLikes PostLikes[]
 
   @@map(name: "users")
 }
+
+// model PostLikes {
+//   post       Post     @relation(fields: [postId], references: [id])
+//   postId     String // relation scalar field (used in the `@relation` attribute above)
+//   user       User     @relation(fields: [byUsername], references: [username])
+//   byUsername String // relation scalar field (used in the `@relation` attribute above)
+//   createdAt  DateTime @default(now())
+
+//   @@id([postId, byUsername])
+// }

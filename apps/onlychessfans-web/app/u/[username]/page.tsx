@@ -22,11 +22,23 @@ async function getData(username: string) {
       author: {
         select: { firstName: true, lastName: true, username: true },
       },
+      likedBy: {
+        select: { username: true },
+      },
+      _count: {
+        select: { likedBy: true },
+      },
     },
   });
 
   return {
-    props: { posts: posts as DisplayablePost[] },
+    props: {
+      posts: posts.map((p) => ({
+        ...p,
+        likedBy: p.likedBy,
+        likes: p._count.likedBy,
+      })) as DisplayablePost[],
+    },
     revalidate: 10,
   };
 

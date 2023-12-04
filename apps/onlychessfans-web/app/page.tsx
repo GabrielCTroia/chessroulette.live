@@ -18,11 +18,25 @@ async function getData() {
       author: {
         select: { firstName: true, lastName: true, username: true },
       },
+      likedBy: {
+        select: { username: true },
+      },
+      _count: {
+        select: { likedBy: true },
+      },
     },
   });
 
+  // console.log('posts again', posts[0]._count.);
+
   return {
-    props: { posts: posts as DisplayablePost[] },
+    props: {
+      posts: posts.map((p) => ({
+        ...p,
+        likedBy: p.likedBy,
+        likes: p._count.likedBy,
+      })) as DisplayablePost[],
+    },
     revalidate: 10,
   };
 
@@ -47,7 +61,7 @@ export default async function Page() {
     <div className="gap-2 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)]">
       <Header />
       <main className="mt-6 flex items-center justify-center">
-        <div className='min-w-[25%]'>
+        <div className="min-w-[25%]">
           <Submit
           // onSubmit={(input) => {
           //   console.log('pgn', input);

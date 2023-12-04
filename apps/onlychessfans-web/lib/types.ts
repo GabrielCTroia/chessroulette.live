@@ -6,6 +6,10 @@ export type DisplayableUser = Pick<User, 'firstName' | 'lastName' | 'username'>;
 export type DisplayablePost = {
   id: string;
   author: DisplayableUser;
+  likes: number;
+  likedBy: Pick<DisplayableUser, 'username'>[];
+  createdAt: Date;
+  updatedAt: Date;
   // categories: string[];
 } & (
   | {
