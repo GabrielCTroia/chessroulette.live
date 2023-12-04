@@ -49,3 +49,6 @@ yalc.lock
 
 # Movex
 .movex
+
+.env
+.env*

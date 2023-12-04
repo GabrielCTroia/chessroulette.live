@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 
 export default function Page() {
   return (
-    <div className="gap-2 pl-[max(env(safe-area-inset-left),3.5rem)] pr-[max(env(safe-area-inset-right),3.5rem)]">
+    <div className="gap-2 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)]">
       <Header />
       <main className="mt-10 flex items-center justify-center">
         <div>
@@ -19,7 +19,7 @@ export default function Page() {
             //   console.log('pgn', input);
             // }}
           />
-          <BoardList games={games} itemBoardSizePx={400} />
+          <BoardList games={games} />
         </div>
       </main>
     </div>

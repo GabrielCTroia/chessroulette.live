@@ -2,7 +2,9 @@
   "name": "@xmatter/source",
   "version": "0.0.0",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "seed": "node -r dotenv/config ./scripts/seed.js"
+  },
   "private": true,
   "dependencies": {
     "@jitsi/react-sdk": "^1.4.0",
