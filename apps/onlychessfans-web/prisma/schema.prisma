@@ -1,7 +1,7 @@
 // Local
 
 generator client {
-  provider        = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -9,12 +9,10 @@ datasource db {
   url      = "file:./db.sql"
 }
 
-model Todo {
-  id String @id @default(cuid())
-  @@map("todos")
-}
-
-
+// model Todo {
+//   id String @id @default(cuid())
+//   @@map("todos")
+// }
 
 // schema.prisma
 
@@ -31,22 +29,23 @@ model Todo {
 // }
 
 model Post {
-  id        String     @default(cuid()) @id
-  title     String
-  content   String?
+  id             String @id @default(cuid())
+  type           String // PGN | FEN
+  content        String
   // published Boolean @default(false)
-  author    User?   @relation(fields: [authorId], references: [id])
-  authorId  String?
+  author         User   @relation(fields: [authorUsername], references: [username])
+  authorUsername String
 }
 
 model User {
-  id            String   @default(cuid()) @id
-  email         String   @unique
-  username      String   @unique
-  firstName     String?
-  lastName      String?
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @updatedAt @map(name: "updated_at")
-  posts         Post[]
+  id        String   @id @default(cuid())
+  email     String   @unique
+  username  String   @unique
+  firstName String?
+  lastName  String?
+  createdAt DateTime @default(now()) @map(name: "created_at")
+  updatedAt DateTime @updatedAt @map(name: "updated_at")
+  posts     Post[]
+
   @@map(name: "users")
 }

@@ -1,19 +1,23 @@
 import { Metadata } from 'next';
-import Header from './_components/Header';
-import { games } from './_data';
-import { Submit } from './_components/Submit';
-import { Feed } from '../components/Feed';
+// import Header from './_components/Header';
+// import { games } from './_data';
+// import { Submit } from './_components/Submit';
+// import { Feed } from '../components/Feed';
 
-import prisma from '../lib/prisma';
-import { DisplayablePost } from '../lib/types';
+// import prisma from '../lib/prisma';
+// import { DisplayablePost } from '../lib/types';
+import Header from '../../_components/Header';
+import prisma from 'apps/onlychessfans-web/lib/prisma';
+import { DisplayablePost } from 'apps/onlychessfans-web/lib/types';
+import { Feed } from 'apps/onlychessfans-web/components/Feed';
 
 export const metadata: Metadata = {
   title: 'Only Chess Fans',
 };
 
-async function getData() {
+async function getData(username: string) {
   const posts = await prisma.post.findMany({
-    // where: { published: true },
+    where: { authorUsername: username },
     include: {
       author: {
         select: { firstName: true, lastName: true, username: true },
@@ -40,19 +44,18 @@ async function getData() {
   // return res.json();
 }
 
-export default async function Page() {
-  const data = await getData();
+export default async function Page({
+  params: { username },
+}: {
+  params: { username: string };
+}) {
+  const data = await getData(username);
 
   return (
     <div className="gap-2 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)]">
       <Header />
       <main className="mt-6 flex items-center justify-center">
-        <div className='min-w-[25%]'>
-          <Submit
-          // onSubmit={(input) => {
-          //   console.log('pgn', input);
-          // }}
-          />
+        <div className="min-w-[25%]">
           {/* {data.props.posts.map((p) => {
             return <div>{m.author.firstName}</div>;
           })} */}
