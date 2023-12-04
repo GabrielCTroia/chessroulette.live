@@ -113,37 +113,5 @@ export const pgnToFen = (pgn: ChessPGN) => {
 
   instance.loadPgn(pgn);
 
-  console.log(instance.header());
-
   return instance.fen();
-};
-
-type PGNHeader = {
-  date?: Date;
-  result?: string;
-  // winner?: 'white' | 'black' | d;
-  white?: string;
-  whiteElo?: number;
-  black?: string;
-  blackElo?: number;
-};
-
-export const getPgnDetails = (pgn: ChessPGN) => {
-  const instance = new Chess();
-
-  instance.loadPgn(pgn);
-
-  const header = instance.header();
-
-  return {
-    fen: instance.fen(),
-    header: {
-      date: header.Date,
-      result: header.Result,
-      white: header.White,
-      whiteElo: header.WhiteElo ? Number(header.WhiteElo) : undefined,
-      black: header.Black,
-      blackElo: header.BlackElo ? Number(header.BlackElo) : undefined,
-    },
-  };
 };
