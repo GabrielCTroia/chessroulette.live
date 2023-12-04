@@ -4,11 +4,6 @@ import movexConfig from 'apps/chessroulette-web/movex.config';
 import { ResourceIdentifier } from 'movex-core-util';
 import { MovexBoundResource } from 'movex-react';
 import { ContainerWithDimensions } from 'apps/chessroulette-web/components/ContainerWithDimensions';
-import {
-  ChessBoard,
-  ChessFEN,
-  chessBoardToPieceLayout,
-} from 'chessterrain-react';
 import { Chess, Color, Square } from 'chess.js';
 import { useState } from 'react';
 import {
@@ -21,6 +16,9 @@ import {
   fenBoardPieceSymbolToDetailed,
   fenBoardToChessBoard,
 } from 'apps/chessroulette-web/lib/ChessFENBoard/chessUtils';
+import { ChessFEN } from 'apps/chessroulette-web/components/Chessboard/type';
+import { Chessboard } from 'react-chessboard';
+import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 
 type ChessColor = 'white' | 'black';
 
@@ -64,9 +62,10 @@ const calcState = (fen?: ChessFEN) => {
   return {
     // chess,
     chessBoard: fenBoard,
-    pieceLayoutState: chessBoardToPieceLayout(
-      fenBoardToChessBoard(fenBoard.board)
-    ),
+    fen: fenBoard.fen,
+    // pieceLayoutState: chessBoardToPieceLayout(
+    //   fenBoardToChessBoard(fenBoard.board)
+    // ),
     // turn: chess.turn() === 'b' ? 'black' : ('white' as ChessColor),
   };
 };
@@ -87,91 +86,92 @@ export default ({ playingColor = 'white', ...props }: Props) => {
           <ContainerWithDimensions
             className="h-full w-full"
             render={(s) => (
-              <ChessBoard
-                sizePx={s.height}
-                playingColor={'black'}
-                pieceLayoutState={boardState.pieceLayoutState}
-                onMove={(p) => {
-                  // console.log('learn on move', chess.board());
+              <Freeboard sizePx={s.height} />
+              // <ChessBoard
+              //   sizePx={s.height}
+              //   playingColor={'black'}
+              //   pieceLayoutState={boardState.pieceLayoutState}
+              //   onMove={(p) => {
+              //     // console.log('learn on move', chess.board());
 
-                  // const prevBoard = boardState.chessBoard;
+              //     // const prevBoard = boardState.chessBoard;
 
-                  try {
-                    boardState.chessBoard.move(p.move.from, p.move.to);
+              //     try {
+              //       boardState.chessBoard.move(p.move.from, p.move.to);
 
-                    setBoardState(calcState(boardState.chessBoard.fen));
-                  } catch (e) {
-                    console.warn('No piece to move Error');
-                  }
+              //       setBoardState(calcState(boardState.chessBoard.fen));
+              //     } catch (e) {
+              //       console.warn('No piece to move Error');
+              //     }
 
-                  // const movingFenPiece = boardState.chessBoard.piece(
-                  //   p.move.from
-                  // );
-                  // const movingPiece = movingFenPiece
-                  //   ? fenBoardPieceSymbolToDetailed(movingFenPiece)
-                  //   : undefined;
+              //     // const movingFenPiece = boardState.chessBoard.piece(
+              //     //   p.move.from
+              //     // );
+              //     // const movingPiece = movingFenPiece
+              //     //   ? fenBoardPieceSymbolToDetailed(movingFenPiece)
+              //     //   : undefined;
 
-                  // console.log('movingPiece', movingPiece);
+              //     // console.log('movingPiece', movingPiece);
 
-                  // p.move.from.
-                  // console.log(
-                  //   'alphaNotationToMatrixIndex',
-                  //   p.move.from,
-                  //   alphaNotationToMatrixIndex(p.move.from),
-                  //   '>',
-                  //   p.move.to,
-                  //   alphaNotationToMatrixIndex(p.move.to)
-                  // );
-                  // const nextState = calcState(props.fen);
+              //     // p.move.from.
+              //     // console.log(
+              //     //   'alphaNotationToMatrixIndex',
+              //     //   p.move.from,
+              //     //   alphaNotationToMatrixIndex(p.move.from),
+              //     //   '>',
+              //     //   p.move.to,
+              //     //   alphaNotationToMatrixIndex(p.move.to)
+              //     // );
+              //     // const nextState = calcState(props.fen);
 
-                  // const nextBoard = matrixInsertMany(boardState.chessBoard, [
-                  //   {
-                  //     index: alphaNotationToMatrixIndex(p.move.from),
-                  //     nextVal: null,
-                  //   },
-                  //   {
-                  //     index: alphaNotationToMatrixIndex(p.move.to),
-                  //     nextVal: {
-                  //       square: p.move.to,
-                  //       type: movingPiece.type,
-                  //       color: movingPiece.color,
-                  //     },
-                  //   },
-                  // ]);
+              //     // const nextBoard = matrixInsertMany(boardState.chessBoard, [
+              //     //   {
+              //     //     index: alphaNotationToMatrixIndex(p.move.from),
+              //     //     nextVal: null,
+              //     //   },
+              //     //   {
+              //     //     index: alphaNotationToMatrixIndex(p.move.to),
+              //     //     nextVal: {
+              //     //       square: p.move.to,
+              //     //       type: movingPiece.type,
+              //     //       color: movingPiece.color,
+              //     //     },
+              //     //   },
+              //     // ]);
 
-                  // setBoardState((prev) => ({
-                  //   ...prev,
-                  //   chessBoard: nextBoard,
-                  //   pieceLayoutState: chessBoardToPieceLayout(nextBoard),
-                  //   // turn: (chess.turn() === 'b'
-                  //   //   ? 'black'
-                  //   //   : 'white') as ChessColor,
-                  // }));
+              //     // setBoardState((prev) => ({
+              //     //   ...prev,
+              //     //   chessBoard: nextBoard,
+              //     //   pieceLayoutState: chessBoardToPieceLayout(nextBoard),
+              //     //   // turn: (chess.turn() === 'b'
+              //     //   //   ? 'black'
+              //     //   //   : 'white') as ChessColor,
+              //     // }));
 
-                  // try {
-                  //   const movingPiece = chess.get(p.move.from);
+              //     // try {
+              //     //   const movingPiece = chess.get(p.move.from);
 
-                  //   console.log('movingPiece', movingPiece);
+              //     //   console.log('movingPiece', movingPiece);
 
-                  //   chess.remove(p.move.from);
-                  //   chess.put(movingPiece, p.move.to);
+              //     //   chess.remove(p.move.from);
+              //     //   chess.put(movingPiece, p.move.to);
 
-                  //   console.log('learn on move', chess.turn());
+              //     //   console.log('learn on move', chess.turn());
 
-                  //   const nextchessBoard = chess.board();
+              //     //   const nextchessBoard = chess.board();
 
-                  //   setBoardState((prev) => ({
-                  //     chessBoard: nextchessBoard,
-                  //     pieceLayoutState: chessBoardToPieceLayout(nextchessBoard),
-                  //     turn: (chess.turn() === 'b'
-                  //       ? 'black'
-                  //       : 'white') as ChessColor,
-                  //   }));
-                  // } catch (e) {
-                  //   console.log('move invalid', p.move);
-                  // }
-                }}
-              />
+              //     //   setBoardState((prev) => ({
+              //     //     chessBoard: nextchessBoard,
+              //     //     pieceLayoutState: chessBoardToPieceLayout(nextchessBoard),
+              //     //     turn: (chess.turn() === 'b'
+              //     //       ? 'black'
+              //     //       : 'white') as ChessColor,
+              //     //   }));
+              //     // } catch (e) {
+              //     //   console.log('move invalid', p.move);
+              //     // }
+              //   }}
+              // />
             )}
           />
         );

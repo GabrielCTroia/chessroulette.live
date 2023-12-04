@@ -9,7 +9,7 @@
     "@nx/next": "17.0.3",
     "@vercel/analytics": "^1.1.1",
     "chess.js": "^1.0.0-beta.6",
-    "chessterrain-react": "^0.0.1",
+    "chessterrain-react": "file:.yalc/chessterrain-react",
     "debounce": "^2.0.0",
     "movex": "file:.yalc/movex",
     "movex-core-util": "file:.yalc/movex-core-util",
@@ -20,6 +20,7 @@
     "movex-store": "file:.yalc/movex-store",
     "next": "^14.0.3",
     "react": "^18.2.0",
+    "react-chessboard": "^4.3.2",
     "react-dom": "^18.2.0",
     "server-only": "^0.0.1",
     "tslib": "^2.3.0"
