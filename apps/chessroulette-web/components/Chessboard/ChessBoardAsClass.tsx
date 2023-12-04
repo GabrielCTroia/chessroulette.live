@@ -13,8 +13,8 @@ import {
   toDictIndexedBy,
   Terrain,
   GeneralBoardState,
+  Color,
 } from 'chessterrain-react';
-import { Chess } from 'chess.js';
 import { ChessFEN, ChessMove } from './type';
 import { chessBoardToPieceLayout, relativeCoordToSquare } from './util';
 import {
@@ -31,18 +31,16 @@ import ChessFENBoard from 'apps/chessroulette-web/lib/ChessFENBoard/ChessFENBoar
 // TODO: The identifiablePiece should be given gerneically so the pieceSTate is inferrred correctly outside
 export type ChessBoardAsClassProps = Pick<
   ChessTerrainProps,
-  'sizePx' | 'playingColor' | 'showAnnotations'
+  'sizePx' | 'playingColor' | 'showAnnotations' | 'orientation'
 > & {
   // pieceLayoutState: GeneralPieceLayoutState<PieceRegistry>; // TODO: PieceRegistry this can be hardcoded for chess
   fen?: ChessFEN;
   onMove: (p: { move: ChessMove }) => void;
 };
 
-const terrain = new Terrain({ props: { width: 8 } });
+// const gameClient = new Chess();
 
-const gameClient = new Chess();
-
-const startingChessBoard = gameClient.board();
+// const startingChessBoard = gameClient.board();
 
 // export type PieceWithCoord = {
 //   piece: IdentifiablePieceState;
@@ -82,7 +80,9 @@ export class ChessBoardAsClass extends React.Component<
     styledSquares: CLEAR_STYLED_SQUARES_STATE,
     board: {
       terrainState: new Terrain({ props: { width: 8 } }).state,
-      pieceLayoutState: chessBoardToPieceLayout(startingChessBoard),
+      pieceLayoutState: chessBoardToPieceLayout(
+        fenBoardToChessBoard(new ChessFENBoard(this.props.fen).board)
+      ),
     },
   };
 
@@ -210,32 +210,32 @@ export class ChessBoardAsClass extends React.Component<
     // );
   };
 
-  private onPieceClicked = (p: RelativeCoordsWithPiece) => {
-    const { touchedPiece } = this.state;
+  // private onPieceClicked = (p: RelativeCoordsWithPiece) => {
+  //   const { touchedPiece } = this.state;
 
-    // If the next Touched Piece is also mine (but moving) maybe the Touched Piece wants to take it's place there
-    if (touchedPiece) {
-      // TODO: move
-      // const drawingResult = this.attemptToDrawArrowForTouchedPiece({
-      //   to: p.relativeCoords,
-      //   piece: touchedPiece.piece,
-      //   from: touchedPiece.coord,
-      // });
-      // if (drawingResult.ok) {
-      //   this.clearTouchedPiece();
-      //   return;
-      // }
-      if (touchedPiece.piece.id === p.piece.id) {
-        this.touchPiece(undefined);
-        return;
-      }
-    }
+  //   // If the next Touched Piece is also mine (but moving) maybe the Touched Piece wants to take it's place there
+  //   if (touchedPiece) {
+  //     // TODO: move
+  //     // const drawingResult = this.attemptToDrawArrowForTouchedPiece({
+  //     //   to: p.relativeCoords,
+  //     //   piece: touchedPiece.piece,
+  //     //   from: touchedPiece.coord,
+  //     // });
+  //     // if (drawingResult.ok) {
+  //     //   this.clearTouchedPiece();
+  //     //   return;
+  //     // }
+  //     if (touchedPiece.piece.id === p.piece.id) {
+  //       this.touchPiece(undefined);
+  //       return;
+  //     }
+  //   }
 
-    // Otherwise, if the Piece is mine, it means: "touch"
-    if (toShortColor(this.props.playingColor) === p.piece.color) {
-      this.touchPiece(p);
-    }
-  };
+  //   // Otherwise, if the Piece is mine, it means: "touch"
+  //   if (toShortColor(this.props.playingColor) === p.piece.color) {
+  //     this.touchPiece(p);
+  //   }
+  // };
 
   onEmptySquareClicked = (coords: RelativeCoord) => {
     this.setState({
