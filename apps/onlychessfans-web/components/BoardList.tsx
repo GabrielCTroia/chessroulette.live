@@ -24,7 +24,7 @@ export const BoardList = (props: Props) => {
               const { fen, header } = getPgnDetails(game.pgn);
 
               return (
-                <article className="mb-10">
+                <article className="mb-10" key={i}>
                   <header className="mb-2 flex justify-between">
                     <div>
                       {header.white} ({header.whiteElo}) - {header.black} (
@@ -34,7 +34,6 @@ export const BoardList = (props: Props) => {
                   </header>
                   <main className="bg-white overflow-hidden rounded-lg">
                     <Chessboard
-                      key={i}
                       position={fen}
                       boardWidth={width}
                       showBoardNotation

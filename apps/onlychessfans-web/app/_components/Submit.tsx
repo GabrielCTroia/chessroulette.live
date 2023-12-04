@@ -22,7 +22,7 @@ export const Submit = (props: Props) => {
   };
 
   return (
-    <div className="pb-10">
+    <div className="pb-10 flex justify-center">
       {/* {show && (
         <div></div>
       )}
@@ -36,7 +36,7 @@ export const Submit = (props: Props) => {
           setShow(true);
         }}
       >
-        +
+        Add Your Own Position 😍 💦
       </button>
 
       {show && (
