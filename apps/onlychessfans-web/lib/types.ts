@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { Post, User } from '@prisma/client';
 import { ChessFEN, ChessPGN } from './util';
 
 export type DisplayableUser = Pick<User, 'firstName' | 'lastName' | 'username'>;
@@ -21,3 +21,4 @@ export type DisplayablePost = {
       content: ChessFEN;
     }
 );
+

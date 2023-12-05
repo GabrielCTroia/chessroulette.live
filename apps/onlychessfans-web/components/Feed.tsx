@@ -4,15 +4,29 @@ import { Chessboard } from 'react-chessboard';
 import { ChessFEN, ChessPGN, getPgnDetails } from '../lib/util';
 import { ContainerWithDimensions } from './ContainerWithDimensions';
 import { DisplayablePost, DisplayableUser } from '../lib/types';
+import LikeButton from './LikeButton';
+import { useOptimistic } from 'react';
+import { useRouter } from 'next/navigation';
 
 type Props = {
   posts: DisplayablePost[];
   // itemBoardSizePx: number;
   containerClassName?: string;
+  seenByUsername?: DisplayableUser['username'];
+  onPostLiked: (p: { id: DisplayablePost['id'] }) => Promise<unknown>;
+  onPostDisliked: (p: { id: DisplayablePost['id'] }) => Promise<unknown>;
 };
 
 export const Feed = (props: Props) => {
+  const router = useRouter();
   console.log('feed posts', props.posts);
+  // const [optimisticMessages, addOptimisticMessage] = useOptimistic<Message[]>(
+  //   messages,
+  //   (state: Message[], newMessage: string) => [
+  //     ...state,
+  //     { message: newMessage },
+  //   ]
+  // );
 
   return (
     <ContainerWithDimensions
@@ -24,10 +38,13 @@ export const Feed = (props: Props) => {
               if (post.type === 'FEN') {
                 return (
                   <article className="mb-10" key={i}>
-                    <header className="mb-2 flex justify-between">
-                      <div>
+                    <header className="mb-2 flex justify-between text-slate-500">
+                      <div className="">
                         By{' '}
-                        <a href={`u/${post.author.username}`}>
+                        <a
+                          href={`u/${post.author.username}`}
+                          className="underline text-blue-400"
+                        >
                           @{post.author.username}
                         </a>
                       </div>
@@ -55,7 +72,28 @@ export const Feed = (props: Props) => {
                     </main>
                     <footer className="mt-4 flex justify-between">
                       <div>
-                        <button className="text-2xl">♡ {post.likes}</button>
+                        {/* <button className="text-2xl">♡ {post.likes}</button> */}
+                        <LikeButton
+                          liked={
+                            !!(
+                              props.seenByUsername &&
+                              post.likedBy
+                                .map((m) => m.username)
+                                .indexOf(props.seenByUsername) > -1
+                            )
+                          }
+                          likesCount={post.likes}
+                          onLike={async () => {
+                            await props.onPostLiked(post);
+
+                            router.refresh();
+                          }}
+                          onDislike={async () => {
+                            await props.onPostDisliked(post);
+
+                            router.refresh();
+                          }}
+                        />
                         {/* <a href="#"></a> */}
                       </div>
                       <div>
@@ -77,10 +115,13 @@ export const Feed = (props: Props) => {
               return (
                 <article className="mb-10" key={i}>
                   <header className="mb-2">
-                    <div className="flex justify-between">
-                      <div>
+                    <div className="flex justify-between text-slate-500">
+                      <div className="">
                         By{' '}
-                        <a href={`u/${post.author.username}`}>
+                        <a
+                          href={`u/${post.author.username}`}
+                          className="underline text-blue-400"
+                        >
                           @{post.author.username}
                         </a>
                       </div>
@@ -112,7 +153,36 @@ export const Feed = (props: Props) => {
                   </main>
                   <footer className="mt-4 flex justify-between">
                     <div>
-                      <button className="text-2xl">♡ {post.likes} </button>
+                      <LikeButton
+                        liked={
+                          !!(
+                            props.seenByUsername &&
+                            post.likedBy
+                              .map((m) => m.username)
+                              .indexOf(props.seenByUsername) > -1
+                          )
+                        }
+                        likesCount={post.likes}
+                        onLike={async () => {
+                          await props.onPostLiked(post);
+
+                          router.refresh();
+                        }}
+                        onDislike={async () => {
+                          await props.onPostDisliked(post);
+
+                          router.refresh();
+                        }}
+                      />
+                      {/* <button className="text-2xl">
+                        {props.seenByUsername &&
+                        post.likedBy
+                          .map((m) => m.username)
+                          .indexOf(props.seenByUsername) > -1
+                          ? '❤️'
+                          : '♡'}{' '}
+                        {post.likes}
+                      </button> */}
                       {/* <a href="#"></a> */}
                     </div>
                     <div>
