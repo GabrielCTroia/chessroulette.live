@@ -36,7 +36,7 @@ export const Submit = (props: Props) => {
           setShow(true);
         }}
       >
-        Add Your Own Position 😍 💦
+        Add Your Own Position <span className='text-lg'>😍</span>
       </button>
 
       {show && (
@@ -96,7 +96,7 @@ export const Submit = (props: Props) => {
                   // for="message"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
-                  Paste Your Kinky Game PGN or FEN below 👇
+                  Paste Your Sexy Game PGN or FEN below 👇
                 </label>
                 <textarea
                   // id="message"

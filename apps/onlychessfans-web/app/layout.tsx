@@ -26,7 +26,7 @@ export default async function RootLayout({
         >
           <Header className="" />
         </div>
-        <div className="p-20">
+        <div className="pt-32">
           <StyledJsxRegistry>{children}</StyledJsxRegistry>
         </div>
       </body>

@@ -57,6 +57,7 @@ export const Feed = (props: Props) => {
                     </header>
                     <main className="bg-white overflow-hidden rounded-lg">
                       <Chessboard
+                        id={post.id}
                         position={post.content}
                         boardWidth={width}
                         showBoardNotation
