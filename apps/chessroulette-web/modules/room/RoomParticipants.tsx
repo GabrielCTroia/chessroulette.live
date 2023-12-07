@@ -46,9 +46,9 @@ export default (props: Props) => {
           },
         });
       }}
-      onResourceStateUpdated={(r) => {
-        console.log('next state', r);
-      }}
+      // onResourceStateUpdated={(r) => {
+      //   console.log('next state', r);
+      // }}
       render={({ boundResource: { state, dispatch } }) => {
         console.log('state', state);
         const userId = searchParams.get('userId');

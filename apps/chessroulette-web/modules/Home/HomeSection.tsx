@@ -4,7 +4,7 @@ import { Button } from 'apps/chessroulette-web/components/Button';
 import movexConfig from 'apps/chessroulette-web/movex.config';
 import {
   MovexBoundResource,
-  MovexConnection,
+  // MovexConnection,
   useMovexResourceType,
 } from 'movex-react';
 import { initialRoomState } from '../room/reducer';
