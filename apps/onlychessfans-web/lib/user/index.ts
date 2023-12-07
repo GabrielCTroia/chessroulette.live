@@ -2,6 +2,8 @@ import { LOGGEDIN_USER } from 'apps/onlychessfans-web/config';
 import prisma from '../prisma';
 
 export async function getAuthenticatedUser() {
+  'use server';
+
   const user = await prisma.user.findFirst({
     where: { username: LOGGEDIN_USER },
     // include: {
@@ -20,7 +22,7 @@ export async function getAuthenticatedUser() {
   // console.log('posts again', posts[0]._count.);
 
   return {
-    props: { user },
+    props: { user: user || undefined },
     revalidate: 10,
   };
 

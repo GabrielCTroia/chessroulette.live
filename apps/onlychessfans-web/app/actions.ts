@@ -1,9 +1,9 @@
 'use server';
 
-import { revalidateTag } from 'next/cache';
 import prisma from '../lib/prisma';
 import { Post, User } from '@prisma/client';
 import { DisplayablePost } from '../lib/types';
+import { getAuthenticatedUser } from '../lib/user';
 
 export async function getPosts(props?: {
   queriedByUsername?: User['username'];
@@ -60,8 +60,17 @@ export async function getPosts(props?: {
 //   revalidateTag('posts')
 // }
 
-export async function likePost(props: { user: User; postId: Post['id'] }) {
+export async function likePost(props: {
+  // user: User;
+  postId: Post['id'];
+}) {
   'use server';
+
+  const authenticatedUser = await getAuthenticatedUser();
+
+  if (!authenticatedUser.props.user) {
+    return;
+  }
 
   return await prisma.post.update({
     where: {
@@ -74,7 +83,8 @@ export async function likePost(props: { user: User; postId: Post['id'] }) {
     },
     data: {
       likedBy: {
-        connect: [props.user],
+        // connect: [props.user],
+        connect: [authenticatedUser.props.user],
       },
       // likedBy: authenticatedUser.props.user.username,
     },
@@ -84,8 +94,17 @@ export async function likePost(props: { user: User; postId: Post['id'] }) {
   // revalidate cache
 }
 
-export async function dislikePost(props: { user: User; postId: Post['id'] }) {
+export async function dislikePost(props: {
+  // user: User;
+  postId: Post['id'];
+}) {
   'use server';
+
+  const authenticatedUser = await getAuthenticatedUser();
+
+  if (!authenticatedUser.props.user) {
+    return;
+  }
 
   return await prisma.post.update({
     where: {
@@ -98,7 +117,8 @@ export async function dislikePost(props: { user: User; postId: Post['id'] }) {
     },
     data: {
       likedBy: {
-        disconnect: [props.user],
+        // disconnect: [props.user],
+        disconnect: [authenticatedUser.props.user],
       },
       // likedBy: authenticatedUser.props.user.username,
     },

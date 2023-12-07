@@ -1,15 +1,8 @@
 import { Metadata } from 'next';
-import Header from './_components/Header';
-import { games } from './_data';
 import { Submit } from './_components/Submit';
-import { Feed } from '../components/Feed';
-
-import prisma from '../lib/prisma';
-import { DisplayablePost } from '../lib/types';
+import { SSRFeed } from '../modules/Feed';
 import { getAuthenticatedUser } from '../lib/user';
-import { User } from '@prisma/client';
-import { useOptimistic } from 'react';
-import { getPosts, likePost, dislikePost } from './actions';
+import { getPosts } from './actions';
 
 export const metadata: Metadata = {
   title: 'Only Chess Fans',
@@ -21,50 +14,15 @@ export default async function Page() {
     props: { posts },
   } = await getPosts();
 
-  // const [optimisticMessages, addOptimisticMessage] = useOptimistic<DisplayablePost[]>(
-  //   data.props.posts,
-  //   (state: DisplayablePost[], newMessage: string) => [
-  //     ...state,
-  //     { message: newMessage },
-  //   ]
-  // )
-
   return (
-    <div className="gap-2 pl-[max(env(safe-area-inset-left),1.5rem)] pr-[max(env(safe-area-inset-right),1.5rem)]">
+    <div className="gap-2 pl-[max(env(safe-area-inset-left),1rem)] pr-[max(env(safe-area-inset-right),1rem)]">
       <main className="mt-6 flex items-center justify-center">
-        <div className="min-w-[25%]">
-          <Submit
-          // onSubmit={(input) => {
-          //   console.log('pgn', input);
-          // }}
-          />
-          {/* {data.props.posts.map((p) => {
-            return <div>{m.author.firstName}</div>;
-          })} */}
-          {/* {authenticatedUser.props.user?.username} */}
-          <Feed
+        <div className="min-w-full sm:min-w-[70%] md:min-w-[30%]">
+          <Submit />
+
+          <SSRFeed
             posts={posts}
-            seenByUsername={authenticatedUser.props.user?.username}
-            onPostLiked={async ({ id }) => {
-              'use server';
-
-              if (authenticatedUser.props.user) {
-                likePost({
-                  user: authenticatedUser.props.user,
-                  postId: id,
-                });
-              }
-            }}
-            onPostDisliked={async ({ id }) => {
-              'use server';
-
-              if (authenticatedUser.props.user) {
-                dislikePost({
-                  user: authenticatedUser.props.user,
-                  postId: id,
-                });
-              }
-            }}
+            authenticatedUser={authenticatedUser.props.user}
           />
         </div>
       </main>
