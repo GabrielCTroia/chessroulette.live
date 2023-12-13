@@ -1,4 +1,5 @@
 import { Action } from 'movex-core-util';
+import activityReducer, { ActivityActions, ActivityState } from './activity/reducer';
 
 // export const userSlots = {
 //   pink: true,
@@ -24,14 +25,17 @@ export type RoomState = {
   //   [slot in UserSlot]: boolean;
   // };
   participants: Record<ParticipantId, unknown>;
-  activity: 'play' | 'analysis' | 'meetup' | 'learn' | 'none';
+  activity: ActivityState;
   counter: number;
   // messages: ChatMsg[];
 };
 
 export const initialRoomState: RoomState = {
   participants: {},
-  activity: 'none',
+  activity: {
+    activityType: 'none',
+    activityState: {},
+  },
   counter: 0,
   // messages: [],
 };
@@ -51,7 +55,8 @@ export type RoomActions =
         participantId: ParticipantId;
       }
     >
-  | Action<'inc'>;
+  | Action<'inc'>
+  | ActivityActions;
 // | Action<
 //     'submit',
 //     {
@@ -83,12 +88,14 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
       ...state,
       participants: nextParticipants,
     };
-  } else if (action.type === 'inc') {
-    return {
-      ...state,
-      counter: state.counter + 1,
-    };
   }
+
+  // else if (action.type === 'inc') {
+  //   return {
+  //     ...state,
+  //     counter: state.counter + 1,
+  //   };
+  // }
 
   // // Message gets submitted
   // else if (action.type === 'submit') {
@@ -99,6 +106,16 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
   //     messages: [...state.messages, nextMsg],
   //   };
   // }
+
+  // TODO: This should be done differently!
+  if (action.type === 'dropPiece') {
+
+    console.log('heere')
+    return {
+      ...state,
+      activity: activityReducer(state.activity, action)
+    };
+  }
 
   return state;
 };

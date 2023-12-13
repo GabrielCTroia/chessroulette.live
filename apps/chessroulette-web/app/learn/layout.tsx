@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import RoomTemplate from 'apps/chessroulette-web/templates/RoomTemplate';
 
 export const metadata: Metadata = {
-  title: 'Class Room',
+  title: 'Chessroulette | Learn',
   description: 'Welcome to Chessroulette',
 };
 

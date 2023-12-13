@@ -6,6 +6,14 @@ body {
   background-color: #161A2B;
   color: white;
 }
+
+
+* { 
+  /* box-sizing: border-box; */
+  /* min-width: 0; */
+  /* min-height: 0; */
+}
+
 /* 
 html {
   -webkit-text-size-adjust: 100%;

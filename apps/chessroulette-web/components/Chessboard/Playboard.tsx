@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { ChessFEN } from './type';
 import { ChessBoardAsClass } from './ChessBoardAsClass';
 import { Color, toLongColor } from 'chessterrain-react';
 import { Chess, Square } from 'chess.js';
+import { ChessFEN } from '@xmatter/util-kit';
 
 type Props = {
   sizePx: number;

@@ -1,0 +1,20 @@
+/* .history-row {
+  marginTop: spacers.smaller,
+    ...(theme.name === 'lightDefault'
+      ? {
+          background: hexToRgba(theme.colors.primary, 0.07),
+        }
+      : {
+          background: hexToRgba(theme.colors.positiveDarker, 0.07),
+        }),
+    border: `1px solid ${theme.colors.negativeLight}`,
+    borderColor: hexToRgba(theme.colors.primary, 0.1),
+    borderWidth: 0,
+    borderLeftWidth: '1px',
+    borderTopWidth: '1px',
+    borderLeftColor: hexToRgba(theme.colors.primary, 0.4),
+    borderBottomWidth: '1px',
+    ...softBorderRadius,
+
+    paddingLeft: spacers.small,
+} */

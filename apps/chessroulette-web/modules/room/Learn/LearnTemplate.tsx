@@ -1,10 +1,3 @@
-import { Metadata } from 'next';
-import { metadata as roomMetadata } from '../layout';
-
-export const metadata: Metadata = {
-  title: `${roomMetadata.title} | Learn`,
-};
-
 export type Props = {
   mainComponent: React.ReactNode;
   mainContainerClass?: string;
@@ -15,16 +8,16 @@ export type Props = {
 
 // TODO Not sure if this should be a next template or not
 
-export default function PlayTemplate({
+export const LearnTemplate = ({
   leftSideComponent,
   mainComponent,
   mainContainerClass = '',
   rightSideComponent,
   containerClassName,
-}: Props) {
+}: Props) => {
   return (
     <section
-      className={`flex h-full gap-6 ${containerClassName} flex-1 nobg-red-400`}
+      className={`flex h-full gap-6 ${containerClassName} flex-1`}
       style={
         {
           // aspectRatio: 16 / 9,
@@ -46,11 +39,11 @@ export default function PlayTemplate({
         {mainComponent}
       </main>
       {rightSideComponent && (
-        <aside id="right-side" className="grow-no">
+        <aside id="right-side" className="flex-1">
           {rightSideComponent}
         </aside>
       )}
     </section>
     // <div className="bg-indigo-500 p-2 font-mono">{props.children}</div>
   );
-}
+};

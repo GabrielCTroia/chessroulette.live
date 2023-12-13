@@ -3,7 +3,6 @@
 import movexConfig from 'apps/chessroulette-web/movex.config';
 import { ResourceIdentifier, objectKeys } from 'movex-core-util';
 import { MovexBoundResource, useMovexBoundResourceFromRid } from 'movex-react';
-import { ChessGame } from '../ChessGame/ChessGame';
 import { NoSSR } from 'apps/chessroulette-web/components/NoSSR';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';

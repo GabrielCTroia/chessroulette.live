@@ -1,3 +1,4 @@
+import { ChessFEN } from '../Chess/types';
 import {
   FENBoard,
   FenBoardPieceSymbol,
@@ -5,7 +6,6 @@ import {
   getFileRank,
 } from './chessUtils';
 import { Square } from 'chess.js';
-import { ChessFEN } from './type';
 
 export class ChessFENBoard {
   static STARTING_FEN: ChessFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';

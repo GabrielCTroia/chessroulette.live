@@ -1,23 +1,9 @@
-import { Metadata } from 'next';
-import Template from './LearnTemplate';
-import { NoSSR } from 'apps/chessroulette-web/components/NoSSR';
-import { PlayerBox } from 'apps/chessroulette-web/components/PlayerBox';
-import { ChessGame } from 'apps/chessroulette-web/modules/ChessGame/ChessGame';
-import { MovexBoundResource } from 'movex-react';
-import movexConfig from 'apps/chessroulette-web/movex.config';
-import MainActivity from 'apps/chessroulette-web/modules/room/PlayActivity';
-import { useRouter, useSearchParams } from 'next/navigation';
 import {
   ResourceIdentifier,
   isResourceIdentifierOfType,
   toResourceIdentifierObj,
 } from 'movex-core-util';
-import RoomParticipants from 'apps/chessroulette-web/modules/room/RoomParticipants';
-import LearnActivity from 'apps/chessroulette-web/modules/room/LearnActivity';
-
-export const metadata: Metadata = {
-  title: 'Chessroulette | Room',
-};
+import LearnActivity from 'apps/chessroulette-web/modules/room/Learn/LearnActivity';
 
 export default function Page({ params }: { params: { slug: string } }) {
   // console.log('params', decodeURIComponent(params.slug));
@@ -83,21 +69,27 @@ export default function Page({ params }: { params: { slug: string } }) {
     //   );
     // }}
     // />
-    <Template
-      rightSideComponent={
-        <div className="flex space-between flex-col gap-6 h-full">
-          <div className="flex-1 flex">
-            <PlayerBox />
-          </div>
-        </div>
-      }
-      // mainContainerClass="flex items-center"
-      mainComponent={
-        <NoSSR>
-          <LearnActivity rid={rid} playingColor='black' fen='rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w KQkq - 0 1'/>
-        </NoSSR>
-      }
-      // rightSideComponent={<RoomParticipants rid={rid} />}
+    // <Template
+    //   rightSideComponent={
+    //     <div className="flex space-between flex-col gap-6 h-full">
+    //       <div className="flex-1 flex flex-col">
+    //         <PlayerBox />
+    //         <div>
+
+    //         </div>
+    //       </div>
+    //     </div>
+    //   }
+    //   // mainContainerClass="flex items-center"
+    //   mainComponent={
+
+    //   }
+    //   // rightSideComponent={<RoomParticipants rid={rid} />}
+    // />
+    <LearnActivity
+      rid={rid}
+      playingColor="black"
+      fen="rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w KQkq - 0 1"
     />
   );
 }

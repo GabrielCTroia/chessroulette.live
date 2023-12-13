@@ -17,6 +17,7 @@ import { useState } from 'react';
 import { objectKeys } from 'movex-core-util';
 import { getRandomInt } from 'apps/chessroulette-web/util';
 import Header from 'apps/chessroulette-web/components/Header';
+import ChessFENBoard from 'apps/chessroulette-web/lib/ChessFENBoard/ChessFENBoard';
 
 export default () => {
   const roomResource = useMovexResourceType(movexConfig, 'room');
@@ -43,13 +44,19 @@ export default () => {
           // });
         }}
       /> */}
-      <main className='flex gap-6'>
+      <main className="flex gap-6">
         <Button
           onClick={() => {
             // console.log('works', roomResource);
 
             roomResource
-              ?.create({ ...initialRoomState, activity: 'play' })
+              ?.create({
+                ...initialRoomState,
+                activity: {
+                  activityType: 'play',
+                  activityState: {},
+                },
+              })
               .map((s) => {
                 router.push(
                   `play/${toRidAsStr(s.rid)}?userId=${getRandomInt(0, 999)}`
@@ -64,7 +71,15 @@ export default () => {
             // console.log('works', roomResource);
 
             roomResource
-              ?.create({ ...initialRoomState, activity: 'learn' })
+              ?.create({
+                ...initialRoomState,
+                activity: {
+                  activityType: 'learn',
+                  activityState: {
+                    fen: ChessFENBoard.STARTING_FEN,
+                  },
+                },
+              })
               .map((s) => {
                 router.push(
                   `learn/${toRidAsStr(s.rid)}?userId=${getRandomInt(0, 999)}`

@@ -1,4 +1,4 @@
-import ChessFENBoard from './ChessFENBoard';
+import { ChessFENBoard } from './ChessFENBoard';
 
 const STARTING_BOARD = [
   ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
