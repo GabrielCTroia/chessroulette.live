@@ -1,9 +1,10 @@
-import ChessFENBoard from 'apps/chessroulette-web/lib/ChessFENBoard/ChessFENBoard';
+
 
 import { Color } from 'chessterrain-react';
 import { Chessboard } from 'react-chessboard';
 import { Square } from 'chess.js';
-import { ChessFEN } from 'util-kit/src/lib/ChessFENBoard/type';
+import { ChessFEN, ChessFENBoard } from '@xmatter/util-kit';
+
 
 type Props = {
   sizePx: number;

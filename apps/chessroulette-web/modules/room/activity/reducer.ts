@@ -1,16 +1,28 @@
 import {
   ChessFEN,
+  ChessFENBoard,
   ChessMove,
-} from 'apps/chessroulette-web/components/Chessboard/type';
-import ChessFENBoard from 'apps/chessroulette-web/lib/ChessFENBoard/ChessFENBoard';
-import { Action } from 'movex-core-util';
+  DetailedChessMove,
+} from '@xmatter/util-kit';
+import { addMoveToChessHistoryAtNextAvailableIndex } from 'apps/chessroulette-web/components/GameHistory/lib';
+import {
+  ChessHistoryIndex,
+  ChessRecursiveHistory,
+} from 'apps/chessroulette-web/components/GameHistory/types';
 
-type ParticipantId = string;
+import { Action } from 'movex-core-util';
+import { fenBoardPieceSymbolToDetailedChessPiece } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
+
+// type ParticipantId = string;
 
 export type LearnActivityState = {
   activityType: 'learn';
   activityState: {
     fen: ChessFEN;
+    history: {
+      moves: ChessRecursiveHistory;
+      focusedIndex: ChessHistoryIndex;
+    };
   };
 };
 
@@ -39,25 +51,52 @@ export default (
   if (prev.activityType === 'learn') {
     // TODO: Should this be split?
 
-    console.log('action', action);
     if (action.type === 'dropPiece') {
       try {
-        const instance = new ChessFENBoard(prev.activityState.fen);
-        instance.move(action.payload.from, action.payload.to);
+        const { from, to } = action.payload;
 
-        const next = {
-          ...prev,
-          activityState: {
-            ...prev.activityState,
-            fen: instance.fen,
-          },
+        const instance = new ChessFENBoard(prev.activityState.fen);
+        const fenPiece = instance.piece(from);
+
+        if (!fenPiece) {
+          throw new Error(`No Piece at ${from}`);
+        }
+
+        const { color, piece } =
+          fenBoardPieceSymbolToDetailedChessPiece(fenPiece);
+
+        instance.move(from, to);
+
+        const nextMove: DetailedChessMove = {
+          from: from,
+          to: to,
+          san: `${from}${to}`,
+          color: color,
+          piece: piece,
         };
 
-        console.log('worked', next)
+        // const addAtIndex = atIndex !== undefined ? atIndex : prev.history.length;
+        const [nextHistory, addedAtIndex] =
+          addMoveToChessHistoryAtNextAvailableIndex(
+            prev.activityState.history.moves,
+            prev.activityState.history.moves.length,
+            nextMove
+          );
 
-        return next;
+        return {
+          ...prev,
+          activityState: {
+            fen: instance.fen,
+            history: {
+              moves: nextHistory,
+              focusedIndex: addedAtIndex,
+            },
+            // moveHistory: ,
+            // focusedIndex:
+          },
+        };
       } catch (e) {
-        console.warn('failed', e)
+        console.warn('failed', e);
 
         return prev;
       }

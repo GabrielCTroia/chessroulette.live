@@ -1,6 +1,7 @@
-import { Chess, Color, PieceSymbol, Square } from 'chess.js';
+import type { Color, PieceSymbol, Square, Move } from 'chess.js';
+import { Chess } from 'chess.js';
 import { Matrix, MatrixIndex, matrixMap } from '../matrix';
-import { ChessPGN } from '../Chess/types';
+import { ChessMove, ChessMoveSan, ChessPGN, DetailedChessMove } from '../Chess/types';
 
 export const ranks = { 1: 7, 2: 6, 3: 5, 4: 4, 5: 3, 6: 2, 7: 1, 8: 0 };
 export const files = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
@@ -85,15 +86,20 @@ export const fenBoardToChessBoard = (fenBoard: FENBoard): ChessBoard =>
       return null;
     }
 
+    const p = fenBoardPieceSymbolToDetailedChessPiece(m);
+
     return {
       square: matrixIndexToSquare(index),
-      ...fenBoardPieceSymbolToDetailed(m),
+      color: p.color,
+      type: p.piece,
     };
   });
 
-export const fenBoardPieceSymbolToDetailed = (p: FenBoardPieceSymbol) =>
+export const fenBoardPieceSymbolToDetailedChessPiece = (
+  p: FenBoardPieceSymbol
+) =>
   ({
-    type: p.toLowerCase() as PieceSymbol,
+    piece: p.toLowerCase() as PieceSymbol,
     color: isUpperCase(p) ? 'w' : 'b',
   } as const);
 
@@ -108,10 +114,72 @@ export const chessBoardToFenBoard = (chessBoard: ChessBoard): FENBoard =>
     return (p.color === 'b' ? p.type : p.type.toUpperCase()) as PieceSymbol;
   });
 
+export const fenBoardPieceSymbolToPieceSymbol = (
+  p: FenBoardPieceSymbol
+): PieceSymbol => {
+  const { color, piece } = fenBoardPieceSymbolToDetailedChessPiece(p);
+
+  return `${color}${piece.toUpperCase()}` as PieceSymbol;
+};
+
+export const detailedPieceToPieceSymbol = () => {};
+
 export const pgnToFen = (pgn: ChessPGN) => {
   const instance = new Chess();
+
+  // instance.
 
   instance.loadPgn(pgn);
 
   return instance.fen();
 };
+
+// export const BITS: Record<string, number> = {
+//   NORMAL: 1,
+//   CAPTURE: 2,
+//   BIG_PAWN: 4,
+//   EP_CAPTURE: 8,
+//   PROMOTION: 16,
+//   KSIDE_CASTLE: 32,
+//   QSIDE_CASTLE: 64,
+// }
+
+// export const chessNoveToSan = (move: Move): ChessMoveSan => {
+//   let output = '';
+
+//   if ((move.flags as any) & BITS['KSIDE_CASTLE']) {
+//     output = 'O-O'
+//   } else if ((move.flags as any) & BITS['QSIDE_CASTLE']) {
+//     output = 'O-O-O'
+//   } else {
+//     if (move.piece !== 'p') {
+//       const disambiguator = getDisambiguator(move, moves);
+//       output += move.piece.toUpperCase() + disambiguator
+//     }
+
+//     if ((move.flags as any) & (BITS['CAPTURE'] | BITS['EP_CAPTURE'])) {
+//       if (move.piece === 'p') {
+//         output += algebraic(move.from)[0]
+//       }
+//       output += 'x'
+//     }
+
+//     output += algebraic(move.to)
+
+//     if (move.promotion) {
+//       output += '=' + move.promotion.toUpperCase()
+//     }
+//   }
+
+//   this._makeMove(move)
+//   if (this.isCheck()) {
+//     if (this.isCheckmate()) {
+//       output += '#'
+//     } else {
+//       output += '+'
+//     }
+//   }
+//   this._undoMove()
+
+//   return output
+// }

@@ -12,7 +12,8 @@ import { HistoryList } from './HistoryList';
 // import { isChessRecursiveHistoryIndex } from 'chessroulette-io/dist/analysis/analysisActions';
 import { Text } from '../../Text';
 import { ChessHistoryIndex, PairedMove } from '../types';
-import { isChessRecursiveHistoryIndex, isPartialBlackMove } from '../util';
+import { isPartialBlackMove } from '../util';
+import { isChessRecursiveHistoryIndex } from '../lib';
 
 type Props = {
   pairedMove: PairedMove;
