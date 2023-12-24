@@ -1,5 +1,9 @@
 import { Action } from 'movex-core-util';
-import activityReducer, { ActivityActions, ActivityState } from './activity/reducer';
+import activityReducer, {
+  ActivityActions,
+  ActivityState,
+} from '../activity/reducer';
+import { User } from '../../user/type';
 
 // export const userSlots = {
 //   pink: true,
@@ -24,7 +28,7 @@ export type RoomState = {
   // userSlots: {
   //   [slot in UserSlot]: boolean;
   // };
-  participants: Record<ParticipantId, unknown>;
+  participants: Record<User['id'], { userId: User['id'] }>;
   activity: ActivityState;
   counter: number;
   // messages: ChatMsg[];
@@ -46,16 +50,16 @@ export type RoomActions =
   | Action<
       'join',
       {
-        participantId: ParticipantId;
+        userId: User['id'];
       }
     >
   | Action<
       'leave',
       {
-        participantId: ParticipantId;
+        userId: User['id'];
       }
     >
-  | Action<'inc'>
+  // | Action<'inc'>
   | ActivityActions;
 // | Action<
 //     'submit',
@@ -75,13 +79,13 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
       ...state,
       participants: {
         ...state.participants,
-        [action.payload.participantId]: null,
+        [action.payload.userId]: action.payload,
       },
     };
   }
   // User Leaves
   else if (action.type === 'leave') {
-    const { [action.payload.participantId]: _, ...nextParticipants } =
+    const { [action.payload.userId]: _, ...nextParticipants } =
       state.participants;
 
     return {
@@ -109,11 +113,10 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
 
   // TODO: This should be done differently!
   if (action.type === 'dropPiece') {
-
-    console.log('heere')
+    // console.log('heere')
     return {
       ...state,
-      activity: activityReducer(state.activity, action)
+      activity: activityReducer(state.activity, action),
     };
   }
 

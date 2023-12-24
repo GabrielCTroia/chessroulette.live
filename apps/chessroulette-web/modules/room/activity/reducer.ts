@@ -59,6 +59,7 @@ export default (
         const fenPiece = instance.piece(from);
 
         if (!fenPiece) {
+          console.error('Err', instance.board);
           throw new Error(`No Piece at ${from}`);
         }
 

@@ -7,7 +7,7 @@ import {
   // MovexConnection,
   useMovexResourceType,
 } from 'movex-react';
-import { initialRoomState } from '../room/reducer';
+import { initialRoomState } from '../room/movex/reducer';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { toRidAsStr } from 'movex';
 import RoomParticipants from '../room/RoomParticipants';

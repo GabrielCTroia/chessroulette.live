@@ -7,13 +7,15 @@ import { NoSSR } from 'apps/chessroulette-web/components/NoSSR';
 import { useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
 import { Button } from 'apps/chessroulette-web/components/Button';
+import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 
 type Props = {
   rid: ResourceIdentifier<'room'>;
 };
 
 export default (props: Props) => {
-  const searchParams = useSearchParams();
+  // const searchParams = useSearchParams();
+  const userId = useUserId();
 
   // const roomResource = useMovexBoundResourceFromRid(movexConfig, props.rid);
 
@@ -32,7 +34,7 @@ export default (props: Props) => {
       movexDefinition={movexConfig}
       rid={props.rid}
       onReady={(r) => {
-        const userId = searchParams.get('userId');
+        // const userId = searchParams.get('userId');
 
         if (!userId) {
           return;
@@ -40,9 +42,7 @@ export default (props: Props) => {
 
         r.boundResource.dispatch({
           type: 'join',
-          payload: {
-            participantId: userId,
-          },
+          payload: { userId },
         });
       }}
       // onResourceStateUpdated={(r) => {
@@ -50,7 +50,7 @@ export default (props: Props) => {
       // }}
       render={({ boundResource: { state, dispatch } }) => {
         console.log('state', state);
-        const userId = searchParams.get('userId');
+        // const userId = searchParams.get('userId');
         const particpants = objectKeys(state.participants);
 
         return (
@@ -63,7 +63,7 @@ export default (props: Props) => {
             Counter: {state.counter}
             <Button
               onClick={() => {
-                dispatch({ type: 'inc' });
+                // dispatch({ type: 'inc' });
               }}
             >
               inc

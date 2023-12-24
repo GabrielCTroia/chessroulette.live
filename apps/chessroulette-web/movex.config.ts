@@ -1,4 +1,4 @@
-import roomReducer from './modules/room/reducer';
+import roomReducer from './modules/room/movex/reducer';
 
 export default {
   resources: {
