@@ -3,11 +3,13 @@
 import { MovexProvider } from 'movex-react';
 import movexConfig from '../movex.config';
 import { useUserId } from '../hooks/useUserId/useUserId';
+import { config } from '../config';
 
 export default (props: React.PropsWithChildren) => {
   const userId = useUserId();
 
-  console.log('user id in movex proc', userId);
+  console.log('config', config);
+
   if (!userId) {
     return null;
   }
@@ -15,7 +17,7 @@ export default (props: React.PropsWithChildren) => {
   return (
     <MovexProvider
       movexDefinition={movexConfig}
-      endpointUrl={'localhost:3333'}
+      endpointUrl={config.MOVEX_ENDPOINT_URL}
       clientId={userId || undefined}
       // socketUrl={config.MOVEX_URL}
       onConnected={(instance) => {
