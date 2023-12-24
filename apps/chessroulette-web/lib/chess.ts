@@ -1,5 +1,6 @@
+import { ChessFEN, ChessPGN } from '@xmatter/util-kit';
 import { Chess } from 'chess.js';
-import { ChessFEN, ChessPGN } from '../components/Chessboard/type';
+// import { ChessFEN, ChessPGN } from '../components/Chessboard/type';
 
 export const getNewChessGame = (
   props?:

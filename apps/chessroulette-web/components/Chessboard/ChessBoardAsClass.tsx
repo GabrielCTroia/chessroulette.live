@@ -1,400 +1,400 @@
-import React from 'react';
-import {
-  SerializedCoord,
-  RelativeCoord,
-  serializeCoord,
-  invoke,
-  ChessTerrainProps,
-  ChessTerrain,
-  RelativeCoordsWithPiece,
-  RelativeCoordsWithOptionalPiece,
-  toShortColor,
-  StyledTerrainCoord,
-  toDictIndexedBy,
-  Terrain,
-  GeneralBoardState,
-  Color,
-  IdentifiablePiece,
-} from 'chessterrain-react';
-import { ChessFEN, ChessMove } from './type';
-import { chessBoardToPieceLayout, relativeCoordToSquare } from './util';
-import {
-  hoveredOwnPieceSquareStyle,
-  movableSquareStyle,
-  touchedPieceSquareStyle,
-} from './squareStyles';
-import {
-  fenBoardToChessBoard,
-  squareToMatrixIndex,
-} from 'apps/chessroulette-web/lib/ChessFENBoard/chessUtils';
-import ChessFENBoard from 'apps/chessroulette-web/lib/ChessFENBoard/ChessFENBoard';
-import { Square } from 'chess.js';
-/**
- * This is the component that works with the Chess Game rules and makes the Terrain (piece, square) interaction possible
- * It would be a different such Board component per Game type (i.e. Maha would have a different one)
- */
+// import React from 'react';
+// import {
+//   SerializedCoord,
+//   RelativeCoord,
+//   serializeCoord,
+//   invoke,
+//   ChessTerrainProps,
+//   ChessTerrain,
+//   RelativeCoordsWithPiece,
+//   RelativeCoordsWithOptionalPiece,
+//   toShortColor,
+//   StyledTerrainCoord,
+//   toDictIndexedBy,
+//   Terrain,
+//   GeneralBoardState,
+//   Color,
+//   IdentifiablePiece,
+// } from 'chessterrain-react';
+// import { ChessFEN, ChessMove } from './type';
+// import { chessBoardToPieceLayout, relativeCoordToSquare } from './util';
+// import {
+//   hoveredOwnPieceSquareStyle,
+//   movableSquareStyle,
+//   touchedPieceSquareStyle,
+// } from './squareStyles';
+// import {
+//   fenBoardToChessBoard,
+//   squareToMatrixIndex,
+// } from 'apps/chessroulette-web/lib/ChessFENBoard/chessUtils';
+// import ChessFENBoard from 'apps/chessroulette-web/lib/ChessFENBoard/ChessFENBoard';
+// import { Square } from 'chess.js';
+// /**
+//  * This is the component that works with the Chess Game rules and makes the Terrain (piece, square) interaction possible
+//  * It would be a different such Board component per Game type (i.e. Maha would have a different one)
+//  */
 
-// TODO: The identifiablePiece should be given gerneically so the pieceSTate is inferrred correctly outside
-export type ChessBoardAsClassProps = Pick<
-  ChessTerrainProps,
-  'sizePx' | 'playingColor' | 'showAnnotations' | 'orientation' | 'freeArrow'
-> & {
-  // pieceLayoutState: GeneralPieceLayoutState<PieceRegistry>; // TODO: PieceRegistry this can be hardcoded for chess
-  fen?: ChessFEN;
-  onMove: (p: { move: ChessMove }) => void;
-  onPieceTouched?: (p: {
-    piece: IdentifiablePiece; // TODO: Take out the pIece id in favor of label
-    square: Square;
-  }) => void;
-  movable?: Square[];
-};
-
-// const gameClient = new Chess();
-
-// const startingChessBoard = gameClient.board();
-
-// export type PieceWithCoord = {
-//   piece: IdentifiablePieceState;
-//   relativeCoords: RelativeCoord;
+// // TODO: The identifiablePiece should be given gerneically so the pieceSTate is inferrred correctly outside
+// export type ChessBoardAsClassProps = Pick<
+//   ChessTerrainProps,
+//   'sizePx' | 'playingColor' | 'showAnnotations' | 'orientation' | 'freeArrow'
+// > & {
+//   // pieceLayoutState: GeneralPieceLayoutState<PieceRegistry>; // TODO: PieceRegistry this can be hardcoded for chess
+//   fen?: ChessFEN;
+//   onMove: (p: { move: ChessMove }) => void;
+//   onPieceTouched?: (p: {
+//     piece: IdentifiablePiece; // TODO: Take out the pIece id in favor of label
+//     square: Square;
+//   }) => void;
+//   movable?: Square[];
 // };
 
-export type RelativeCoordsMap = Record<SerializedCoord, RelativeCoord>;
+// // const gameClient = new Chess();
 
-export type StyledSquaresState = {
-  hoveredSquare?: RelativeCoordsMap;
-  possibleMoves?: RelativeCoordsMap;
-};
+// // const startingChessBoard = gameClient.board();
 
-type State = {
-  touchedPiece?: RelativeCoordsWithPiece;
-  hoveredPiece?: RelativeCoordsWithPiece;
+// // export type PieceWithCoord = {
+// //   piece: IdentifiablePieceState;
+// //   relativeCoords: RelativeCoord;
+// // };
 
-  // pendingPromoMove?: PendingPromoMove;
+// export type RelativeCoordsMap = Record<SerializedCoord, RelativeCoord>;
 
-  styledSquares: StyledSquaresState;
+// export type StyledSquaresState = {
+//   hoveredSquare?: RelativeCoordsMap;
+//   possibleMoves?: RelativeCoordsMap;
+// };
 
-  // pieceLayoutState: GeneralPieceLayoutState<PieceRegistry>;
+// type State = {
+//   touchedPiece?: RelativeCoordsWithPiece;
+//   hoveredPiece?: RelativeCoordsWithPiece;
 
-  board: GeneralBoardState;
-};
+//   // pendingPromoMove?: PendingPromoMove;
 
-const CLEAR_STYLED_SQUARES_STATE: StyledSquaresState = {
-  possibleMoves: undefined,
-  hoveredSquare: undefined,
-};
+//   styledSquares: StyledSquaresState;
 
-export class ChessBoardAsClass extends React.Component<
-  ChessBoardAsClassProps,
-  State
-> {
-  override state: State = {
-    styledSquares: CLEAR_STYLED_SQUARES_STATE,
-    board: {
-      terrainState: new Terrain({ props: { width: 8 } }).state,
-      pieceLayoutState: chessBoardToPieceLayout(
-        fenBoardToChessBoard(new ChessFENBoard(this.props.fen).board)
-      ),
-    },
-  };
+//   // pieceLayoutState: GeneralPieceLayoutState<PieceRegistry>;
 
-  setDraggedPiece() {}
+//   board: GeneralBoardState;
+// };
 
-  onCoordHover = (p: RelativeCoordsWithOptionalPiece) => {
-    // console.log('on coords hover', p);
+// const CLEAR_STYLED_SQUARES_STATE: StyledSquaresState = {
+//   possibleMoves: undefined,
+//   hoveredSquare: undefined,
+// };
 
-    // If not piece no hover
-    if (!p.piece) {
-      if (this.state.hoveredPiece) {
-        this.hoverPiece(undefined);
-      }
+// export class ChessBoardAsClass extends React.Component<
+//   ChessBoardAsClassProps,
+//   State
+// > {
+//   override state: State = {
+//     styledSquares: CLEAR_STYLED_SQUARES_STATE,
+//     board: {
+//       terrainState: new Terrain({ props: { width: 8 } }).state,
+//       pieceLayoutState: chessBoardToPieceLayout(
+//         fenBoardToChessBoard(new ChessFENBoard(this.props.fen).board)
+//       ),
+//     },
+//   };
 
-      return;
-    }
+//   setDraggedPiece() {}
 
-    if (p.piece.id !== this.state.touchedPiece?.piece.id) {
-      this.hoverPiece({
-        piece: p.piece,
-        relativeCoords: p.relativeCoords,
-      });
-    }
-  };
+//   onCoordHover = (p: RelativeCoordsWithOptionalPiece) => {
+//     // console.log('on coords hover', p);
 
-  override componentDidUpdate(
-    prevProps: Readonly<ChessBoardAsClassProps>
-  ): void {
-    // If the FEN updated
-    if (prevProps.fen !== this.props.fen) {
-      this.setState({
-        board: {
-          ...this.state.board,
-          pieceLayoutState: chessBoardToPieceLayout(
-            // TODO: This could be optimized to load the new fen!
-            fenBoardToChessBoard(new ChessFENBoard(this.props.fen).board)
-          ),
-        },
-      });
-    }
-  }
+//     // If not piece no hover
+//     if (!p.piece) {
+//       if (this.state.hoveredPiece) {
+//         this.hoverPiece(undefined);
+//       }
 
-  private onCoordClicked = (p: RelativeCoordsWithOptionalPiece) => {
-    const { touchedPiece } = this.state;
+//       return;
+//     }
 
-    if (p.piece) {
-      if (touchedPiece && p.piece.id === touchedPiece.piece.id) {
-        this.touchPiece(undefined);
-        return;
-      }
+//     if (p.piece.id !== this.state.touchedPiece?.piece.id) {
+//       this.hoverPiece({
+//         piece: p.piece,
+//         relativeCoords: p.relativeCoords,
+//       });
+//     }
+//   };
 
-      // If same color, just touch it
-      // else if (p.piece.color === toShortColor(this.props.playingColor)) {
-      this.touchPiece({
-        piece: p.piece,
-        relativeCoords: p.relativeCoords,
-      });
-      // }
-    }
+//   override componentDidUpdate(
+//     prevProps: Readonly<ChessBoardAsClassProps>
+//   ): void {
+//     // If the FEN updated
+//     if (prevProps.fen !== this.props.fen) {
+//       this.setState({
+//         board: {
+//           ...this.state.board,
+//           pieceLayoutState: chessBoardToPieceLayout(
+//             // TODO: This could be optimized to load the new fen!
+//             fenBoardToChessBoard(new ChessFENBoard(this.props.fen).board)
+//           ),
+//         },
+//       });
+//     }
+//   }
 
-    if (touchedPiece) {
-      this.props.onMove({
-        move: {
-          from: relativeCoordToSquare(touchedPiece.relativeCoords),
-          to: relativeCoordToSquare(p.relativeCoords),
-        },
-      });
-      this.touchPiece(undefined);
+//   private onCoordClicked = (p: RelativeCoordsWithOptionalPiece) => {
+//     const { touchedPiece } = this.state;
 
-      return;
-    }
+//     if (p.piece) {
+//       if (touchedPiece && p.piece.id === touchedPiece.piece.id) {
+//         this.touchPiece(undefined);
+//         return;
+//       }
 
-    // if (touchedPiece) {
-    //   this.touchPiece(undefined);
+//       // If same color, just touch it
+//       // else if (p.piece.color === toShortColor(this.props.playingColor)) {
+//       this.touchPiece({
+//         piece: p.piece,
+//         relativeCoords: p.relativeCoords,
+//       });
+//       // }
+//     }
 
-    //   if (touchedPiece.piece.id === p.piece?.id) {
-    //     return;
-    //   }
+//     if (touchedPiece) {
+//       this.props.onMove({
+//         move: {
+//           from: relativeCoordToSquare(touchedPiece.relativeCoords),
+//           to: relativeCoordToSquare(p.relativeCoords),
+//         },
+//       });
+//       this.touchPiece(undefined);
 
-    //   // if (p.piece && p.piece.id !== touchedPiece.piece.id) {
+//       return;
+//     }
 
-    //   // }
+//     // if (touchedPiece) {
+//     //   this.touchPiece(undefined);
 
-    //   this.props.onMove({
-    //     move: {
-    //       from: relativeCoordToSquare(touchedPiece.relativeCoords),
-    //       to: relativeCoordToSquare(p.relativeCoords),
-    //     },
-    //   });
-    // }
-    // else if (p.piece !== undefined) {
-    //   this.touchPiece({
-    //     piece: p.piece,
-    //     relativeCoords: p.relativeCoords,
-    //   });
-    // }
-    //  else {
-    // this.props.onMove({
-    //   move: {
-    //     from: relativeCoordToSquare(touchedPiece.relativeCoords),
-    //     to: relativeCoordToSquare(p.relativeCoords),
-    //   },
-    // });
-    // }
+//     //   if (touchedPiece.piece.id === p.piece?.id) {
+//     //     return;
+//     //   }
 
-    // if (p?.piece.id === .piece.id) {
-    //   this.touchPiece(undefined);
-    //   return;
-    // }
+//     //   // if (p.piece && p.piece.id !== touchedPiece.piece.id) {
 
-    // if (p.piece) {
+//     //   // }
 
-    //   this.onPieceClicked({
-    //     piece: p.piece,
-    //     relativeCoords: p.relativeCoords,
-    //   });
-    // } else {
-    //   // this.onEmptySquareClicked(p.relativeCoords);
-    // }
-    // const onInteractableCoordClicked = useCallbackIf(
-    //   canTouch,
-    //   (coord: Coord, piece?: IdentifiablePieceState) =>
-    //     piece ? onPieceClicked({ piece, coord }) : onEmptySquareClicked(coord),
-    //   [onPieceClicked, onEmptySquareClicked]
-    // );
-  };
+//     //   this.props.onMove({
+//     //     move: {
+//     //       from: relativeCoordToSquare(touchedPiece.relativeCoords),
+//     //       to: relativeCoordToSquare(p.relativeCoords),
+//     //     },
+//     //   });
+//     // }
+//     // else if (p.piece !== undefined) {
+//     //   this.touchPiece({
+//     //     piece: p.piece,
+//     //     relativeCoords: p.relativeCoords,
+//     //   });
+//     // }
+//     //  else {
+//     // this.props.onMove({
+//     //   move: {
+//     //     from: relativeCoordToSquare(touchedPiece.relativeCoords),
+//     //     to: relativeCoordToSquare(p.relativeCoords),
+//     //   },
+//     // });
+//     // }
 
-  // private onPieceClicked = (p: RelativeCoordsWithPiece) => {
-  //   const { touchedPiece } = this.state;
+//     // if (p?.piece.id === .piece.id) {
+//     //   this.touchPiece(undefined);
+//     //   return;
+//     // }
 
-  //   // If the next Touched Piece is also mine (but moving) maybe the Touched Piece wants to take it's place there
-  //   if (touchedPiece) {
-  //     // TODO: move
-  //     // const drawingResult = this.attemptToDrawArrowForTouchedPiece({
-  //     //   to: p.relativeCoords,
-  //     //   piece: touchedPiece.piece,
-  //     //   from: touchedPiece.coord,
-  //     // });
-  //     // if (drawingResult.ok) {
-  //     //   this.clearTouchedPiece();
-  //     //   return;
-  //     // }
-  //     if (touchedPiece.piece.id === p.piece.id) {
-  //       this.touchPiece(undefined);
-  //       return;
-  //     }
-  //   }
+//     // if (p.piece) {
 
-  //   // Otherwise, if the Piece is mine, it means: "touch"
-  //   if (toShortColor(this.props.playingColor) === p.piece.color) {
-  //     this.touchPiece(p);
-  //   }
-  // };
+//     //   this.onPieceClicked({
+//     //     piece: p.piece,
+//     //     relativeCoords: p.relativeCoords,
+//     //   });
+//     // } else {
+//     //   // this.onEmptySquareClicked(p.relativeCoords);
+//     // }
+//     // const onInteractableCoordClicked = useCallbackIf(
+//     //   canTouch,
+//     //   (coord: Coord, piece?: IdentifiablePieceState) =>
+//     //     piece ? onPieceClicked({ piece, coord }) : onEmptySquareClicked(coord),
+//     //   [onPieceClicked, onEmptySquareClicked]
+//     // );
+//   };
 
-  onEmptySquareClicked = (coords: RelativeCoord) => {
-    this.setState({
-      styledSquares: {
-        hoveredSquare: {
-          [serializeCoord(coords)]: coords,
-        },
-      },
-    });
-  };
+//   // private onPieceClicked = (p: RelativeCoordsWithPiece) => {
+//   //   const { touchedPiece } = this.state;
 
-  private touchPiece = (p: RelativeCoordsWithPiece | undefined) => {
-    this.setState({
-      touchedPiece: p,
-      hoveredPiece: undefined,
-    });
+//   //   // If the next Touched Piece is also mine (but moving) maybe the Touched Piece wants to take it's place there
+//   //   if (touchedPiece) {
+//   //     // TODO: move
+//   //     // const drawingResult = this.attemptToDrawArrowForTouchedPiece({
+//   //     //   to: p.relativeCoords,
+//   //     //   piece: touchedPiece.piece,
+//   //     //   from: touchedPiece.coord,
+//   //     // });
+//   //     // if (drawingResult.ok) {
+//   //     //   this.clearTouchedPiece();
+//   //     //   return;
+//   //     // }
+//   //     if (touchedPiece.piece.id === p.piece.id) {
+//   //       this.touchPiece(undefined);
+//   //       return;
+//   //     }
+//   //   }
 
-    if (p) {
-      this.props.onPieceTouched?.({
-        piece: p.piece,
-        square: relativeCoordToSquare(p.relativeCoords),
-      });
-    }
+//   //   // Otherwise, if the Piece is mine, it means: "touch"
+//   //   if (toShortColor(this.props.playingColor) === p.piece.color) {
+//   //     this.touchPiece(p);
+//   //   }
+//   // };
 
-    // TODO: Actual capture if needed
-  };
+//   onEmptySquareClicked = (coords: RelativeCoord) => {
+//     this.setState({
+//       styledSquares: {
+//         hoveredSquare: {
+//           [serializeCoord(coords)]: coords,
+//         },
+//       },
+//     });
+//   };
 
-  private hoverPiece = (p: RelativeCoordsWithPiece | undefined) => {
-    this.setState({
-      hoveredPiece: p,
-    });
-  };
+//   private touchPiece = (p: RelativeCoordsWithPiece | undefined) => {
+//     this.setState({
+//       touchedPiece: p,
+//       hoveredPiece: undefined,
+//     });
 
-  private onPieceDragStarted = () => {};
+//     if (p) {
+//       this.props.onPieceTouched?.({
+//         piece: p.piece,
+//         square: relativeCoordToSquare(p.relativeCoords),
+//       });
+//     }
 
-  private onPieceDragUpdated = () => {};
+//     // TODO: Actual capture if needed
+//   };
 
-  private onPieceDragEnded = () => {};
+//   private hoverPiece = (p: RelativeCoordsWithPiece | undefined) => {
+//     this.setState({
+//       hoveredPiece: p,
+//     });
+//   };
 
-  render() {
-    const { playingColor, ...chessTerrainProps } = this.props;
+//   private onPieceDragStarted = () => {};
 
-    // This could be memoized
-    const mergedStyledCoords: Record<SerializedCoord, StyledTerrainCoord> =
-      invoke(() => {
-        const { styledSquares } = this.state;
+//   private onPieceDragUpdated = () => {};
 
-        if (!this.state.styledSquares) {
-          return {};
-        }
+//   private onPieceDragEnded = () => {};
 
-        const { hoveredSquare } = this.state.styledSquares;
+//   render() {
+//     const { playingColor, ...chessTerrainProps } = this.props;
 
-        const { touchedPiece, hoveredPiece } = this.state;
+//     // This could be memoized
+//     const mergedStyledCoords: Record<SerializedCoord, StyledTerrainCoord> =
+//       invoke(() => {
+//         const { styledSquares } = this.state;
 
-        return {
-          ...toDictIndexedBy(
-            [
-              ...(touchedPiece
-                ? [
-                    {
-                      // ...touchedPiece.,
-                      relativeCoord: touchedPiece.relativeCoords,
-                      style: touchedPieceSquareStyle,
-                      // hoveredSquare.piece.color ===
-                      // chessTerrainProps.playingColor
-                      //   ? hoveredOwnPieceSquareStyle
-                      //   : hoveredOtherPieceSquareStyle,
-                    },
-                  ]
-                : []),
-              ...(hoveredPiece
-                ? [
-                    {
-                      relativeCoord: hoveredPiece.relativeCoords,
-                      style: hoveredOwnPieceSquareStyle,
-                    },
-                  ]
-                : []),
-              ...(this.props.movable?.map((sq) => {
-                // Can get the function directly
-                const [row, col] = squareToMatrixIndex(sq);
+//         if (!this.state.styledSquares) {
+//           return {};
+//         }
 
-                return {
-                  relativeCoord: {
-                    row,
-                    col,
-                  },
-                  style: movableSquareStyle,
-                };
-              }) || []),
-              // ...(hoveredSquare ? Object.values(hoveredSquare).map((dest) => [
-              //   relativeCoord: hoveredSquare.,
-              //   style: touchedPieceSquareStyle,
-              // ] : []),
-              ...Object.values(styledSquares.hoveredSquare || {}).map(
-                (dest) => ({
-                  relativeCoord: dest,
-                  style: hoveredOwnPieceSquareStyle,
-                })
-              ),
-            ],
-            (p) => serializeCoord(p.relativeCoord)
-          ),
+//         const { hoveredSquare } = this.state.styledSquares;
 
-          // Extra
-          // ...styledCoords,
-        };
-      });
-    return (
-      <>
-        <ChessTerrain
-          key={'1'}
-          board={this.state.board}
-          darkSquareColor="rgba(0, 163, 255, .3)"
-          playingColor={this.props.playingColor}
-          onCoordClicked={this.onCoordClicked}
-          onCoordHover={this.onCoordHover}
-          freeArrow={this.props.freeArrow}
-          // onPieceDragStarted={(p) => {
-          //   // this.setDraggedPiece(p.);
-          //   console.log('piece drag started', p);
-          // }}
-          // onPieceDragUpdated={(p) => {
-          //   console.log('piece drag changed', p);
-          // }}
-          styledCoords={mergedStyledCoords}
-          {...chessTerrainProps}
-        />
-        {/* <div className="draggable-layer">
-          {draggedPiece && (
-            <img
-              src={
-                dark[
-                  `${draggedPiece.color}${draggedPiece.label}` as keyof typeof dark
-                ]
-              }
-              style={{
-                height: draggedPiece.squareSize,
-                position: 'absolute',
-                top: absoluteCoords?.y,
-                left: absoluteCoords?.x,
-                // scale: '.8',
-              }}
-            />
-          )}
-        </div> */}
-      </>
-    );
-  }
-}
+//         const { touchedPiece, hoveredPiece } = this.state;
+
+//         return {
+//           ...toDictIndexedBy(
+//             [
+//               ...(touchedPiece
+//                 ? [
+//                     {
+//                       // ...touchedPiece.,
+//                       relativeCoord: touchedPiece.relativeCoords,
+//                       style: touchedPieceSquareStyle,
+//                       // hoveredSquare.piece.color ===
+//                       // chessTerrainProps.playingColor
+//                       //   ? hoveredOwnPieceSquareStyle
+//                       //   : hoveredOtherPieceSquareStyle,
+//                     },
+//                   ]
+//                 : []),
+//               ...(hoveredPiece
+//                 ? [
+//                     {
+//                       relativeCoord: hoveredPiece.relativeCoords,
+//                       style: hoveredOwnPieceSquareStyle,
+//                     },
+//                   ]
+//                 : []),
+//               ...(this.props.movable?.map((sq) => {
+//                 // Can get the function directly
+//                 const [row, col] = squareToMatrixIndex(sq);
+
+//                 return {
+//                   relativeCoord: {
+//                     row,
+//                     col,
+//                   },
+//                   style: movableSquareStyle,
+//                 };
+//               }) || []),
+//               // ...(hoveredSquare ? Object.values(hoveredSquare).map((dest) => [
+//               //   relativeCoord: hoveredSquare.,
+//               //   style: touchedPieceSquareStyle,
+//               // ] : []),
+//               ...Object.values(styledSquares.hoveredSquare || {}).map(
+//                 (dest) => ({
+//                   relativeCoord: dest,
+//                   style: hoveredOwnPieceSquareStyle,
+//                 })
+//               ),
+//             ],
+//             (p) => serializeCoord(p.relativeCoord)
+//           ),
+
+//           // Extra
+//           // ...styledCoords,
+//         };
+//       });
+//     return (
+//       <>
+//         <ChessTerrain
+//           key={'1'}
+//           board={this.state.board}
+//           darkSquareColor="rgba(0, 163, 255, .3)"
+//           playingColor={this.props.playingColor}
+//           onCoordClicked={this.onCoordClicked}
+//           onCoordHover={this.onCoordHover}
+//           freeArrow={this.props.freeArrow}
+//           // onPieceDragStarted={(p) => {
+//           //   // this.setDraggedPiece(p.);
+//           //   console.log('piece drag started', p);
+//           // }}
+//           // onPieceDragUpdated={(p) => {
+//           //   console.log('piece drag changed', p);
+//           // }}
+//           styledCoords={mergedStyledCoords}
+//           {...chessTerrainProps}
+//         />
+//         {/* <div className="draggable-layer">
+//           {draggedPiece && (
+//             <img
+//               src={
+//                 dark[
+//                   `${draggedPiece.color}${draggedPiece.label}` as keyof typeof dark
+//                 ]
+//               }
+//               style={{
+//                 height: draggedPiece.squareSize,
+//                 position: 'absolute',
+//                 top: absoluteCoords?.y,
+//                 left: absoluteCoords?.x,
+//                 // scale: '.8',
+//               }}
+//             />
+//           )}
+//         </div> */}
+//       </>
+//     );
+//   }
+// }

@@ -1,2 +1,2 @@
 export * from './GameHistory';
-export * from './ChessGameHistoryProvider';
+// export * from './ChessGameHistoryProvider';

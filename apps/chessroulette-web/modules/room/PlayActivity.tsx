@@ -3,7 +3,7 @@
 import movexConfig from 'apps/chessroulette-web/movex.config';
 import { ResourceIdentifier } from 'movex-core-util';
 import { MovexBoundResource } from 'movex-react';
-import { ChessGame } from '../ChessGame/ChessGame';
+// import { ChessGame } from '../ChessGame/ChessGame';
 import { ContainerWithDimensions } from 'apps/chessroulette-web/components/ContainerWithDimensions';
 
 type Props = {
@@ -20,8 +20,9 @@ export default (props: Props) => {
           <ContainerWithDimensions
             className="h-full w-full"
             render={(s) => (
-              <ChessGame sizePx={s.height} />
+              // <ChessGame sizePx={s.height} />
               // </div>
+              <div></div>
             )}
           />
         );

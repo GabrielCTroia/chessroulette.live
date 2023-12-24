@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import Template from './PlayTemplate';
 import { NoSSR } from 'apps/chessroulette-web/components/NoSSR';
 import { PlayerBox } from 'apps/chessroulette-web/components/PlayerBox';
-import { ChessGame } from 'apps/chessroulette-web/modules/ChessGame/ChessGame';
+// import { ChessGame } from 'apps/chessroulette-web/modules/ChessGame/ChessGame';
 import { MovexBoundResource } from 'movex-react';
 import movexConfig from 'apps/chessroulette-web/movex.config';
 import MainActivity from 'apps/chessroulette-web/modules/room/PlayActivity';
