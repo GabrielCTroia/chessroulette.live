@@ -7,11 +7,13 @@ import {
 } from '@xmatter/util-kit';
 import {
   addMoveToChessHistoryAtNextAvailableIndex,
+  getChessHistoryAtIndex,
   pgnToHistory,
 } from 'apps/chessroulette-web/components/GameHistory/lib';
 import {
   ChessHistoryIndex,
   ChessRecursiveHistory,
+  ChessRecursiveMove,
 } from 'apps/chessroulette-web/components/GameHistory/types';
 import { getNewChessGame, isValidPgn } from 'apps/chessroulette-web/lib/chess';
 
@@ -20,11 +22,15 @@ import { fenBoardPieceSymbolToDetailedChessPiece } from 'util-kit/src/lib/ChessF
 
 // type ParticipantId = string;
 
+// type ChessRecursiveHistoryWithFen = (ChessRecursiveMove & { fen: ChessFEN })[];
+
 export type LearnActivityState = {
   activityType: 'learn';
   activityState: {
     fen: ChessFEN;
     history: {
+      // moves: ChessRecursiveHistoryWithFen;
+      startingFen: ChessFEN;
       moves: ChessRecursiveHistory;
       focusedIndex: ChessHistoryIndex;
     };
@@ -47,7 +53,13 @@ export const initialActivtityState: ActivityState = {
 
 export type ActivityActions =
   | Action<'dropPiece', ChessMove>
-  | Action<'importPgn', ChessPGN>;
+  | Action<'importPgn', ChessPGN>
+  | Action<
+      'focusHistoryIndex',
+      {
+        index: ChessHistoryIndex;
+      }
+    >;
 
 // PART 3: The Reducer – This is where all the logic happens
 
@@ -70,18 +82,18 @@ export default (
           throw new Error(`No Piece at ${from}`);
         }
 
-        const { color, piece } =
-          fenBoardPieceSymbolToDetailedChessPiece(fenPiece);
+        // const { color, piece } =
+        //   fenBoardPieceSymbolToDetailedChessPiece(fenPiece);
 
-        instance.move(from, to);
+        const nextMove = instance.move(from, to);
 
-        const nextMove: DetailedChessMove = {
-          from: from,
-          to: to,
-          san: `${from}${to}`,
-          color: color,
-          piece: piece,
-        };
+        // const nextMove: DetailedChessMove = {
+        //   from: from,
+        //   to: to,
+        //   san: `${piece === 'p' ? '' : piece}${to}`,
+        //   color: color,
+        //   piece: piece,
+        // };
 
         // const addAtIndex = atIndex !== undefined ? atIndex : prev.history.length;
         const [nextHistory, addedAtIndex] =
@@ -96,6 +108,7 @@ export default (
           activityState: {
             fen: instance.fen,
             history: {
+              ...prev.activityState.history,
               moves: nextHistory,
               focusedIndex: addedAtIndex,
             },
@@ -109,8 +122,6 @@ export default (
         return prev;
       }
     } else if (action.type === 'importPgn') {
-      console.log('this works', action);
-
       if (!isValidPgn(action.payload)) {
         return prev;
       }
@@ -119,8 +130,6 @@ export default (
         pgn: action.payload,
       });
 
-      console.log('instance', action.payload, instance.fen());
-
       const nextHistoryMovex = pgnToHistory(action.payload);
 
       return {
@@ -128,11 +137,40 @@ export default (
         activityState: {
           fen: instance.fen(),
           history: {
+            startingFen: ChessFENBoard.STARTING_FEN,
             moves: nextHistoryMovex,
             focusedIndex: nextHistoryMovex.length - 1,
           },
         },
       };
+    } else if (action.type === 'focusHistoryIndex') {
+      const historyAtFocusedIndex = getChessHistoryAtIndex(
+        prev.activityState.history.moves,
+        action.payload.index
+      );
+
+      const instance = new ChessFENBoard(
+        prev.activityState.history.startingFen
+      );
+
+      historyAtFocusedIndex.forEach((m) => {
+        instance.move(m.from, m.to);
+      });
+
+      const nextFen = instance.fen;
+
+      return {
+        ...prev,
+        activityState: {
+          fen: nextFen,
+          history: {
+            ...prev.activityState.history,
+            focusedIndex: action.payload.index,
+          },
+        },
+      };
+
+      // const fenPiece = instance.piece(from);
     }
   }
 

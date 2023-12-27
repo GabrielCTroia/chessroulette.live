@@ -155,8 +155,12 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                                   focusedIndex={
                                     activityState.history.focusedIndex
                                   }
-                                  onRefocus={() => {
-                                    console.log('on refocus');
+                                  onRefocus={(index) => {
+                                    console.log('on refocus', index);
+                                    dispatch({
+                                      type: 'focusHistoryIndex',
+                                      payload: { index },
+                                    });
                                   }}
                                   // containerClassName="px-1"
                                 />
@@ -183,7 +187,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           return (
                             <PgnInputBox
                               containerClassName="flex-1 h-full"
-                              contentClassName='p-3 bg-slate-500'
+                              contentClassName="p-3 bg-slate-500"
                               onChange={(nextPgn) => {
                                 dispatch({
                                   type: 'importPgn',

@@ -113,7 +113,7 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
   // }
 
   // TODO: This should be done differently!
-  if (action.type === 'dropPiece' || action.type === 'importPgn') {
+  if (action.type === 'dropPiece' || action.type === 'importPgn' || action.type === 'focusHistoryIndex') {
     // console.log('heere')
     return {
       ...state,

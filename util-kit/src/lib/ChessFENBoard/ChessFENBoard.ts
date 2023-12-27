@@ -1,11 +1,14 @@
-import { ChessFEN } from '../Chess/types';
+import { ChessFEN, DetailedChessMove } from '../Chess/types';
+import { invoke } from '../misc';
 import {
   FENBoard,
   FenBoardPieceSymbol,
   emptyBoard,
+  fenBoardPieceSymbolToDetailedChessPiece,
+  fenBoardPieceSymbolToPieceSymbol,
   getFileRank,
 } from './chessUtils';
-import { Square } from 'chess.js';
+import { PieceSymbol, Square } from 'chess.js';
 
 export class ChessFENBoard {
   static STARTING_FEN: ChessFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -75,7 +78,7 @@ export class ChessFENBoard {
    * @param {string} from - The square to move from. Eg: "a2"
    * @param {string} to - The square to move to. Eg: "a3"
    */
-  move(from: Square, to: Square) {
+  move(from: Square, to: Square): DetailedChessMove {
     // TODO: Add it back This needs to recalcualte the fen as well
 
     const piece = this.piece(from);
@@ -83,10 +86,44 @@ export class ChessFENBoard {
       throw new Error('Move Error: the from square was empty');
     }
 
+    const toPiece = this.piece(to);
+    const captured: PieceSymbol | undefined = toPiece
+      ? fenBoardPieceSymbolToPieceSymbol(toPiece)
+      : undefined;
+
     this.put(to, piece);
 
     // TODO: here the fen gets recalculate 2 times
     this.clear(from);
+
+    const detailedPiece = fenBoardPieceSymbolToDetailedChessPiece(piece);
+
+    const sanPiece =
+      detailedPiece.piece === 'p'
+        ? ''
+        : detailedPiece.piece.toLocaleUpperCase();
+    const sanCaptured = invoke(() => {
+      if (!captured) {
+        return '';
+      }
+
+      if (detailedPiece.piece === 'p') {
+        return `${from[0]}x`;
+      }
+
+      return 'x';
+    });
+
+    const san = `${sanPiece}${sanCaptured}${to}`;
+
+    return {
+      color: detailedPiece.color,
+      piece: detailedPiece.piece,
+      captured,
+      san,
+      to,
+      from,
+    };
   }
 
   /**
