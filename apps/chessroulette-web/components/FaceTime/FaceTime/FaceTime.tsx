@@ -42,17 +42,7 @@ export const FaceTime: React.FC<FaceTimeProps> = ({
   const [loadingVideo, setLoadingVideo] = useState(true);
 
   const loader = (
-    <div
-      // className={cls.loadingWrapper}
-      //     top: 0,
-      //     left: 0,
-      //     right: 0,
-      //     bottom: 0,
-      //     position: 'absolute',
-      //     zIndex: 99,
-      //     display: 'flex',
-      className="absolute flex right-0 top-0 bottom-0 left-0 z-50"
-    >
+    <div className="absolute flex right-0 top-0 bottom-0 left-0 z-50">
       {loadingFallback || (
         <div>Loading...</div>
         // <div className={cls.loader}>
@@ -63,10 +53,7 @@ export const FaceTime: React.FC<FaceTimeProps> = ({
   );
 
   return (
-    <div
-      // className={cx(cls.container, containerClassName)}
-      className={`relative ${containerClassName}`}
-    >
+    <div className={`relative ${containerClassName}`}>
       <AspectRatio aspectRatio={aspectRatio}>
         {streamConfig.on ? (
           <>

@@ -6,21 +6,30 @@ import {
   objectKeys,
   toResourceIdentifierStr,
 } from 'movex-core-util';
-import { MovexBoundResource, useMovexBoundResourceFromRid } from 'movex-react';
-import { NoSSR } from 'apps/chessroulette-web/components/NoSSR';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo } from 'react';
-import { Button } from 'apps/chessroulette-web/components/Button';
+import { MovexBoundResource } from 'movex-react';
+import { useMemo } from 'react';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { PeerStreamingGroup } from '../PeerStreaming';
 import { MultiFaceTimeCompact } from 'apps/chessroulette-web/components/FaceTime/MultiFaceTimeCompact';
 import { PeerUserIdsMap } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
+import { config } from 'apps/chessroulette-web/config';
+import { CameraView } from 'apps/chessroulette-web/components/CameraView';
+import { AspectRatio } from 'apps/chessroulette-web/components/AspectRatio';
+import { FaceTimeProps } from 'apps/chessroulette-web/components/FaceTime';
 
 type Props = {
   rid: ResourceIdentifier<'room'>;
+  aspectRatio?: FaceTimeProps['aspectRatio'];
 };
 
-export default (props: Props) => {
+const hashDemoImgId = (id: string) => {
+  return Number(id.match(/\d/)?.[0] || 0);
+};
+
+export default ({
+  rid,
+  aspectRatio = 16/10,
+}: Props) => {
   const userId = useUserId();
   const peerUser = useMemo(() => {
     if (userId) {
@@ -33,8 +42,8 @@ export default (props: Props) => {
   }, [userId]);
 
   const ridAsStr = useMemo(
-    () => toResourceIdentifierStr(props.rid),
-    [props.rid]
+    () => toResourceIdentifierStr(rid),
+    [rid]
   );
 
   // console.log('render streaming');
@@ -48,21 +57,30 @@ export default (props: Props) => {
   return (
     <MovexBoundResource
       movexDefinition={movexConfig}
-      rid={props.rid}
+      rid={rid}
       // onResourceStateUpdated={(r) => {
       //   console.log('next state', r);
       // }}
-      render={({ boundResource: { state, dispatch } }) => {
+      render={({ boundResource: { state } }) => {
         // console.log('state', state);
         // const userId = searchParams.get('userId');
         const { [userId]: removedMe, ...peerUserIdsMap } = objectKeys(
           state.participants
-        ).reduce((prev, nextUserId) => {
-          return {
+        ).reduce(
+          (prev, nextUserId) => ({
             ...prev,
             [nextUserId]: nextUserId,
-          };
-        }, {} as PeerUserIdsMap);
+          }),
+          {} as PeerUserIdsMap
+        );
+
+        if (!config.CAMERA_ON) {
+          return (
+            <AspectRatio aspectRatio={aspectRatio}>
+              <CameraView className={`w-full h-full object-covers`} demoImgId={hashDemoImgId(userId) as any} />
+            </AspectRatio>
+          )
+        }
 
         return (
           <PeerStreamingGroup
@@ -73,12 +91,13 @@ export default (props: Props) => {
             render={({ reel }) => (
               <MultiFaceTimeCompact
                 reel={reel}
+                aspectRatio={aspectRatio}
                 onFocus={() => {
                   console.log('on focus');
                 }}
               />
             )}
-          ></PeerStreamingGroup>
+          />
         );
       }}
       // If there is a given slot just show the ChatBox

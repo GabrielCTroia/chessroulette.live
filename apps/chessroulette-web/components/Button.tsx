@@ -5,15 +5,19 @@ type Props = PropsWithChildren<{
   type?: 'primary' | 'secondary' | 'clear';
   onClick?: () => void;
   className?: string;
+  disabled?: boolean;
 }>;
 
 export const Button: React.FC<Props> = ({
   children,
   type = 'primary',
+  disabled,
   onClick,
   className,
 }) => {
   const localClassName = useMemo(() => {
+    // const disabledClass = disabled ? 'disabled' : '';
+
     if (type === 'primary') {
       return 'bg-indigo-500 hover:bg-indigo-600 p-3 pl-5 pr-5 text-white font-bold rounded-xl';
     }
@@ -23,10 +27,14 @@ export const Button: React.FC<Props> = ({
     }
 
     return;
-  }, [type, className]);
+  }, [type, disabled]);
 
   return (
-    <button className={localClassName + ' ' + className} onClick={onClick}>
+    <button
+      className={`${localClassName} ${className}`}
+      onClick={onClick}
+      disabled={disabled}
+    >
       {children}
     </button>
   );

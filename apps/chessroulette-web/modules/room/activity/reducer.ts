@@ -2,13 +2,18 @@ import {
   ChessFEN,
   ChessFENBoard,
   ChessMove,
+  ChessPGN,
   DetailedChessMove,
 } from '@xmatter/util-kit';
-import { addMoveToChessHistoryAtNextAvailableIndex } from 'apps/chessroulette-web/components/GameHistory/lib';
+import {
+  addMoveToChessHistoryAtNextAvailableIndex,
+  pgnToHistory,
+} from 'apps/chessroulette-web/components/GameHistory/lib';
 import {
   ChessHistoryIndex,
   ChessRecursiveHistory,
 } from 'apps/chessroulette-web/components/GameHistory/types';
+import { getNewChessGame, isValidPgn } from 'apps/chessroulette-web/lib/chess';
 
 import { Action } from 'movex-core-util';
 import { fenBoardPieceSymbolToDetailedChessPiece } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
@@ -40,7 +45,9 @@ export const initialActivtityState: ActivityState = {
 
 // PART 2: Action Types
 
-export type ActivityActions = Action<'dropPiece', ChessMove>;
+export type ActivityActions =
+  | Action<'dropPiece', ChessMove>
+  | Action<'importPgn', ChessPGN>;
 
 // PART 3: The Reducer – This is where all the logic happens
 
@@ -101,6 +108,31 @@ export default (
 
         return prev;
       }
+    } else if (action.type === 'importPgn') {
+      console.log('this works', action);
+
+      if (!isValidPgn(action.payload)) {
+        return prev;
+      }
+
+      const instance = getNewChessGame({
+        pgn: action.payload,
+      });
+
+      console.log('instance', action.payload, instance.fen());
+
+      const nextHistoryMovex = pgnToHistory(action.payload);
+
+      return {
+        ...prev,
+        activityState: {
+          fen: instance.fen(),
+          history: {
+            moves: nextHistoryMovex,
+            focusedIndex: nextHistoryMovex.length - 1,
+          },
+        },
+      };
     }
   }
 

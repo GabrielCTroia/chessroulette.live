@@ -1,3 +1,4 @@
+import { ChessPGN } from '@xmatter/util-kit';
 import {
   ChessHistoryIndex,
   ChessHistoryMove,
@@ -6,6 +7,7 @@ import {
   ChessRecursiveHistoryIndex,
   ChessRecursiveMove,
 } from './types';
+import { getNewChessGame } from 'apps/chessroulette-web/lib/chess';
 
 export const isChessRecursiveHistoryIndex = (
   a: unknown
@@ -558,4 +560,7 @@ export const getNextAvailableParallelIndex = (
   ];
 };
 
-export const actions = {};
+// export const actions = {};
+
+export const pgnToHistory = (pgn: ChessPGN) =>
+  getNewChessGame({ pgn }).history({ verbose: true });

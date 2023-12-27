@@ -20,6 +20,7 @@ import { initialPeerStreamingState, peerStreamingReducer } from './reducer';
 import { User, UserId } from '../user/type';
 import { Reel } from 'apps/chessroulette-web/components/FaceTime/MultiFaceTimeCompact';
 import { useReel } from './hooks';
+import { config } from 'apps/chessroulette-web/config';
 // import { useDispatch } from 'react-redux';
 // import { useWillUnmount } from 'src/lib/hooks/useWillUnmount';
 // import { Peer } from 'src/providers/PeerConnectionProvider';
@@ -88,7 +89,7 @@ export const PeerStreamingGroup: React.FC<Props> = React.memo((props) => {
     });
   }, [props.peerUserIdsMap, dispatch]);
 
-  console.log('PeerStreamingGroup state', state);
+  // console.log('PeerStreamingGroup state', state);
 
   // const reel = useMemo<Reel>(() => ({
 
@@ -106,6 +107,10 @@ export const PeerStreamingGroup: React.FC<Props> = React.memo((props) => {
     peersMap: state.peers,
     clientUserId: props.clientUserId,
   });
+
+  if (!config.CAMERA_ON) {
+    return <>{props.render({ reel })}</>;
+  }
 
   return (
     // TODO: Ensure this doesn't get rendered multiple times (ths opening the peerjs connection multiple times)

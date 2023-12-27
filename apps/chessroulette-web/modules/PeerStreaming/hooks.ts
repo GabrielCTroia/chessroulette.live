@@ -43,7 +43,7 @@ export const useReel = ({
 }: Props): Reel | undefined => {
   // const [state, dispatch] = useReducer(peerStreamingReducer, initialPeerStreamingState);
 
-  console.log('use reel peersMap:', peersMap);
+  // console.log('use reel peersMap:', peersMap);ƒ
 
   const peersMapValues = Object.values(peersMap);
 

@@ -23,3 +23,15 @@ export const getNewChessGame = (
 
   return instance;
 };
+
+export const isValidPgn = (s: string): s is ChessPGN => {
+  const instance = new Chess();
+
+  try {
+    instance.loadPgn(s);
+
+    return true;
+  } catch {
+    return false;
+  }
+};

@@ -4,6 +4,7 @@ import activityReducer, {
   ActivityState,
 } from '../activity/reducer';
 import { User } from '../../user/type';
+import { getNewChessGame } from 'apps/chessroulette-web/lib/chess';
 
 // export const userSlots = {
 //   pink: true,
@@ -112,7 +113,7 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
   // }
 
   // TODO: This should be done differently!
-  if (action.type === 'dropPiece') {
+  if (action.type === 'dropPiece' || action.type === 'importPgn') {
     // console.log('heere')
     return {
       ...state,

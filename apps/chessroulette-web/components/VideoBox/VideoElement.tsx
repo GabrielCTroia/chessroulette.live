@@ -1,5 +1,4 @@
 import React, { useRef, useEffect } from 'react';
-// import { setTimeout } from 'window-or-global';
 
 type VideoAttributes = React.DetailedHTMLProps<
   React.VideoHTMLAttributes<HTMLVideoElement>,
