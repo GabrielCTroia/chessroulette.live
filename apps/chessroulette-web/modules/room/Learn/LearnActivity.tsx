@@ -87,18 +87,36 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                 const { activityState } = state.activity;
 
                 return (
-                  <ContainerWithDimensions
-                    className="h-full w-full"
-                    render={(s) => (
-                      <Freeboard
-                        sizePx={s.height} // TODO: Here this fails when the height is super small! need to look into it
-                        fen={activityState.fen}
-                        onPieceDrop={(payload) =>
-                          dispatch({ type: 'dropPiece', payload })
-                        }
-                      />
-                    )}
-                  />
+                  <>
+                    <ContainerWithDimensions
+                      className="h-full w-full"
+                      render={(s) => (
+                        <Freeboard
+                          boardOrientation={activityState.boardOrientation}
+                          sizePx={s.height} // TODO: Here this fails when the height is super small! need to look into it
+                          fen={activityState.fen}
+                          onPieceDrop={(payload) =>
+                            dispatch({ type: 'dropPiece', payload })
+                          }
+                        />
+                      )}
+                    />
+                    <div className="text-right">
+                      <button
+                        onClick={() => {
+                          dispatch({
+                            type: 'changeBoardOrientation',
+                            payload:
+                              activityState.boardOrientation === 'black'
+                                ? 'white'
+                                : 'black',
+                          });
+                        }}
+                      >
+                        Flip
+                      </button>
+                    </div>
+                  </>
                 );
               }}
             />

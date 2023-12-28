@@ -1,4 +1,5 @@
 import {
+  ChessColor,
   ChessFEN,
   ChessFENBoard,
   ChessMove,
@@ -16,6 +17,7 @@ import {
   ChessRecursiveMove,
 } from 'apps/chessroulette-web/components/GameHistory/types';
 import { getNewChessGame, isValidPgn } from 'apps/chessroulette-web/lib/chess';
+import { Color } from 'chessterrain-react';
 
 import { Action } from 'movex-core-util';
 import { fenBoardPieceSymbolToDetailedChessPiece } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
@@ -28,6 +30,7 @@ export type LearnActivityState = {
   activityType: 'learn';
   activityState: {
     fen: ChessFEN;
+    boardOrientation: Color;
     history: {
       // moves: ChessRecursiveHistoryWithFen;
       startingFen: ChessFEN;
@@ -59,7 +62,8 @@ export type ActivityActions =
       {
         index: ChessHistoryIndex;
       }
-    >;
+    >
+  | Action<'changeBoardOrientation', Color>;
 
 // PART 3: The Reducer – This is where all the logic happens
 
@@ -106,6 +110,7 @@ export default (
         return {
           ...prev,
           activityState: {
+            boardOrientation: 'white',
             fen: instance.fen,
             history: {
               ...prev.activityState.history,
@@ -135,6 +140,7 @@ export default (
       return {
         ...prev,
         activityState: {
+          ...prev.activityState,
           fen: instance.fen(),
           history: {
             startingFen: ChessFENBoard.STARTING_FEN,
@@ -162,6 +168,7 @@ export default (
       return {
         ...prev,
         activityState: {
+          ...prev.activityState,
           fen: nextFen,
           history: {
             ...prev.activityState.history,
@@ -171,6 +178,16 @@ export default (
       };
 
       // const fenPiece = instance.piece(from);
+    }
+
+    if (action.type === 'changeBoardOrientation') {
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          boardOrientation: action.payload,
+        },
+      };
     }
   }
 
