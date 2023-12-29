@@ -1,10 +1,8 @@
 import {
-  ChessColor,
   ChessFEN,
   ChessFENBoard,
   ChessMove,
   ChessPGN,
-  DetailedChessMove,
 } from '@xmatter/util-kit';
 import {
   addMoveToChessHistoryAtNextAvailableIndex,
@@ -14,13 +12,10 @@ import {
 import {
   ChessHistoryIndex,
   ChessRecursiveHistory,
-  ChessRecursiveMove,
 } from 'apps/chessroulette-web/components/GameHistory/types';
 import { getNewChessGame, isValidPgn } from 'apps/chessroulette-web/lib/chess';
 import { Color } from 'chessterrain-react';
-
 import { Action } from 'movex-core-util';
-import { fenBoardPieceSymbolToDetailedChessPiece } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
 
 // type ParticipantId = string;
 

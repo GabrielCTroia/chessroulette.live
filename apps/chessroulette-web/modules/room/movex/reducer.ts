@@ -4,7 +4,6 @@ import activityReducer, {
   ActivityState,
 } from '../activity/reducer';
 import { User } from '../../user/type';
-import { getNewChessGame } from 'apps/chessroulette-web/lib/chess';
 
 // export const userSlots = {
 //   pink: true,

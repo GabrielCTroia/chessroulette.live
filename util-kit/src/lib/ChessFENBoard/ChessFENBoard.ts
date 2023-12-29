@@ -8,7 +8,7 @@ import {
   fenBoardPieceSymbolToPieceSymbol,
   getFileRank,
 } from './chessUtils';
-import { PieceSymbol, Square } from 'chess.js';
+import type { PieceSymbol, Square } from 'chess.js';
 
 export class ChessFENBoard {
   static STARTING_FEN: ChessFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -98,10 +98,7 @@ export class ChessFENBoard {
 
     const detailedPiece = fenBoardPieceSymbolToDetailedChessPiece(piece);
 
-    const sanPiece =
-      detailedPiece.piece === 'p'
-        ? ''
-        : detailedPiece.piece.toLocaleUpperCase();
+    const sanPiece = detailedPiece.piece === 'p' ? '' : detailedPiece.piece.toLocaleUpperCase();
     const sanCaptured = invoke(() => {
       if (!captured) {
         return '';

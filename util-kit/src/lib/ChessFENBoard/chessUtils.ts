@@ -1,7 +1,7 @@
 import type { Color, PieceSymbol, Square, Move } from 'chess.js';
 import { Chess } from 'chess.js';
 import { Matrix, MatrixIndex, matrixMap } from '../matrix';
-import { ChessMove, ChessMoveSan, ChessPGN, DetailedChessMove } from '../Chess/types';
+import { ChessPGN } from '../Chess/types';
 
 export const ranks = { 1: 7, 2: 6, 3: 5, 4: 4, 5: 3, 6: 2, 7: 1, 8: 0 };
 export const files = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
@@ -124,15 +124,15 @@ export const fenBoardPieceSymbolToPieceSymbol = (
 
 export const detailedPieceToPieceSymbol = () => {};
 
-export const pgnToFen = (pgn: ChessPGN) => {
-  const instance = new Chess();
+// export const pgnToFen = (pgn: ChessPGN) => {
+//   const instance = new Chess();
 
-  // instance.
+//   // instance.
 
-  instance.loadPgn(pgn);
+//   instance.loadPgn(pgn);
 
-  return instance.fen();
-};
+//   return instance.fen();
+// };
 
 // export const BITS: Record<string, number> = {
 //   NORMAL: 1,
