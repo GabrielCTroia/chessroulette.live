@@ -18,6 +18,7 @@ import { objectKeys } from 'movex-core-util';
 import { getRandomInt } from 'apps/chessroulette-web/util';
 import Header from 'apps/chessroulette-web/components/Header';
 import { ChessFENBoard } from '@xmatter/util-kit';
+import { initialLearnActivityState } from '../room/activity/reducer';
 
 
 export default () => {
@@ -74,16 +75,7 @@ export default () => {
             roomResource
               ?.create({
                 ...initialRoomState,
-                activity: {
-                  activityType: 'learn',
-                  activityState: {
-                    fen: ChessFENBoard.STARTING_FEN,
-                    history: {
-                      moves: [],
-                      focusedIndex: -1,
-                    },
-                  },
-                },
+                activity: initialLearnActivityState,
               })
               .map((s) => {
                 router.push(

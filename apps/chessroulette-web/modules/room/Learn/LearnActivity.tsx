@@ -150,7 +150,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           <Button
                             onClick={p.focus}
                             className={
-                              p.isFocused ? 'bg-red-500 hover:bg-red-700' : ''
+                              p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
                             }
                           >
                             History
@@ -195,7 +195,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           <Button
                             onClick={p.focus}
                             className={
-                              p.isFocused ? 'bg-red-500 hover:bg-red-700' : ''
+                              p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
                             }
                           >
                             Import

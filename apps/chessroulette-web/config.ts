@@ -11,7 +11,7 @@ const SIGNALING_SERVER_CONFIG = {
 const MOVEX_ENDPOINT_URL = process.env.NEXT_PUBLIC_MOVEX_ENDPOINT_URL as string;
 
 // TODO: This could be changed from
-const CAMERA_ON = true;
+const CAMERA_ON = false;
 
 export const config = {
   SIGNALING_SERVER_CONFIG,

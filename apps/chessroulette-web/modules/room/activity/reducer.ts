@@ -52,6 +52,19 @@ export const initialActivtityState: ActivityState = {
   activityState: {},
 };
 
+export const initialLearnActivityState: LearnActivityState = {
+  activityType: 'learn',
+  activityState: {
+    boardOrientation: 'white',
+    fen: ChessFENBoard.STARTING_FEN,
+    history: {
+      startingFen: ChessFENBoard.STARTING_FEN,
+      moves: [],
+      focusedIndex: -1,
+    },
+  },
+};
+
 // PART 2: Action Types
 
 export type ActivityActions =
@@ -110,7 +123,7 @@ export default (
         return {
           ...prev,
           activityState: {
-            boardOrientation: 'white',
+            ...prev.activityState,
             fen: instance.fen,
             history: {
               ...prev.activityState.history,

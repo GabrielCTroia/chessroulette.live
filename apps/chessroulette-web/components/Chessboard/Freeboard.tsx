@@ -1,14 +1,20 @@
-import { Color, toLongColor } from 'chessterrain-react';
+'use client';
+
+import { useMemo } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Square } from 'chess.js';
-import { ChessFEN, ChessFENBoard } from '@xmatter/util-kit';
-import { useMemo } from 'react';
+import {
+  ChessColor,
+  ChessFEN,
+  ChessFENBoard,
+  toLongColor,
+} from '@xmatter/util-kit';
 
 type Props = {
   sizePx: number;
   fen?: ChessFEN;
-  playingColor?: Color;
-  boardOrientation?: Color;
+  playingColor?: ChessColor;
+  boardOrientation?: ChessColor;
   onPieceDrop?: (p: { from: Square; to: Square }) => void;
 };
 
@@ -17,7 +23,8 @@ export const Freeboard = ({
   ...props
 }: Props) => {
   const boardOrientation = useMemo(
-    () => props.boardOrientation ? toLongColor(props.boardOrientation) : undefined,
+    () =>
+      props.boardOrientation ? toLongColor(props.boardOrientation) : undefined,
     [props.boardOrientation]
   );
 
