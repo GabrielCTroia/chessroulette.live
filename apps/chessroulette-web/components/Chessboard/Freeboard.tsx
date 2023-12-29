@@ -9,6 +9,7 @@ import {
   ChessFENBoard,
   toLongColor,
 } from '@xmatter/util-kit';
+import { useArrowColor } from './useArrowColor';
 
 type Props = {
   sizePx: number;
@@ -17,6 +18,7 @@ type Props = {
   boardOrientation?: ChessColor;
   onPieceDrop?: (p: { from: Square; to: Square }) => void;
 };
+
 
 export const Freeboard = ({
   fen = ChessFENBoard.STARTING_FEN,
@@ -27,6 +29,8 @@ export const Freeboard = ({
       props.boardOrientation ? toLongColor(props.boardOrientation) : undefined,
     [props.boardOrientation]
   );
+
+  const arrowColor = useArrowColor();
 
   return (
     <Chessboard
@@ -52,6 +56,7 @@ export const Freeboard = ({
         });
         return true;
       }}
+      customArrowColor={arrowColor}
     />
   );
 };

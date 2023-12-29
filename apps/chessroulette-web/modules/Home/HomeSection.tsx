@@ -47,7 +47,7 @@ export default () => {
         }}
       /> */}
       <main className="flex gap-6">
-        <Button
+        {/* <Button
           onClick={() => {
             // console.log('works', roomResource);
 
@@ -67,7 +67,7 @@ export default () => {
           }}
         >
           Play
-        </Button>
+        </Button> */}
         <Button
           onClick={() => {
             // console.log('works', roomResource);

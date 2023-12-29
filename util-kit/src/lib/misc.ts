@@ -35,3 +35,9 @@ export const toDictIndexedBy = <
     }),
     {} as { [k: string]: O }
   );
+
+// Use this to get inherited keys as well
+export const keyInObject = <X extends {}, Y extends PropertyKey>(
+  obj: X,
+  prop: Y
+): obj is X & Record<Y, unknown> => prop in obj;
