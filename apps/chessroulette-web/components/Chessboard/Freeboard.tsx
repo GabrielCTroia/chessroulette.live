@@ -38,30 +38,31 @@ export const Freeboard = ({
 
   const arrowColor = useArrowColor();
 
-  const [canCall, setCanCall] = useState(false);
+  // const [canCall, setCanCall] = useState(false);
 
-  const onArrowsChangeConditioned = useCallbackIf<
-    NonNullable<ChessboardProps['onArrowsChange']>
-  >(
-    canCall,
-    (arrows) => {
-      if (arrows.length === 0) {
-        props.onArrowsChange?.([]);
-      }
-      else {
-        props.onArrowsChange?.([...props.arrows || [], ...arrows]);
-      }
-    },
-    [props.onArrowsChange, props.arrows]
-  );
+  // TODO: This isn't yet working correctly
+  // const onArrowsChangeConditioned = useCallbackIf<
+  //   NonNullable<ChessboardProps['onArrowsChange']>
+  // >(
+  //   canCall,
+  //   (arrows) => {
+  //     if (arrows.length === 0) {
+  //       props.onArrowsChange?.([]);
+  //     }
+  //     else {
+  //       props.onArrowsChange?.([...props.arrows || [], ...arrows]);
+  //     }
+  //   },
+  //   [props.onArrowsChange, props.arrows?.length]
+  // );
 
-  useEffect(() => {
-    setTimeout(() => {
-      setCanCall(true);
-    }, 50);
-  }, []);
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     setCanCall(true);
+  //   }, 50);
+  // }, []);
 
-  console.log('customArrows', props.arrows);
+  // console.log('customArrows', props.arrows);
 
   return (
     <Chessboard
@@ -88,7 +89,7 @@ export const Freeboard = ({
         return true;
       }}
       customArrows={props.arrows}
-      onArrowsChange={onArrowsChangeConditioned}
+      // onArrowsChange={onArrowsChangeConditioned}
       customArrowColor={arrowColor}
     />
   );
