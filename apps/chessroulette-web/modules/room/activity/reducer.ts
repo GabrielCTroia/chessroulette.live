@@ -16,6 +16,7 @@ import {
 import { getNewChessGame, isValidPgn } from 'apps/chessroulette-web/lib/chess';
 import { Color } from 'chessterrain-react';
 import { Action } from 'movex-core-util';
+import { Arrow } from 'react-chessboard/dist/chessboard/types';
 
 // type ParticipantId = string;
 
@@ -26,6 +27,7 @@ export type LearnActivityState = {
   activityState: {
     fen: ChessFEN;
     boardOrientation: Color;
+    arrows: Arrow[];
     history: {
       // moves: ChessRecursiveHistoryWithFen;
       startingFen: ChessFEN;
@@ -52,6 +54,7 @@ export const initialLearnActivityState: LearnActivityState = {
   activityState: {
     boardOrientation: 'white',
     fen: ChessFENBoard.STARTING_FEN,
+    arrows: [],
     history: {
       startingFen: ChessFENBoard.STARTING_FEN,
       moves: [],
@@ -71,7 +74,8 @@ export type ActivityActions =
         index: ChessHistoryIndex;
       }
     >
-  | Action<'changeBoardOrientation', Color>;
+  | Action<'changeBoardOrientation', Color>
+  | Action<'arrowChange', Arrow[]>;
 
 // PART 3: The Reducer – This is where all the logic happens
 
@@ -194,6 +198,16 @@ export default (
         activityState: {
           ...prev.activityState,
           boardOrientation: action.payload,
+        },
+      };
+    }
+
+    if (action.type === 'arrowChange') {
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          arrows: action.payload,
         },
       };
     }

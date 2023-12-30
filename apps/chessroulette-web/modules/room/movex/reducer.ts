@@ -116,7 +116,8 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
     action.type === 'dropPiece' ||
     action.type === 'importPgn' ||
     action.type === 'focusHistoryIndex' ||
-    action.type === 'changeBoardOrientation'
+    action.type === 'changeBoardOrientation' ||
+    action.type === 'arrowChange'
   ) {
     // console.log('heere')
     return {

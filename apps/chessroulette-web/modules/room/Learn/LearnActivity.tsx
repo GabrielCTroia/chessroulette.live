@@ -58,9 +58,9 @@ export default ({ playingColor = 'white', ...props }: Props) => {
             <MovexBoundResource
               movexDefinition={movexConfig}
               rid={props.rid}
-              onResourceStateUpdated={(s) => {
-                console.log('first component updated state', s);
-              }}
+              // onResourceStateUpdated={(s) => {
+              //   console.log('first component updated state', s);
+              // }}
               onReady={({ boundResource }) => {
                 // const userId = searchParams.get('userId');
                 boundResource.dispatch({
@@ -86,6 +86,8 @@ export default ({ playingColor = 'white', ...props }: Props) => {
 
                 const { activityState } = state.activity;
 
+                console.log('activity state', activityState);
+
                 return (
                   <>
                     <ContainerWithDimensions
@@ -98,6 +100,11 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           onPieceDrop={(payload) =>
                             dispatch({ type: 'dropPiece', payload })
                           }
+                          onArrowsChange={(payload) => {
+                            console.log('on arrow change?')
+                            dispatch({ type: 'arrowChange', payload });
+                          }}
+                          arrows={activityState.arrows}
                         />
                       )}
                     />
