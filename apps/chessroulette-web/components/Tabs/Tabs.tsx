@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 type Props = {
   tabs: {
@@ -11,6 +11,7 @@ type Props = {
       isFocused: boolean;
     }) => React.ReactNode;
   }[];
+  renderContainerHeader?: (tabsHeader: React.ReactNode[]) => React.ReactNode;
   currentIndex?: number;
   containerClassName?: string;
   headerContainerClassName?: string;
@@ -22,18 +23,30 @@ export const Tabs = (props: Props) => {
     props.currentIndex || 0
   );
 
+  const headerComponent = useMemo(() => {
+    const tabs = props.tabs.map((p, i) => (
+      <div key={i}>
+        {p.renderHeader({
+          focus: () => setCurrentTabIndex(i),
+          isFocused: i === currentTabIndex,
+        })}
+      </div>
+    ));
+
+    if (props.renderContainerHeader) {
+      return props.renderContainerHeader(tabs);
+    }
+
+    return (
+      <div className={`flex flex-row ${props.headerContainerClassName}`}>
+        {tabs.map((c) => c)}
+      </div>
+    );
+  }, [props.renderContainerHeader]);
+
   return (
     <div className={props.containerClassName}>
-      <div className={`flex flex-row ${props.headerContainerClassName}`}>
-        {props.tabs.map((p, i) => (
-          <div key={i}>
-            {p.renderHeader({
-              focus: () => setCurrentTabIndex(i),
-              isFocused: i === currentTabIndex,
-            })}
-          </div>
-        ))}
-      </div>
+      {headerComponent}
       <div className={`flex-1 ${props.contentClassName}`}>
         {props.tabs[currentTabIndex].renderContent({
           focus: setCurrentTabIndex,

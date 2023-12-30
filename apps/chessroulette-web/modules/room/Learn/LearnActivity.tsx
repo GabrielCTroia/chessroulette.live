@@ -8,13 +8,16 @@ import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboar
 import { LearnTemplate } from './LearnTemplate';
 import { GameHistory } from 'apps/chessroulette-web/components/GameHistory';
 import { getNewChessGame } from 'apps/chessroulette-web/lib/chess';
-import { ChessFEN, ChessPGN } from '@xmatter/util-kit';
+import { ChessFEN, ChessPGN, getRandomInt } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { useMemo, useState } from 'react';
 import Streaming from '../Streaming';
 import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
 import { Button } from 'apps/chessroulette-web/components/Button';
 import { Tabs } from 'apps/chessroulette-web/components/Tabs';
+import { ClipboardCopyButton } from 'apps/chessroulette-web/components/ClipboardCopyButton';
+import { useRouter, usePathname } from 'next/navigation';
+import { useUrl } from 'nextjs-current-url';
 
 type ChessColor = 'white' | 'black';
 
@@ -27,6 +30,14 @@ type Props = {
 type Tabs = 'history' | 'import';
 
 export default ({ playingColor = 'white', ...props }: Props) => {
+  const url = useUrl();
+
+  const [nextUserId, setNextUserId] = useState(getRandomInt(0, 99999));
+  const inviteUrl = useMemo(
+    () => (url ? url.host + url.pathname + `?userId=${nextUserId}` : ''),
+    [url, nextUserId]
+  );
+
   // const ridAsStr = useMemo(
   //   () => toResourceIdentifierStr(props.rid),
   //   [props.rid]
@@ -101,7 +112,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                             dispatch({ type: 'dropPiece', payload })
                           }
                           onArrowsChange={(payload) => {
-                            console.log('on arrow change?')
+                            console.log('on arrow change?');
                             dispatch({ type: 'arrowChange', payload });
                           }}
                           arrows={activityState.arrows}
@@ -151,6 +162,28 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                     containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 min-w-0"
                     contentClassName="min-h-0 min-w-0 flex-1"
                     currentIndex={0}
+                    renderContainerHeader={(tabs) => (
+                      <div
+                        className={`flex flex-row gap-3 pb-3 border-b border-slate-500`}
+                      >
+                        {tabs.map((c) => c)}
+                        <div className="flex-1" />
+                        <ClipboardCopyButton
+                          value={inviteUrl}
+                          copiedlLabel="Invitation Copied"
+                          className="bg-green-500 hover:bg-green-700"
+                          onCopied={() => {
+                            setNextUserId(getRandomInt(0, 9999));
+                          }}
+                          // onClick={p.focus}
+                          // className={
+                          // p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
+                          // }
+                        >
+                          Invite Friend
+                        </ClipboardCopyButton>
+                      </div>
+                    )}
                     tabs={[
                       {
                         renderHeader: (p) => (
@@ -181,7 +214,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                                     activityState.history.focusedIndex
                                   }
                                   onRefocus={(index) => {
-                                    console.log('on refocus', index);
+                                    // console.log('on refocus', index);
                                     dispatch({
                                       type: 'focusHistoryIndex',
                                       payload: { index },

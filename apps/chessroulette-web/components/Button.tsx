@@ -1,14 +1,14 @@
 import React from 'react';
 import { PropsWithChildren, useMemo } from 'react';
 
-type Props = PropsWithChildren<{
+export type ButtonProps = PropsWithChildren<{
   type?: 'primary' | 'secondary' | 'clear';
   onClick?: () => void;
   className?: string;
   disabled?: boolean;
 }>;
 
-export const Button: React.FC<Props> = ({
+export const Button: React.FC<ButtonProps> = ({
   children,
   type = 'primary',
   disabled,
