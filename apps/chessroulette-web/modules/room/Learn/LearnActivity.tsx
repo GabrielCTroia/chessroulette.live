@@ -99,6 +99,10 @@ export default ({ playingColor = 'white', ...props }: Props) => {
 
                 console.log('activity state', activityState);
 
+                const { history } = activityState;
+
+                const lastMove = history.moves.slice(-1)[0];
+
                 return (
                   <>
                     <ContainerWithDimensions
@@ -108,9 +112,12 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           boardOrientation={activityState.boardOrientation}
                           sizePx={s.height} // TODO: Here this fails when the height is super small! need to look into it
                           fen={activityState.fen}
-                          onPieceDrop={(payload) =>
-                            dispatch({ type: 'dropPiece', payload })
-                          }
+                          lastMove={lastMove}
+                          onMove={(payload) => {
+                            dispatch({ type: 'dropPiece', payload });
+
+                            return true;
+                          }}
                           onArrowsChange={(payload) => {
                             console.log('on arrow change?');
                             dispatch({ type: 'arrowChange', payload });

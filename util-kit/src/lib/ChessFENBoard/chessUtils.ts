@@ -124,6 +124,7 @@ export const fenBoardPieceSymbolToPieceSymbol = (
 
 export const detailedPieceToPieceSymbol = () => {};
 
+
 // export const pgnToFen = (pgn: ChessPGN) => {
 //   const instance = new Chess();
 
