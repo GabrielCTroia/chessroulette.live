@@ -101,6 +101,28 @@ describe('move', () => {
 
     expect(actual).toThrow('Move Error: the from square was empty');
   });
+
+  test('throws when attempting to move an inexistent piece', () => {
+    const chessFenBoard = new ChessFENBoard(
+      'rnbq1bnr/pppppppp/8/P7/2R5/8/1PPPPPPP/RNBkKBN1'
+    );
+
+    const actual = () => {
+      chessFenBoard.move('a2', 'a3');
+    };
+
+    expect(actual).toThrow('Move Error: the from square was empty');
+  });
+
+  test('moves with promotion', () => {
+    const chessFenBoard = new ChessFENBoard();
+
+    chessFenBoard.move('a2', 'a8', 'Q');
+
+    const actual = chessFenBoard.fen;
+
+    expect(actual).toBe('Qnbqkbnr/pppppppp/8/8/8/8/1PPPPPPP/RNBQKBNR');
+  });
 });
 
 describe('piece', () => {

@@ -1,7 +1,7 @@
-import type { Color, PieceSymbol, Square, Move } from 'chess.js';
+import type { Color, PieceSymbol, Square, Move, Piece } from 'chess.js';
 import { Chess } from 'chess.js';
 import { Matrix, MatrixIndex, matrixMap } from '../matrix';
-import { ChessPGN } from '../Chess/types';
+import { ChessMove, ChessPGN, PieceSan, ShortChessColor } from '../Chess/types';
 
 export const ranks = { 1: 7, 2: 6, 3: 5, 4: 4, 5: 3, 6: 2, 7: 1, 8: 0 };
 export const files = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
@@ -71,6 +71,10 @@ export const matrixIndexToSquare = ([row, col]: MatrixIndex): Square => {
 };
 
 export type FenBoardPieceSymbol = PieceSymbol | Uppercase<PieceSymbol>;
+export type FenBoardPromotionalPieceSymbol = Exclude<
+  FenBoardPieceSymbol,
+  'K' | 'k' | 'p' | 'P'
+>;
 
 export type FENBoard = Matrix<FenBoardPieceSymbol | ''>;
 
@@ -122,8 +126,34 @@ export const fenBoardPieceSymbolToPieceSymbol = (
   return `${color}${piece.toUpperCase()}` as PieceSymbol;
 };
 
+export const pieceSanToFenBoardPieceSymbol = (
+  p: PieceSan
+): FenBoardPieceSymbol => {
+  const { color, type } = pieceSanToPiece(p);
+
+  return (
+    color === 'b' ? type.toLowerCase() : type.toUpperCase()
+  ) as FenBoardPieceSymbol;
+};
+
+export const pieceSanToPiece = (p: PieceSan): Piece => {
+  const color = p[0] as ShortChessColor;
+  const type = p[1].toLowerCase() as PieceSymbol;
+
+  return { color, type };
+};
+
 export const detailedPieceToPieceSymbol = () => {};
 
+export const isPromotableMove = (m: ChessMove, pieceSan: PieceSan) => {
+  const piece = pieceSanToPiece(pieceSan);
+
+  return (
+    piece.type === 'p' && // is pawn
+    ((piece.color === 'w' && m.to[1] === '8') || // when white is on the 8th rank
+      (piece.color === 'b' && m.to[1] === '1')) // when black is on the 1st rankƒ
+  );
+};
 
 // export const pgnToFen = (pgn: ChessPGN) => {
 //   const instance = new Chess();

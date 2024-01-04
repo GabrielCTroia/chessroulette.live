@@ -78,7 +78,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
     <div className={className} ref={(e) => (containerElementRef.current = e)}>
       {pairedHistory.map((pairedMove, index) => (
         <HistoryRow
-          key={`${pairedMove[0].san}-${pairedMove[1]?.san || ''}`}
+          key={`${pairedMove[0].san}-${pairedMove[1]?.san || ''}-${index}`}
           ref={(b) => (rowElementRefs.current[index] = b)}
           pairedMove={pairedMove}
           pairedIndex={rootPairedIndex + index}

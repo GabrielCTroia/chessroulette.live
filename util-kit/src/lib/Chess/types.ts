@@ -4,11 +4,13 @@ import type { Square, Move, PieceSymbol } from 'chess.js';
 export type ChessMove = {
   from: Square;
   to: Square;
+  promoteTo?: PromotionalPieceSan;
 };
 
 export type ShortChessMove = {
   from: Square;
   to: Square;
+  promoteTo?: PromotionalPieceSan;
 };
 
 export type DetailedChessMove = Pick<
@@ -38,3 +40,19 @@ export type DetailedChessPiece = {
   piece: PieceSymbol;
   color: ShortChessColor;
 };
+
+export type PieceSan =
+  | 'wP'
+  | 'wB'
+  | 'wN'
+  | 'wR'
+  | 'wQ'
+  | 'wK'
+  | 'bP'
+  | 'bB'
+  | 'bN'
+  | 'bR'
+  | 'bQ'
+  | 'bK';
+
+export type PromotionalPieceSan = Exclude<PieceSan, 'wP' | 'wK' | 'bP' | 'bK'>;

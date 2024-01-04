@@ -115,6 +115,8 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           fen={activityState.fen}
                           lastMove={lastMove}
                           onMove={(payload) => {
+                            console.log('learn activity on move', payload);
+
                             dispatch({ type: 'dropPiece', payload });
 
                             return true;
@@ -225,9 +227,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                                 <GameHistory
                                   history={activityState.history.moves}
                                   containerClassName="overflow-y-scroll"
-                                  focusedIndex={
-                                    activityState.history.focusedIndex
-                                  }
+                                  focusedIndex={activityState.history.focusedIndex}
                                   onRefocus={(index) => {
                                     // console.log('on refocus', index);
                                     dispatch({

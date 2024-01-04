@@ -1,6 +1,7 @@
 import {
   ChessFEN,
   GetComponentProps,
+  PromotionalPieceSan,
   ShortChessMove,
   isDarkSquare,
   isLightSquare,
@@ -11,6 +12,7 @@ import { useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
 import { useArrowColor } from './useArrowColor';
+import { isPromotableMove } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
 
 type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
@@ -88,27 +90,56 @@ export const ChessboardContainer = ({
     };
   }, [lastMove, circledSquare, props.sizePx]);
 
-  //
-  // const lastMove =
+  const [promoMove, setPromoMove] = useState<ShortChessMove>();
 
   return (
-    <Chessboard
-      position={fen}
-      boardWidth={props.sizePx}
-      showBoardNotation
-      boardOrientation={boardOrientation}
-      snapToCursor={false}
-      arePiecesDraggable
-      customBoardStyle={customStyles.customBoardStyle}
-      customLightSquareStyle={customStyles.customLightSquareStyle}
-      customDarkSquareStyle={customStyles.customDarkSquareStyle}
-      onPieceDrop={(from, to) => !!props.onMove?.({ from, to })}
-      customSquareStyles={customSquareStyles}
-      customArrows={arrows}
-      // onSquareRightClick={setCircledSq}
-      // onArrowsChange={onArrowsChangeConditioned}
-      customArrowColor={arrowColor}
-      {...props}
-    />
+    <div className="relative">
+      <Chessboard
+        position={fen}
+        boardWidth={props.sizePx}
+        showBoardNotation
+        boardOrientation={boardOrientation}
+        snapToCursor={false}
+        arePiecesDraggable
+        customBoardStyle={customStyles.customBoardStyle}
+        customLightSquareStyle={customStyles.customLightSquareStyle}
+        customDarkSquareStyle={customStyles.customDarkSquareStyle}
+        onPieceDrop={(from, to) => {
+          // As long as the on PromotionPieceSelect is present this doesn't get triggered with a pieceSelect
+
+          return !!props.onMove?.({ from, to });
+        }}
+        customSquareStyles={customSquareStyles}
+        customArrows={arrows}
+        autoPromoteToQueen={false}
+        onPromotionCheck={(from, to, piece) => {
+          const isPromoMove = isPromotableMove({ from, to }, piece);
+
+          if (isPromoMove) {
+            setPromoMove({ from, to });
+          }
+
+          return isPromoMove;
+        }}
+        onPromotionPieceSelect={(promoteTo) => {
+          if (!promoMove) {
+            return false;
+          }
+
+          if (promoteTo === undefined) {
+            setPromoMove(undefined);
+
+            return false;
+          }
+
+          return !!props.onMove?.({
+            ...promoMove,
+            promoteTo,
+          });
+        }}
+        customArrowColor={arrowColor}
+        {...props}
+      />
+    </div>
   );
 };

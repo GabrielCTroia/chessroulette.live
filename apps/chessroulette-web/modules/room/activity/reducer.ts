@@ -17,6 +17,10 @@ import { getNewChessGame, isValidPgn } from 'apps/chessroulette-web/lib/chess';
 import { Color } from 'chessterrain-react';
 import { Action } from 'movex-core-util';
 import { Arrow, Square } from 'react-chessboard/dist/chessboard/types';
+import {
+  FenBoardPromotionalPieceSymbol,
+  pieceSanToFenBoardPieceSymbol,
+} from 'util-kit/src/lib/ChessFENBoard/chessUtils';
 
 // type ParticipantId = string;
 
@@ -92,7 +96,9 @@ export default (
 
     if (action.type === 'dropPiece') {
       try {
-        const { from, to } = action.payload;
+        const { from, to, promoteTo } = action.payload;
+
+        console.log('passes', action);
 
         const instance = new ChessFENBoard(prev.activityState.fen);
         const fenPiece = instance.piece(from);
@@ -102,10 +108,20 @@ export default (
           throw new Error(`No Piece at ${from}`);
         }
 
+        console.log('HERE', action);
+
         // const { color, piece } =
         //   fenBoardPieceSymbolToDetailedChessPiece(fenPiece);
 
-        const nextMove = instance.move(from, to);
+        const promoteToFenBoardPiecesymbol:
+          | FenBoardPromotionalPieceSymbol
+          | undefined = promoteTo
+          ? (pieceSanToFenBoardPieceSymbol(
+              promoteTo
+            ) as FenBoardPromotionalPieceSymbol)
+          : undefined;
+
+        const nextMove = instance.move(from, to, promoteToFenBoardPiecesymbol);
 
         // const nextMove: DetailedChessMove = {
         //   from: from,
@@ -123,6 +139,9 @@ export default (
             nextMove
           );
 
+        console.log('next history', nextHistory, nextHistory.length);
+        console.log('addedAtIndex', addedAtIndex);
+
         return {
           ...prev,
           activityState: {
@@ -138,7 +157,7 @@ export default (
           },
         };
       } catch (e) {
-        console.warn('failed', e);
+        console.error('failed', e);
 
         return prev;
       }
@@ -158,6 +177,8 @@ export default (
         activityState: {
           ...prev.activityState,
           fen: instance.fen(),
+          circle: undefined,
+          arrows: [],
           history: {
             startingFen: ChessFENBoard.STARTING_FEN,
             moves: nextHistoryMovex,

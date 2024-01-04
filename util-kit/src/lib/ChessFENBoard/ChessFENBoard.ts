@@ -3,6 +3,7 @@ import { invoke } from '../misc';
 import {
   FENBoard,
   FenBoardPieceSymbol,
+  FenBoardPromotionalPieceSymbol,
   emptyBoard,
   fenBoardPieceSymbolToDetailedChessPiece,
   fenBoardPieceSymbolToPieceSymbol,
@@ -78,10 +79,14 @@ export class ChessFENBoard {
    * @param {string} from - The square to move from. Eg: "a2"
    * @param {string} to - The square to move to. Eg: "a3"
    */
-  move(from: Square, to: Square): DetailedChessMove {
-    // TODO: Add it back This needs to recalcualte the fen as well
+  move(
+    from: Square,
+    to: Square,
+    promoteTo?: FenBoardPromotionalPieceSymbol
+  ): DetailedChessMove {
+    const piece = promoteTo || this.piece(from);
 
-    const piece = this.piece(from);
+    // const piece = this.piece(from);
     if (!piece) {
       throw new Error('Move Error: the from square was empty');
     }
@@ -98,7 +103,10 @@ export class ChessFENBoard {
 
     const detailedPiece = fenBoardPieceSymbolToDetailedChessPiece(piece);
 
-    const sanPiece = detailedPiece.piece === 'p' ? '' : detailedPiece.piece.toLocaleUpperCase();
+    const sanPiece =
+      detailedPiece.piece === 'p'
+        ? ''
+        : detailedPiece.piece.toLocaleUpperCase();
     const sanCaptured = invoke(() => {
       if (!captured) {
         return '';
