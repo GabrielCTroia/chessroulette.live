@@ -179,7 +179,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                     containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 min-w-0"
                     contentClassName="min-h-0 min-w-0 flex-1"
                     currentIndex={0}
-                    renderContainerHeader={(tabs) => (
+                    renderContainerHeader={({ tabs, focus }) => (
                       <div
                         className={`flex flex-row gap-3 pb-3 border-b border-slate-500`}
                       >
@@ -192,6 +192,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           onCopied={() => {
                             setNextUserId(getRandomInt(0, 9999));
                           }}
+                          size="sm"
                           // onClick={p.focus}
                           // className={
                           // p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
@@ -199,6 +200,17 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                         >
                           Invite Friend
                         </ClipboardCopyButton>
+                        <Button
+                          className="bg-red-500"
+                          onClick={() => {
+                            dispatch({ type: 'importPgn', payload: '' });
+
+                            focus(0);
+                          }}
+                          size="sm"
+                        >
+                          Reset Board
+                        </Button>
                       </div>
                     )}
                     tabs={[
@@ -206,6 +218,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                         renderHeader: (p) => (
                           <Button
                             onClick={p.focus}
+                            size="sm"
                             className={
                               p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
                             }
@@ -227,7 +240,9 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                                 <GameHistory
                                   history={activityState.history.moves}
                                   containerClassName="overflow-y-scroll"
-                                  focusedIndex={activityState.history.focusedIndex}
+                                  focusedIndex={
+                                    activityState.history.focusedIndex
+                                  }
                                   onRefocus={(index) => {
                                     // console.log('on refocus', index);
                                     dispatch({
@@ -249,6 +264,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                         renderHeader: (p) => (
                           <Button
                             onClick={p.focus}
+                            size="sm"
                             className={
                               p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
                             }

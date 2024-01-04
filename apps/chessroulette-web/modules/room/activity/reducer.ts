@@ -5,6 +5,7 @@ import {
   ChessPGN,
 } from '@xmatter/util-kit';
 import {
+  addMoveToChessHistory,
   addMoveToChessHistoryAtNextAvailableIndex,
   getChessHistoryAtIndex,
   pgnToHistory,
@@ -108,11 +109,6 @@ export default (
           throw new Error(`No Piece at ${from}`);
         }
 
-        console.log('HERE', action);
-
-        // const { color, piece } =
-        //   fenBoardPieceSymbolToDetailedChessPiece(fenPiece);
-
         const promoteToFenBoardPiecesymbol:
           | FenBoardPromotionalPieceSymbol
           | undefined = promoteTo
@@ -123,21 +119,19 @@ export default (
 
         const nextMove = instance.move(from, to, promoteToFenBoardPiecesymbol);
 
-        // const nextMove: DetailedChessMove = {
-        //   from: from,
-        //   to: to,
-        //   san: `${piece === 'p' ? '' : piece}${to}`,
-        //   color: color,
-        //   piece: piece,
-        // };
-
         // const addAtIndex = atIndex !== undefined ? atIndex : prev.history.length;
-        const [nextHistory, addedAtIndex] =
-          addMoveToChessHistoryAtNextAvailableIndex(
-            prev.activityState.history.moves,
-            prev.activityState.history.moves.length,
-            nextMove
-          );
+        // const [nextHistory, addedAtIndex] =
+        //   addMoveToChessHistoryAtNextAvailableIndex(
+        //     prev.activityState.history.moves,
+        //     prev.activityState.history.moves.length,
+        //     nextMove
+        //   );
+
+        const [nextHistory, addedAtIndex] = addMoveToChessHistory(
+          prev.activityState.history.moves,
+          nextMove,
+          prev.activityState.history.focusedIndex
+        );
 
         console.log('next history', nextHistory, nextHistory.length);
         console.log('addedAtIndex', addedAtIndex);

@@ -81,6 +81,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
                         ])
                       }
                       // className={cls.nestedHistory}
+                      className='pl-2'
                       rootPairedIndex={pairedIndex} // continue this move
                       focusedIndex={focusedIndexPerBranch}
                       isNested={true}
@@ -132,6 +133,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
                 }
                 key={`${blackMove.san}-branch-${branchIndex}`}
                 // className={cls.nestedHistory}
+                className='pl-2'
                 rootPairedIndex={pairedIndex + 1} // start a new move
                 focusedIndex={focusedIndexPerBranch}
                 isNested={true}

@@ -1,6 +1,7 @@
 import React from 'react';
 import { HistoryList, HistoryListProps } from './components/HistoryList';
 import { ChessRecursiveHistory } from './types';
+import { useKeysToRefocusHistory } from './hooks';
 
 export type GameHistoryProps = {
   history: ChessRecursiveHistory;
@@ -21,17 +22,21 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
 
   emptyContent = 'Wow, so empty!',
   showRows = 4,
-  focusedIndex,
+  focusedIndex = 0,
   onRefocus,
   ...props
-}) => (
-  <div className={`flex flex-1 ${props.containerClassName}`}>
-    <HistoryList
-      history={history}
-      focusedIndex={focusedIndex}
-      onRefocus={onRefocus}
-      className="flex flex-1 flex-col"
-      rowClassName="pb-3 border-b border-slate-600"
-    />
-  </div>
-);
+}) => {
+  useKeysToRefocusHistory(history, focusedIndex, onRefocus);
+
+  return (
+    <div className={`flex flex-1 ${props.containerClassName}`}>
+      <HistoryList
+        history={history}
+        focusedIndex={focusedIndex}
+        onRefocus={onRefocus}
+        className="flex flex-1 flex-col"
+        rowClassName="pb-3 border-b border-slate-600"
+      />
+    </div>
+  );
+};

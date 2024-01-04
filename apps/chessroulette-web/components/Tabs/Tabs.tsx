@@ -11,7 +11,10 @@ type Props = {
       isFocused: boolean;
     }) => React.ReactNode;
   }[];
-  renderContainerHeader?: (tabsHeader: React.ReactNode[]) => React.ReactNode;
+  renderContainerHeader?: (p: {
+    tabs: React.ReactNode[];
+    focus: (tabIndex: number) => void;
+  }) => React.ReactNode;
   currentIndex?: number;
   containerClassName?: string;
   headerContainerClassName?: string;
@@ -34,7 +37,10 @@ export const Tabs = (props: Props) => {
     ));
 
     if (props.renderContainerHeader) {
-      return props.renderContainerHeader(tabs);
+      return props.renderContainerHeader({
+        tabs,
+        focus: setCurrentTabIndex,
+      });
     }
 
     return (
