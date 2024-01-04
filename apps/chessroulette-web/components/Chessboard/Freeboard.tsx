@@ -13,8 +13,6 @@ export const Freeboard = ({
   fen = ChessFENBoard.STARTING_FEN,
   ...props
 }: Props) => {
-  const arrowColor = useArrowColor();
-
   // const [canCall, setCanCall] = useState(false);
 
   // TODO: This isn't yet working correctly
@@ -41,7 +39,5 @@ export const Freeboard = ({
 
   // console.log('customArrows', props.arrows);
 
-  return (
-    <ChessboardContainer fen={fen} {...props} customArrowColor={arrowColor} />
-  );
+  return <ChessboardContainer fen={fen} {...props} />;
 };

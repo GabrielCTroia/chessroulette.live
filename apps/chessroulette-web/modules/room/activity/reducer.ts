@@ -16,7 +16,7 @@ import {
 import { getNewChessGame, isValidPgn } from 'apps/chessroulette-web/lib/chess';
 import { Color } from 'chessterrain-react';
 import { Action } from 'movex-core-util';
-import { Arrow } from 'react-chessboard/dist/chessboard/types';
+import { Arrow, Square } from 'react-chessboard/dist/chessboard/types';
 
 // type ParticipantId = string;
 
@@ -28,6 +28,7 @@ export type LearnActivityState = {
     fen: ChessFEN;
     boardOrientation: Color;
     arrows: Arrow[];
+    circle?: Square;
     history: {
       // moves: ChessRecursiveHistoryWithFen;
       startingFen: ChessFEN;
@@ -55,6 +56,7 @@ export const initialLearnActivityState: LearnActivityState = {
     boardOrientation: 'white',
     fen: ChessFENBoard.STARTING_FEN,
     arrows: [],
+    circle: undefined,
     history: {
       startingFen: ChessFENBoard.STARTING_FEN,
       moves: [],
@@ -75,7 +77,9 @@ export type ActivityActions =
       }
     >
   | Action<'changeBoardOrientation', Color>
-  | Action<'arrowChange', Arrow[]>;
+  | Action<'arrowChange', Arrow[]>
+  | Action<'drawCircle', { square: Square }>
+  | Action<'clearCircle'>;
 
 // PART 3: The Reducer – This is where all the logic happens
 
@@ -208,6 +212,26 @@ export default (
         activityState: {
           ...prev.activityState,
           arrows: action.payload,
+        },
+      };
+    }
+
+    if (action.type === 'drawCircle') {
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          circle: action.payload.square,
+        },
+      };
+    }
+
+    if (action.type === 'clearCircle') {
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          circle: undefined,
         },
       };
     }

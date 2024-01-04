@@ -10,6 +10,7 @@ import { Move, Square } from 'chess.js';
 import { useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
+import { useArrowColor } from './useArrowColor';
 
 type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
@@ -17,6 +18,7 @@ export type ChessboardContainerProps = Omit<ChessBoardProps, 'position'> & {
   fen: ChessFEN;
   sizePx: number;
   arrows?: Arrow[];
+  circledSquare?: Square;
   arrowColor?: string;
   onMove?: (m: ShortChessMove) => boolean;
   lastMove?: ShortChessMove;
@@ -25,8 +27,8 @@ export type ChessboardContainerProps = Omit<ChessBoardProps, 'position'> & {
 export const ChessboardContainer = ({
   fen,
   arrows,
-  arrowColor,
   lastMove,
+  circledSquare,
   ...props
 }: ChessboardContainerProps) => {
   const boardOrientation = useMemo(
@@ -52,7 +54,14 @@ export const ChessboardContainer = ({
     ]
   );
 
+  const arrowColor = useArrowColor();
+
+  // const [circledSq, setCircledSq] = useState<Square>();
+
   const customSquareStyles = useMemo(() => {
+    // const circleSvg = encodeURI('<svg height="100" width="100"><circle cx="0" cy="0" r="40" stroke="black" stroke-width="10" fill="transparent" /></svg>');
+    // console.log('circleSvg', circleSvg);
+
     return {
       ...(lastMove && {
         [lastMove.from]: {
@@ -66,8 +75,18 @@ export const ChessboardContainer = ({
             : 'rgba(234, 183, 255, .3)',
         },
       }),
+      ...(circledSquare && {
+        [circledSquare]: {
+          // backgroundImage: `url("data:image/svg+xml,${circleSvg}")`,
+          // background: 'red',
+          // circleSvg
+          borderRadius: '100%',
+          border: `${props.sizePx / 64}px red solid`,
+          // marginTop: `-${props.sizePx / 64}px`,
+        },
+      }),
     };
-  }, [lastMove]);
+  }, [lastMove, circledSquare, props.sizePx]);
 
   //
   // const lastMove =
@@ -86,8 +105,10 @@ export const ChessboardContainer = ({
       onPieceDrop={(from, to) => !!props.onMove?.({ from, to })}
       customSquareStyles={customSquareStyles}
       customArrows={arrows}
+      // onSquareRightClick={setCircledSq}
       // onArrowsChange={onArrowsChangeConditioned}
       customArrowColor={arrowColor}
+      {...props}
     />
   );
 };

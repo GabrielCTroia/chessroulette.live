@@ -18,6 +18,7 @@ import { Tabs } from 'apps/chessroulette-web/components/Tabs';
 import { ClipboardCopyButton } from 'apps/chessroulette-web/components/ClipboardCopyButton';
 import { useRouter, usePathname } from 'next/navigation';
 import { useUrl } from 'nextjs-current-url';
+import { Square } from 'react-chessboard/dist/chessboard/types';
 
 type ChessColor = 'white' | 'black';
 
@@ -119,10 +120,17 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                             return true;
                           }}
                           onArrowsChange={(payload) => {
-                            console.log('on arrow change?');
+                            // console.log('on arrow change?');
                             dispatch({ type: 'arrowChange', payload });
                           }}
                           arrows={activityState.arrows}
+                          onSquareRightClick={(square) => {
+                            dispatch({
+                              type: 'drawCircle',
+                              payload: { square },
+                            });
+                          }}
+                          circledSquare={activityState.circle}
                         />
                       )}
                     />

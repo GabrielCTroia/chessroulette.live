@@ -19,6 +19,9 @@ export const useArrowColor = (colors = outpostColors) => {
   const [colorIndex, setColorIndex] = useState(0);
   const [controlKeyPressed, setControlKeyPressed] = useState(false);
 
+  // const [rightClickPressed, setRightClickPressed] =
+  // const [rightClickedPressed, setRightClickedPressed] = useState(false);
+
   useEventListener('keydown', (event: object) => {
     if (!keyInObject(event, 'key')) {
       return;
@@ -61,5 +64,13 @@ export const useArrowColor = (colors = outpostColors) => {
     }
   });
 
-  return colors[colorIndex];
+  // useEventListener('contextmenu', () => {
+  //   setRightClickedPressed(true);
+  // });
+
+  // useEventListener('mouseup', () => {
+  //   setRightClickedPressed(false);
+  // });
+
+  return colors[colorIndex]
 };
