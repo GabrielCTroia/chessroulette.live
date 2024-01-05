@@ -236,7 +236,10 @@ export default (
         ...prev,
         activityState: {
           ...prev.activityState,
-          circle: action.payload.square,
+          circle:
+            action.payload.square === prev.activityState.circle
+              ? undefined // Set it to undefined if same
+              : action.payload.square,
         },
       };
     }
