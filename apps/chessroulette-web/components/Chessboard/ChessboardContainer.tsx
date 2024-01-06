@@ -8,7 +8,7 @@ import {
   toLongColor,
 } from '@xmatter/util-kit';
 import { Move, Square } from 'chess.js';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
 import { useArrowColor } from './useArrowColor';
@@ -16,7 +16,10 @@ import { isPromotableMove } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
 
 type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
-export type ChessboardContainerProps = Omit<ChessBoardProps, 'position'> & {
+export type ChessboardContainerProps = Omit<
+  ChessBoardProps,
+  'position' | 'onArrowsChange'
+> & {
   fen: ChessFEN;
   sizePx: number;
   arrows?: Arrow[];
@@ -24,6 +27,7 @@ export type ChessboardContainerProps = Omit<ChessBoardProps, 'position'> & {
   arrowColor?: string;
   onMove?: (m: ShortChessMove) => boolean;
   lastMove?: ShortChessMove;
+  onArrowsChange?: (arrows: Arrow[]) => void;
 };
 
 export const ChessboardContainer = ({
@@ -31,6 +35,7 @@ export const ChessboardContainer = ({
   arrows,
   lastMove,
   circledSquare,
+  onArrowsChange,
   ...props
 }: ChessboardContainerProps) => {
   const boardOrientation = useMemo(
@@ -92,6 +97,26 @@ export const ChessboardContainer = ({
 
   const [promoMove, setPromoMove] = useState<ShortChessMove>();
 
+  // const lastArrowsRef = useRef<Arrow[]>();
+  // const onArrowsChangeCb = useCallback(
+  //   (arrows: Arrow[]) => {
+  //     if (!onArrowsChange) {
+  //       return;
+  //     }
+
+  //     console.log('arrows', arrows, lastArrowsRef.current, arrows === lastArrowsRef.current)
+
+  //     if (arrows === lastArrowsRef.current) {
+  //       return;
+  //     }
+
+  //     onArrowsChange(arrows);
+
+  //     lastArrowsRef.current = arrows;
+  //   },
+  //   [onArrowsChange]
+  // );
+
   return (
     <div className="relative">
       <Chessboard
@@ -138,6 +163,7 @@ export const ChessboardContainer = ({
           });
         }}
         customArrowColor={arrowColor}
+        // onArrowsChange={onArrowsChangeCb}
         {...props}
       />
     </div>
