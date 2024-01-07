@@ -19,6 +19,7 @@ import { ClipboardCopyButton } from 'apps/chessroulette-web/components/Clipboard
 import { useRouter, usePathname } from 'next/navigation';
 import { useUrl } from 'nextjs-current-url';
 import { Square } from 'react-chessboard/dist/chessboard/types';
+import { decrementChessHistoryIndex, getMoveAtIndex } from 'apps/chessroulette-web/components/GameHistory/lib';
 
 type ChessColor = 'white' | 'black';
 
@@ -102,7 +103,10 @@ export default ({ playingColor = 'white', ...props }: Props) => {
 
                 const { history } = activityState;
 
-                const lastMove = history.moves.slice(-1)[0];
+                // const lastMove =   history.moves.slice(-1)[0];
+                const lastMove =   getMoveAtIndex(history.moves, history.focusedIndex) 
+
+                // const g
 
                 return (
                   <>

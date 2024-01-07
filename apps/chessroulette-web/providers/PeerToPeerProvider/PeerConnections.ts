@@ -104,6 +104,8 @@ export class PeerConnections {
       apc.getMyStream().then((myStream) => {
         call.answer(myStream);
         call.on('stream', (stream) => {
+          // console.log('on call handler stream tracks', stream.getTracks());
+
           this.pubsy.publish('onPeerStream', {
             peerUserId,
             stream,

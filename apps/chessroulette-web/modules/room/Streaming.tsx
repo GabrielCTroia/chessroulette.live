@@ -7,7 +7,7 @@ import {
   toResourceIdentifierStr,
 } from 'movex-core-util';
 import { MovexBoundResource } from 'movex-react';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { PeerStreamingGroup } from '../PeerStreaming';
 import { MultiFaceTimeCompact } from 'apps/chessroulette-web/components/FaceTime/MultiFaceTimeCompact';
@@ -16,6 +16,10 @@ import { config } from 'apps/chessroulette-web/config';
 import { CameraView } from 'apps/chessroulette-web/components/CameraView';
 import { AspectRatio } from 'apps/chessroulette-web/components/AspectRatio';
 import { FaceTimeProps } from 'apps/chessroulette-web/components/FaceTime';
+import { Button } from 'apps/chessroulette-web/components/Button';
+
+// import { SpeakerXMarkIcon } from '@heroicons/react/24/solid';
+import { SpeakerWaveIcon, SpeakerXMarkIcon, VideoCameraIcon, VideoCameraSlashIcon } from '@heroicons/react/24/solid';
 
 type Props = {
   rid: ResourceIdentifier<'room'>;
@@ -26,10 +30,7 @@ const hashDemoImgId = (id: string) => {
   return Number(id.match(/\d/)?.[0] || 0);
 };
 
-export default ({
-  rid,
-  aspectRatio = 16/10,
-}: Props) => {
+export default ({ rid, aspectRatio = 16 / 10 }: Props) => {
   const userId = useUserId();
   const peerUser = useMemo(() => {
     if (userId) {
@@ -41,10 +42,9 @@ export default ({
     return undefined;
   }, [userId]);
 
-  const ridAsStr = useMemo(
-    () => toResourceIdentifierStr(rid),
-    [rid]
-  );
+  const [camerasReady, setCamerasReady] = useState(false);
+
+  const ridAsStr = useMemo(() => toResourceIdentifierStr(rid), [rid]);
 
   // console.log('render streaming');
 
@@ -77,9 +77,12 @@ export default ({
         if (!config.CAMERA_ON) {
           return (
             <AspectRatio aspectRatio={aspectRatio}>
-              <CameraView className={`w-full h-full object-covers`} demoImgId={hashDemoImgId(userId) as any} />
+              <CameraView
+                className={`w-full h-full object-covers`}
+                demoImgId={hashDemoImgId(userId) as any}
+              />
             </AspectRatio>
-          )
+          );
         }
 
         return (
@@ -95,6 +98,13 @@ export default ({
                 onFocus={() => {
                   console.log('on focus');
                 }}
+                
+                // onReady={() => setCamerasReady(true)}
+                // {...(camerasReady && {
+                //   mainOverlay: () => (
+                    
+                //   ),
+                // })}
               />
             )}
           />

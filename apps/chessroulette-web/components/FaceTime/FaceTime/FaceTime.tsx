@@ -3,6 +3,7 @@ import { VideoBox, VideoBoxProps } from '../../VideoBox';
 import { PeerStreamingConfig } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 import { AspectRatio, AspectRatioProps } from '../../AspectRatio';
 import { Text } from '../../Text';
+import { noop } from '@xmatter/util-kit';
 
 export type FaceTimeProps = Omit<VideoBoxProps, 'stream'> & {
   streamConfig: PeerStreamingConfig;
@@ -18,6 +19,8 @@ export type FaceTimeProps = Omit<VideoBoxProps, 'stream'> & {
   headerOverlay?: ReactNode;
   mainOverlay?: ReactNode;
   footerOverlay?: ReactNode;
+
+  onReady?: () => void;
 };
 
 export const FaceTime: React.FC<FaceTimeProps> = ({
@@ -36,19 +39,23 @@ export const FaceTime: React.FC<FaceTimeProps> = ({
     height: 3,
   },
   loadingFallback = null,
+  onReady = noop,
   ...avStreamProps
 }) => {
   // const cls = useStyles();
   const [loadingVideo, setLoadingVideo] = useState(true);
 
+  // console.log('avStreamProps', avStreamProps);
+
   const loader = (
     <div className="absolute flex right-0 top-0 bottom-0 left-0 z-50">
-      {loadingFallback || (
-        <div>Loading...</div>
+      {
+        loadingFallback || null
+        // <div className='flex-1 flex text-center'>Loading...</div>
         // <div className={cls.loader}>
         //   {/* <Loader type="line-scale-pulse-out" active innerClassName={cls.loader} /> */}
         // </div>
-      )}
+      }
     </div>
   );
 
@@ -63,6 +70,7 @@ export const FaceTime: React.FC<FaceTimeProps> = ({
               className={`w-full h-full object-cover ${className}`}
               {...avStreamProps}
               onCanPlay={() => {
+                onReady();
                 setLoadingVideo(false);
               }}
             />
@@ -121,69 +129,3 @@ export const FaceTime: React.FC<FaceTimeProps> = ({
     </div>
   );
 };
-
-// const useStyles = createUseStyles<CustomTheme>((theme) => ({
-//   container: {
-//     position: 'relative',
-//   },
-//   overlayedContainer: {
-//     position: 'absolute',
-//     left: 0,
-//     top: 0,
-//     right: 0,
-//     bottom: 0,
-
-//     display: 'flex',
-//     flexDirection: 'column',
-//     zIndex: 9,
-//   },
-//   mainWrapper: {
-//     flex: 1,
-//   },
-//   footerWrapper: {},
-//   headerWrapper: {},
-//   video: {
-//     width: '100%',
-//     height: '100%',
-//     objectFit: 'cover',
-//   },
-//   labelWrapper: {
-//     position: 'relative',
-//     textAlign: 'center',
-//     zIndex: 99,
-//   },
-//   labelWrapperLeft: {
-//     textAlign: 'left',
-//   },
-//   labelWrapperRight: {
-//     textAlign: 'right',
-//   },
-//   label: {
-//     color: colors.universal.white,
-//     ...fonts.subtitle1,
-
-//     paddingLeft: '12px',
-//     paddingRight: '12px',
-//     paddingBottom: '6px',
-
-//     ...onlyMobile({
-//       paddingLeft: '8px',
-//       paddingBottom: '2px',
-//     }),
-//   },
-//   loadingWrapper: {
-//     top: 0,
-//     left: 0,
-//     right: 0,
-//     bottom: 0,
-//     position: 'absolute',
-//     zIndex: 99,
-//     display: 'flex',
-//   },
-//   loader: {
-//     display: 'flex',
-//     flex: 1,
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//   },
-// }));

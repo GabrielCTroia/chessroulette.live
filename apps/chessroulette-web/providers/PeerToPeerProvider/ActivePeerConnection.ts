@@ -3,7 +3,7 @@ import { Pubsy } from 'ts-pubsy';
 import { Err } from 'ts-results';
 import { logsy } from 'apps/chessroulette-web/lib/Logsy';
 import { peerMessageEnvelope, PeerMessageEnvelope } from './records';
-import { getAVStreaming } from 'apps/chessroulette-web/services/AVStreaming';
+import { getAVStreamingInstance } from 'apps/chessroulette-web/services/AVStreaming';
 import { eitherToResult } from 'apps/chessroulette-web/lib/util';
 import { PeerUserId } from './type';
 
@@ -18,7 +18,7 @@ type Events = {
 export class ActivePeerConnection {
   private pubsy = new Pubsy<Events>();
 
-  private AVStreaming = getAVStreaming();
+  private avStreamingInstance = getAVStreamingInstance();
 
   private myStream?: MediaStream;
 
@@ -102,7 +102,7 @@ export class ActivePeerConnection {
   }
 
   async getMyStream() {
-    return this.AVStreaming.getStream().then((stream) => {
+    return this.avStreamingInstance.getStream().then((stream) => {
       this.myStream = stream;
 
       return stream;
@@ -111,7 +111,7 @@ export class ActivePeerConnection {
 
   private removeMyStream() {
     if (this.myStream) {
-      this.AVStreaming.destroyStreamById(this.myStream.id);
+      this.avStreamingInstance.destroyStreamById(this.myStream.id);
       this.myStream = undefined;
     }
   }

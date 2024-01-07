@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FaceTime, FaceTimeProps } from '../FaceTime';
 import { Reel } from './components/Reel';
 import { MyFaceTime } from '../MyFaceTime';
@@ -6,6 +6,18 @@ import {
   PeerUserId,
   StreamingPeer,
 } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
+import {
+  AVStreaming,
+  AVStreamingConstraints,
+  getAVStreamingInstance,
+} from 'apps/chessroulette-web/services/AVStreaming';
+import useInstance from '@use-it/instance';
+import {
+  SpeakerWaveIcon,
+  SpeakerXMarkIcon,
+  VideoCameraIcon,
+  VideoCameraSlashIcon,
+} from '@heroicons/react/24/solid';
 
 type OverlayedNodeRender = (p: { inFocus?: PeerUserId }) => React.ReactNode;
 
@@ -27,7 +39,16 @@ export type MultiFaceTimeCompactProps = {
   headerOverlay?: OverlayedNodeRender;
   footerOverlay?: OverlayedNodeRender;
   mainOverlay?: OverlayedNodeRender;
-} & Omit<FaceTimeProps, 'streamConfig' | 'footer' | 'header' | 'onFocus'>;
+} & Omit<
+  FaceTimeProps,
+  | 'streamConfig'
+  | 'footer'
+  | 'header'
+  | 'onFocus'
+  | 'mainOverlay'
+  | 'footerOverlay'
+  | 'headerOverlay'
+>;
 
 export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
   reel,
@@ -64,6 +85,26 @@ export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
     [reel]
   );
 
+  const avStreaminginstance = useInstance<AVStreaming>(getAVStreamingInstance);
+  const [myFaceTimeConstraints, setMyFaceTimeConstraints] = useState(
+    avStreaminginstance.activeConstraints
+  );
+
+  console.log('myFaceTimeConstraints', myFaceTimeConstraints);
+  useEffect(() => {
+    return avStreaminginstance.pubsy.subscribe(
+      'onUpdateConstraints',
+      setMyFaceTimeConstraints
+    );
+  }, [avStreaminginstance]);
+
+  const MicIcon =
+    myFaceTimeConstraints.audio === true ? SpeakerXMarkIcon : SpeakerWaveIcon;
+  const CameraIcon =
+    myFaceTimeConstraints.video === true
+      ? VideoCameraSlashIcon
+      : VideoCameraIcon;
+
   return (
     <div
       // className={cx(cls.container, containerClassName)}
@@ -81,7 +122,8 @@ export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
       ) : (
         <MyFaceTime
           {...faceTimeProps}
-          label={label}
+          constraints={myFaceTimeConstraints}
+          // label={label}
           labelPosition="bottom-left"
         />
       )}
@@ -101,6 +143,28 @@ export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
             className="flex-1"
           >
             {mainOverlay ? mainOverlay(inFocusUserOverlay) : null}
+            <div className="flex-1 nbg-red-100 w-full h-full items-start">
+              <div className="p-2 flex flex-col">
+                <MicIcon
+                  className="p-1 h-8 w-8 hover:bg-white hover:cursor-pointer hover:text-black hover:rounded-xl"
+                  onClick={() => {
+                    avStreaminginstance.updateConstraints({
+                      ...myFaceTimeConstraints,
+                      audio: !myFaceTimeConstraints.audio,
+                    });
+                  }}
+                />
+                <CameraIcon
+                  className="p-1 h-8 w-8 hover:bg-white hover:cursor-pointer hover:text-black hover:rounded-xl"
+                  onClick={() => {
+                    avStreaminginstance.updateConstraints({
+                      ...myFaceTimeConstraints,
+                      video: !myFaceTimeConstraints.video,
+                    });
+                  }}
+                />
+              </div>
+            </div>
           </div>
           {reel && (
             <div
@@ -141,99 +205,3 @@ export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
     </div>
   );
 };
-
-// const useStyles = createUseStyles({
-//   container: {
-//     position: 'relative',
-//   },
-//   reel: {
-//     position: 'absolute',
-//     bottom: '15px',
-//     right: '10px',
-//   },
-//   smallFacetime: {
-//     border: '2px solid rgba(0, 0, 0, .3)',
-//   },
-//   fullFacetime: {},
-//   noFacetime: {
-//     background: '#ededed',
-//   },
-//   title: {
-//     background: 'rgba(255, 255, 255, .8)',
-//     textAlign: 'center',
-//     padding: '5px',
-//     borderRadius: '5px',
-//   },
-//   titleWrapper: {
-//     position: 'absolute',
-//     top: '20px',
-//     left: 0,
-//     right: 0,
-//     textAlign: 'center',
-//   },
-//   overlayedContainer: {
-//     position: 'absolute',
-//     left: 0,
-//     top: 0,
-//     right: 0,
-//     bottom: 0,
-
-//     display: 'flex',
-//     flexDirection: 'column',
-//   },
-//   headerWrapper: {},
-//   footerWrapper: {},
-//   mainWrapper: {
-//     display: 'flex',
-//     flexDirection: 'row',
-//     flex: 1,
-//     minHeight: 0,
-//   },
-//   faceTimeAsButton: {
-//     cursor: 'pointer',
-//   },
-//   mainOverlayWrapper: {
-//     flex: 1,
-//   },
-//   reelWrapper: {
-//     display: 'flex',
-//     flex: '0 1 auto',
-//     overflow: 'auto',
-
-//     width: '22.2%',
-//     paddingRight: spacers.get(0.7),
-//     paddingBottom: spacers.get(0.7),
-//   },
-//   reelScroller: {
-//     minHeight: '100%',
-//     display: 'flex',
-//     flexDirection: 'column-reverse',
-//     flex: 1,
-//     overflowY: 'auto',
-
-//     // overscroll: auto;
-//     msOverflowStyle: '-ms-autohiding-scrollbar',
-
-//     '&:hover': {
-//       // overflowY: 'scroll',
-//     },
-//   },
-//   smallFacetimeWrapper: {
-//     marginTop: '8%',
-//     ...softBorderRadius,
-//     overflow: 'hidden',
-//     position: 'relative',
-//   },
-//   smallFacetimeBorder: {
-//     position: 'absolute',
-//     top: 0,
-//     bottom: 0,
-//     left: 0,
-//     right: 0,
-//     boxShadow: 'inset 0 0 1px 1px white',
-//     ...softBorderRadius,
-//   },
-//   smallFacetimeLabel: {
-//     ...fonts.small3,
-//   },
-// });

@@ -1,7 +1,8 @@
 import type { Color, PieceSymbol, Square, Move, Piece } from 'chess.js';
 import { Chess } from 'chess.js';
 import { Matrix, MatrixIndex, matrixMap } from '../matrix';
-import { ChessMove, ChessPGN, PieceSan, ShortChessColor } from '../Chess/types';
+import { BlackColor, ChessMove, ChessPGN, PieceSan, ShortChessColor, WhiteColor } from '../Chess/types';
+import { toShortColor } from '../Chess/lib';
 
 export const ranks = { 1: 7, 2: 6, 3: 5, 4: 4, 5: 3, 6: 2, 7: 1, 8: 0 };
 export const files = { a: 0, b: 1, c: 2, d: 3, e: 4, f: 5, g: 6, h: 7 };
@@ -154,6 +155,16 @@ export const isPromotableMove = (m: ChessMove, pieceSan: PieceSan) => {
       (piece.color === 'b' && m.to[1] === '1')) // when black is on the 1st rankƒ
   );
 };
+
+// I don't know why this needs to be typed like this
+//  with a function declaration but if it's declared
+//  as an anonymous function it throws a tsc error
+export function toOppositeColor<C extends Color>(
+  c: C
+): C extends WhiteColor ? BlackColor : WhiteColor;
+export function toOppositeColor<C extends Color>(c: C) {
+  return toShortColor(c) === 'w' ? 'black' : 'white';
+}
 
 // export const pgnToFen = (pgn: ChessPGN) => {
 //   const instance = new Chess();

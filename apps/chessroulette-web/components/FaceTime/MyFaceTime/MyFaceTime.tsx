@@ -6,7 +6,8 @@ import { FaceTime, FaceTimeProps } from '../FaceTime/FaceTime';
 import {
   AVStreaming,
   AVStreamingConstraints,
-  getAVStreaming,
+  DEFAULT_AV_STREAMING_CONSTRAINTS,
+  getAVStreamingInstance,
 } from 'apps/chessroulette-web/services/AVStreaming';
 import { PeerStreamingConfig } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 import useInstance from '@use-it/instance';
@@ -20,9 +21,10 @@ type Props = Omit<FaceTimeProps, 'streamConfig'> & {
 // Automatically opens a local stream
 export const MyFaceTime: React.FC<Props> = ({
   mirrorImage = true, // by defualt it's mirrored
+  constraints,
   ...props
 }) => {
-  const AVStreaming = useInstance<AVStreaming>(getAVStreaming);
+  const avStreamingInstance = useInstance<AVStreaming>(getAVStreamingInstance);
   const [myStreamConfig, setMyStreamConfig] = useState<PeerStreamingConfig>({
     on: false,
   });
@@ -32,7 +34,7 @@ export const MyFaceTime: React.FC<Props> = ({
       return;
     }
 
-    const streamPromise = AVStreaming.getStream().then((stream) => {
+    const streamPromise = avStreamingInstance.getStream().then((stream) => {
       setMyStreamConfig({
         on: true,
         type: 'audio-video',
@@ -44,10 +46,18 @@ export const MyFaceTime: React.FC<Props> = ({
 
     return () => {
       streamPromise.then((stream) => {
-        AVStreaming.destroyStreamById(stream.id);
+        avStreamingInstance.destroyStreamById(stream.id);
       });
     };
   }, []);
+
+  useEffect(() => {
+    if (constraints) {
+      avStreamingInstance.updateConstraints(constraints);
+    } else {
+      avStreamingInstance.updateConstraints(DEFAULT_AV_STREAMING_CONSTRAINTS);
+    }
+  }, [constraints?.audio, constraints?.video])
 
   return (
     <FaceTime

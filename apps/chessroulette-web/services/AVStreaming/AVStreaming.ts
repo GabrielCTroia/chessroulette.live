@@ -5,9 +5,14 @@ import { Pubsy } from 'ts-pubsy';
 
 type DestroyStreamFn = () => void;
 
+export const DEFAULT_AV_STREAMING_CONSTRAINTS = {
+  audio: true,
+  video: true,
+};
+
 // Note: As of Dec 5h, 2020, It currently doesn't seperate the Audio from Video if needed in the future!
 class AVStreamingClass {
-  private pubsy = new Pubsy<{
+  public pubsy = new Pubsy<{
     onUpdateConstraints: AVStreamingConstraints;
   }>();
 
@@ -17,12 +22,10 @@ class AVStreamingClass {
     [id: string]: MediaStream;
   } = {};
 
-  private _activeConstraints: AVStreamingConstraints = {
-    audio: true,
-    video: true,
-  };
+  private _activeConstraints: AVStreamingConstraints =
+    DEFAULT_AV_STREAMING_CONSTRAINTS;
 
-  set activeConstraints({ video, audio }: { video: boolean; audio: boolean }) {
+  set activeConstraints({ video, audio }: AVStreamingConstraints) {
     this._activeConstraints = {
       video,
       audio,
@@ -133,6 +136,8 @@ class AVStreamingClass {
     });
 
     this._activeConstraints = nextConstraints;
+
+    this.pubsy.publish('onUpdateConstraints', nextConstraints);
   }
 
   hasPermission(
@@ -165,7 +170,7 @@ class AVStreamingClass {
 export type AVStreaming = AVStreamingClass;
 
 let instance: AVStreaming;
-export const getAVStreaming = () => {
+export const getAVStreamingInstance = () => {
   if (!instance) {
     instance = new AVStreamingClass();
   }

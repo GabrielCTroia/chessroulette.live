@@ -29,6 +29,8 @@ export const addMoveToChessHistory = (
   m: ChessHistoryMove,
   chessHistoryIndex?: ChessHistoryIndex
 ): [nextHistory: ChessRecursiveHistory, nextIndex: ChessHistoryIndex] => {
+  console.log('addMoveToChessHistory', chessHistoryIndex);
+
   if (isChessRecursiveHistoryIndex(chessHistoryIndex)) {
     const [moveIndex, branchIndex, nestedBranchedHistoryOrMoveIndex] =
       chessHistoryIndex;
@@ -81,6 +83,9 @@ export const addMoveToChessHistory = (
 
     return [nextHistory, [moveIndex, 0, 0]];
   }
+
+  // const lastMove = getMoveAtIndex(history, chessHistoryIndex);
+  // console.log('lastMove', lastMove);
 
   if (
     typeof chessHistoryIndex === 'number' &&
