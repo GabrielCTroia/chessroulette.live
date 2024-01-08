@@ -129,7 +129,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                             // console.log('on arrow change?');
                             dispatch({ type: 'arrowChange', payload });
                           }}
-                          arrows={activityState.arrows}
+                          arrowsMap={activityState.arrows}
                           onSquareRightClick={(square) => {
                             dispatch({
                               type: 'drawCircle',

@@ -90,7 +90,10 @@ export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
     avStreaminginstance.activeConstraints
   );
 
-  console.log('myFaceTimeConstraints', myFaceTimeConstraints);
+  // console.log('myFaceTimeConstraints', myFaceTimeConstraints);
+
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
     return avStreaminginstance.pubsy.subscribe(
       'onUpdateConstraints',
@@ -125,6 +128,7 @@ export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
           constraints={myFaceTimeConstraints}
           // label={label}
           labelPosition="bottom-left"
+          onReady={() => setIsReady(true)}
         />
       )}
       <div
@@ -143,28 +147,30 @@ export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
             className="flex-1"
           >
             {mainOverlay ? mainOverlay(inFocusUserOverlay) : null}
-            <div className="flex-1 nbg-red-100 w-full h-full items-start">
-              <div className="p-2 flex flex-col">
-                <MicIcon
-                  className="p-1 h-8 w-8 hover:bg-white hover:cursor-pointer hover:text-black hover:rounded-xl"
-                  onClick={() => {
-                    avStreaminginstance.updateConstraints({
-                      ...myFaceTimeConstraints,
-                      audio: !myFaceTimeConstraints.audio,
-                    });
-                  }}
-                />
-                <CameraIcon
-                  className="p-1 h-8 w-8 hover:bg-white hover:cursor-pointer hover:text-black hover:rounded-xl"
-                  onClick={() => {
-                    avStreaminginstance.updateConstraints({
-                      ...myFaceTimeConstraints,
-                      video: !myFaceTimeConstraints.video,
-                    });
-                  }}
-                />
+            {isReady && (
+              <div className="flex-1 nbg-red-100 w-full h-full items-start">
+                <div className="p-2 flex flex-col">
+                  <MicIcon
+                    className="p-1 h-8 w-8 hover:bg-white hover:cursor-pointer hover:text-black hover:rounded-xl"
+                    onClick={() => {
+                      avStreaminginstance.updateConstraints({
+                        ...myFaceTimeConstraints,
+                        audio: !myFaceTimeConstraints.audio,
+                      });
+                    }}
+                  />
+                  <CameraIcon
+                    className="p-1 h-8 w-8 hover:bg-white hover:cursor-pointer hover:text-black hover:rounded-xl"
+                    onClick={() => {
+                      avStreaminginstance.updateConstraints({
+                        ...myFaceTimeConstraints,
+                        video: !myFaceTimeConstraints.video,
+                      });
+                    }}
+                  />
+                </div>
               </div>
-            </div>
+            )}
           </div>
           {reel && (
             <div

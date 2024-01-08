@@ -1,3 +1,5 @@
+import fastDeepEquals = require('fast-deep-equal/es6');
+
 /**
  * https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
  *
@@ -21,23 +23,45 @@ export const flatten = <T>(a: T[]) =>
 
 export const invoke = <T>(fn: () => T): T => fn();
 
-export const toDictIndexedBy = <
+export function toDictIndexedBy<
   O extends object,
   KGetter extends (o: O) => string
->(
-  list: O[],
-  getKey: KGetter
-) =>
-  list.reduce(
+>(list: O[], getKey: KGetter): { [k: string]: O };
+export function toDictIndexedBy<
+  O extends object,
+  KGetter extends (o: O) => string,
+  V
+>(list: O[], getKey: KGetter, getVal: (o: O) => V): { [k: string]: V };
+export function toDictIndexedBy<
+  O extends object,
+  KGetter extends (o: O) => string,
+  V
+>(list: O[], getKey: KGetter, getVal?: (o: O) => V) {
+  if (getVal) {
+    return list.reduce(
+      (prev, next) => ({
+        ...prev,
+        [getKey(next)]: getVal(next),
+      }),
+      {} as { [k: string]: V }
+    );
+  }
+
+  return list.reduce(
     (prev, next) => ({
       ...prev,
       [getKey(next)]: next,
     }),
     {} as { [k: string]: O }
   );
+}
+
+export const objectKeys = <O extends object>(o: O) => Object.keys(o) as (keyof O)[];
 
 // Use this to get inherited keys as well
 export const keyInObject = <X extends {}, Y extends PropertyKey>(
   obj: X,
   prop: Y
 ): obj is X & Record<Y, unknown> => prop in obj;
+
+export const deepEquals = fastDeepEquals;

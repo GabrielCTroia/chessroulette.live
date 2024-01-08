@@ -1,4 +1,5 @@
 import {
+  ChessArrowId,
   ChessFEN,
   ChessFENBoard,
   ChessMove,
@@ -27,12 +28,14 @@ import {
 
 // type ChessRecursiveHistoryWithFen = (ChessRecursiveMove & { fen: ChessFEN })[];
 
+export type ArrowsMap = Record<ChessArrowId, null>;
+
 export type LearnActivityState = {
   activityType: 'learn';
   activityState: {
     fen: ChessFEN;
     boardOrientation: Color;
-    arrows: Arrow[];
+    arrows: ArrowsMap;
     circle?: Square;
     history: {
       // moves: ChessRecursiveHistoryWithFen;
@@ -60,7 +63,7 @@ export const initialLearnActivityState: LearnActivityState = {
   activityState: {
     boardOrientation: 'white',
     fen: ChessFENBoard.STARTING_FEN,
-    arrows: [],
+    arrows: {},
     circle: undefined,
     history: {
       startingFen: ChessFENBoard.STARTING_FEN,
@@ -82,7 +85,7 @@ export type ActivityActions =
       }
     >
   | Action<'changeBoardOrientation', Color>
-  | Action<'arrowChange', Arrow[]>
+  | Action<'arrowChange', ArrowsMap>
   | Action<'drawCircle', { square: Square }>
   | Action<'clearCircle'>;
 
@@ -172,7 +175,7 @@ export default (
           ...prev.activityState,
           fen: instance.fen(),
           circle: undefined,
-          arrows: [],
+          arrows: {},
           history: {
             startingFen: ChessFENBoard.STARTING_FEN,
             moves: nextHistoryMovex,

@@ -15076,6 +15076,14 @@ use-debounced-effect@^2.0.1:
   resolved "https://registry.yarnpkg.com/use-debounced-effect/-/use-debounced-effect-2.0.1.tgz#98de2561730770ea0b3cdfc4c562108b1d40a3b7"
   integrity sha512-GURbvUuZR2mGpaxjUNKnVXtjSh7LHc/2zPKjN4YS1cYAFw0WKOFNNZiOfgYCZEd4I16qG9aOwjSyJn1+f52KUw==
 
+use-deep-compare-effect@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/use-deep-compare-effect/-/use-deep-compare-effect-1.8.1.tgz#ef0ce3b3271edb801da1ec23bf0754ef4189d0c6"
+  integrity sha512-kbeNVZ9Zkc0RFGpfMN3MNfaKNvcLNyxOAAd9O4CBZ+kCBXXscn9s/4I+8ytUER4RDpEYs5+O6Rs4PqiZ+rHr5Q==
+  dependencies:
+    "@babel/runtime" "^7.12.5"
+    dequal "^2.0.2"
+
 use-resize-observer@^9.1.0:
   version "9.1.0"
   resolved "https://registry.yarnpkg.com/use-resize-observer/-/use-resize-observer-9.1.0.tgz#14735235cf3268569c1ea468f8a90c5789fc5c6c"

@@ -21,6 +21,7 @@
     "date-fns": "^2.30.0",
     "debounce": "^2.0.0",
     "deox": "^3.3.1",
+    "fast-deep-equal": "^3.1.3",
     "fp-ts": "^2.16.1",
     "hex-to-rgba": "^2.0.1",
     "io-ts": "^2.2.21",
@@ -45,7 +46,8 @@
     "ts-pubsy": "^0.3.0",
     "ts-results": "^3.3.0",
     "tslib": "^2.3.0",
-    "use-debounced-effect": "^2.0.1"
+    "use-debounced-effect": "^2.0.1",
+    "use-deep-compare-effect": "^1.8.1"
   },
   "devDependencies": {
     "@nx-tools/nx-prisma": "^5.1.0",

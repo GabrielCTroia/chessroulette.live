@@ -1,18 +1,28 @@
 import {
+  ChessArrowId,
   ChessFEN,
   GetComponentProps,
   PromotionalPieceSan,
   ShortChessMove,
+  deepEquals,
   isDarkSquare,
   isLightSquare,
+  keyInObject,
+  objectKeys,
+  toChessArrowFromId,
+  toChessArrowId,
+  toDictIndexedBy,
   toLongColor,
 } from '@xmatter/util-kit';
 import { Move, Square } from 'chess.js';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
 import { useArrowColor } from './useArrowColor';
 import { isPromotableMove } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
+import { isDeepStrictEqual } from 'util';
+import { ArrowsMap } from 'apps/chessroulette-web/modules/room/activity/reducer';
+import useDeepCompareEffect from 'use-deep-compare-effect';
 
 type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
@@ -22,17 +32,16 @@ export type ChessboardContainerProps = Omit<
 > & {
   fen: ChessFEN;
   sizePx: number;
-  arrows?: Arrow[];
+  arrowsMap?: ArrowsMap;
   circledSquare?: Square;
   arrowColor?: string;
   onMove?: (m: ShortChessMove) => boolean;
   lastMove?: ShortChessMove;
-  onArrowsChange?: (arrows: Arrow[]) => void;
+  onArrowsChange?: (arrows: ArrowsMap) => void;
 };
 
 export const ChessboardContainer = ({
   fen,
-  arrows,
   lastMove,
   circledSquare,
   onArrowsChange,
@@ -96,26 +105,48 @@ export const ChessboardContainer = ({
   }, [lastMove, circledSquare, props.sizePx]);
 
   const [promoMove, setPromoMove] = useState<ShortChessMove>();
+  const [arrowsList, setArrowsList] = useState<Arrow[]>();
 
-  // const lastArrowsRef = useRef<Arrow[]>();
-  // const onArrowsChangeCb = useCallback(
-  //   (arrows: Arrow[]) => {
-  //     if (!onArrowsChange) {
-  //       return;
-  //     }
+  useEffect(() => {
+    setTimeout(() => {
+      setArrowsList(objectKeys(props.arrowsMap || {}).map(toChessArrowFromId));
+      setAreArrowsAllowed(true);
+    }, 3000);
+  }, [props.arrowsMap]);
 
-  //     console.log('arrows', arrows, lastArrowsRef.current, arrows === lastArrowsRef.current)
+  const [areArrowsAllowed, setAreArrowsAllowed] = useState(true);
+  const [localBoardArrowsMap, setLocalBoardArrowsMap] = useState<ArrowsMap>({});
 
-  //     if (arrows === lastArrowsRef.current) {
-  //       return;
-  //     }
+  useDeepCompareEffect(() => {
+    onArrowsChangeCb(localBoardArrowsMap);
+  }, [localBoardArrowsMap]);
 
-  //     onArrowsChange(arrows);
+  const onArrowsChangeCb = useCallback(
+    (nextLocalBoardArrowsMap: ArrowsMap) => {
+      if (!onArrowsChange) {
+        return;
+      }
 
-  //     lastArrowsRef.current = arrows;
-  //   },
-  //   [onArrowsChange]
-  // );
+      if (!deepEquals(nextLocalBoardArrowsMap, props.arrowsMap)) {
+        // Send them all outside
+        onArrowsChange({
+          ...props.arrowsMap,
+          ...nextLocalBoardArrowsMap,
+        });
+      }
+    },
+    [onArrowsChange, props.arrowsMap, localBoardArrowsMap]
+  );
+
+  const arrowsToRender = useMemo(() => {
+    return objectKeys(props.arrowsMap || {})
+      .filter((a) => !Object(localBoardArrowsMap).hasOwnProperty(a))
+      .map(toChessArrowFromId);
+  }, [localBoardArrowsMap, props.arrowsMap]);
+
+  const resetArrows = useCallback(() => {
+    onArrowsChange({});
+  }, []);
 
   return (
     <div className="relative">
@@ -131,11 +162,11 @@ export const ChessboardContainer = ({
         customDarkSquareStyle={customStyles.customDarkSquareStyle}
         onPieceDrop={(from, to) => {
           // As long as the on PromotionPieceSelect is present this doesn't get triggered with a pieceSelect
-
           return !!props.onMove?.({ from, to });
         }}
         customSquareStyles={customSquareStyles}
-        customArrows={arrows}
+        customArrows={arrowsToRender}
+        areArrowsAllowed={areArrowsAllowed}
         autoPromoteToQueen={false}
         onPromotionCheck={(from, to, piece) => {
           const isPromoMove = isPromotableMove({ from, to }, piece);
@@ -163,7 +194,21 @@ export const ChessboardContainer = ({
           });
         }}
         customArrowColor={arrowColor}
-        // onArrowsChange={onArrowsChangeCb}
+        onArrowsChange={(nextArrows) => {
+          if (
+            nextArrows.length === 0 &&
+            Object.keys(props.arrowsMap).length > 0
+          ) {
+            // Reset when the arrows are set back to 0
+            resetArrows();
+            return;
+          }
+
+          // console.log('on arrow change cb', nextArrows);
+          return setLocalBoardArrowsMap(
+            toDictIndexedBy(nextArrows, toChessArrowId, () => null)
+          );
+        }}
         {...props}
       />
     </div>
