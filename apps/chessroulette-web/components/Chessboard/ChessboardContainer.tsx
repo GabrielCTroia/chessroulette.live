@@ -2,7 +2,6 @@ import {
   ChessFEN,
   GetComponentProps,
   ShortChessMove,
-  deepEquals,
   isDarkSquare,
   objectKeys,
   toChessArrowFromId,
@@ -24,6 +23,7 @@ import {
 } from 'apps/chessroulette-web/modules/room/activity/reducer';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import { noop } from 'movex-core-util';
+import { shallowEqualObjects } from 'shallow-equal';
 
 type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
@@ -123,7 +123,7 @@ export const ChessboardContainer = ({
         return;
       }
 
-      if (!deepEquals(nextLocalBoardArrowsMap, props.arrowsMap)) {
+      if (!shallowEqualObjects(nextLocalBoardArrowsMap, props.arrowsMap)) {
         // Send them all outside
         onArrowsChange({
           ...props.arrowsMap,

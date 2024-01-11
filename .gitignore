@@ -52,3 +52,5 @@ yalc.lock
 
 .env
 .env*
+
+*.tsbuildinfo

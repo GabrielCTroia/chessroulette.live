@@ -1,4 +1,4 @@
-import fastDeepEquals = require('fast-deep-equal');
+// import fastDeepEquals from 'fast-deep-equal/es6';
 
 /**
  * https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
@@ -56,12 +56,11 @@ export function toDictIndexedBy<
   );
 }
 
-export const objectKeys = <O extends object>(o: O) => Object.keys(o) as (keyof O)[];
+export const objectKeys = <O extends object>(o: O) =>
+  Object.keys(o) as (keyof O)[];
 
 // Use this to get inherited keys as well
 export const keyInObject = <X extends {}, Y extends PropertyKey>(
   obj: X,
   prop: Y
 ): obj is X & Record<Y, unknown> => prop in obj;
-
-export const deepEquals = fastDeepEquals;

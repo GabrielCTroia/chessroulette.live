@@ -38,10 +38,5 @@
     "src/**/*.test.ts",
     "**/*.stories.ts",
     "**/*.stories.js"
-  ],
-  "references": [
-    {
-      "path": "./tsconfig.storybook.json"
-    }
   ]
 }
