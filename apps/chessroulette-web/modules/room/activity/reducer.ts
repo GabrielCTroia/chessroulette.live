@@ -4,6 +4,7 @@ import {
   ChessFENBoard,
   ChessMove,
   ChessPGN,
+  ChesscircleId,
 } from '@xmatter/util-kit';
 import {
   addMoveToChessHistory,
@@ -28,7 +29,11 @@ import {
 
 // type ChessRecursiveHistoryWithFen = (ChessRecursiveMove & { fen: ChessFEN })[];
 
-export type ArrowsMap = Record<ChessArrowId, null>;
+export type ArrowDrawTuple = [from: Square, to: Square, hex?: string];
+export type ArrowsMap = Record<ChessArrowId, ArrowDrawTuple>;
+
+export type CircleDrawTuple = [at: Square, hex: string];
+export type CirclesMap = Record<ChesscircleId, CircleDrawTuple>;
 
 export type LearnActivityState = {
   activityType: 'learn';
@@ -36,7 +41,7 @@ export type LearnActivityState = {
     fen: ChessFEN;
     boardOrientation: Color;
     arrows: ArrowsMap;
-    circle?: Square;
+    circles: CirclesMap;
     history: {
       // moves: ChessRecursiveHistoryWithFen;
       startingFen: ChessFEN;
@@ -64,7 +69,7 @@ export const initialLearnActivityState: LearnActivityState = {
     boardOrientation: 'white',
     fen: ChessFENBoard.STARTING_FEN,
     arrows: {},
-    circle: undefined,
+    circles: {},
     history: {
       startingFen: ChessFENBoard.STARTING_FEN,
       moves: [],
@@ -86,8 +91,8 @@ export type ActivityActions =
     >
   | Action<'changeBoardOrientation', Color>
   | Action<'arrowChange', ArrowsMap>
-  | Action<'drawCircle', { square: Square }>
-  | Action<'clearCircle'>;
+  | Action<'drawCircle', CircleDrawTuple>
+  | Action<'clearCircles'>;
 
 // PART 3: The Reducer – This is where all the logic happens
 
@@ -144,6 +149,8 @@ export default (
           activityState: {
             ...prev.activityState,
             fen: instance.fen,
+            circles: {},
+            arrows: {},
             history: {
               ...prev.activityState.history,
               moves: nextHistory,
@@ -174,7 +181,7 @@ export default (
         activityState: {
           ...prev.activityState,
           fen: instance.fen(),
-          circle: undefined,
+          circles: {},
           arrows: {},
           history: {
             startingFen: ChessFENBoard.STARTING_FEN,
@@ -235,24 +242,33 @@ export default (
     }
 
     if (action.type === 'drawCircle') {
+      const [at, hex] = action.payload;
+
+      const circleId = `${at}`;
+
+      const { [circleId]: existent, ...restOfCirles } =
+        prev.activityState.circles;
+
       return {
         ...prev,
         activityState: {
           ...prev.activityState,
-          circle:
-            action.payload.square === prev.activityState.circle
+          circles: {
+            ...restOfCirles,
+            ...(!!existent
               ? undefined // Set it to undefined if same
-              : action.payload.square,
+              : { [circleId]: action.payload }),
+          },
         },
       };
     }
 
-    if (action.type === 'clearCircle') {
+    if (action.type === 'clearCircles') {
       return {
         ...prev,
         activityState: {
           ...prev.activityState,
-          circle: undefined,
+          circles: {},
         },
       };
     }

@@ -119,7 +119,7 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
     action.type === 'changeBoardOrientation' ||
     action.type === 'arrowChange' ||
     action.type === 'drawCircle' ||
-    action.type === 'clearCircle'
+    action.type === 'clearCircles'
   ) {
     // console.log('heere')
     return {

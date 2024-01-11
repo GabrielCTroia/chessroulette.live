@@ -57,4 +57,6 @@ export type PieceSan =
 
 export type PromotionalPieceSan = Exclude<PieceSan, 'wP' | 'wK' | 'bP' | 'bK'>;
 
-export type ChessArrowId = `${Square}${Square}-${string}`;
+// export type ChessArrowId = `${Square}${Square}-${string}`;
+export type ChessArrowId = string;
+export type ChesscircleId = string;
