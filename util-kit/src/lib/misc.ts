@@ -1,4 +1,4 @@
-import fastDeepEquals = require('fast-deep-equal/es6');
+import fastDeepEquals = require('fast-deep-equal');
 
 /**
  * https://stackoverflow.com/questions/1527803/generating-random-whole-numbers-in-javascript-in-a-specific-range
