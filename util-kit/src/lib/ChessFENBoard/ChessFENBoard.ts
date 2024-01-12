@@ -101,6 +101,10 @@ export class ChessFENBoard {
     // TODO: here the fen gets recalculate 2 times
     this.clear(from);
 
+    const nextFen = this.fen;
+
+    // const chessInstance = getNewChessGame
+
     const detailedPiece = fenBoardPieceSymbolToDetailedChessPiece(piece);
 
     const sanPiece =

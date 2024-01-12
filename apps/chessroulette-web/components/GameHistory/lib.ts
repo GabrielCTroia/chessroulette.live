@@ -1,4 +1,4 @@
-import { ChessPGN } from '@xmatter/util-kit';
+import { ChessPGN, getNewChessGame } from '@xmatter/util-kit';
 import {
   ChessHistoryIndex,
   ChessHistoryMove,
@@ -7,7 +7,6 @@ import {
   ChessRecursiveHistoryIndex,
   ChessRecursiveMove,
 } from './types';
-import { getNewChessGame } from 'apps/chessroulette-web/lib/chess';
 
 export const isChessRecursiveHistoryIndex = (
   a: unknown
@@ -29,8 +28,6 @@ export const addMoveToChessHistory = (
   m: ChessHistoryMove,
   chessHistoryIndex?: ChessHistoryIndex
 ): [nextHistory: ChessRecursiveHistory, nextIndex: ChessHistoryIndex] => {
-  console.log('addMoveToChessHistory', chessHistoryIndex);
-
   if (isChessRecursiveHistoryIndex(chessHistoryIndex)) {
     const [moveIndex, branchIndex, nestedBranchedHistoryOrMoveIndex] =
       chessHistoryIndex;

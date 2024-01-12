@@ -1,5 +1,5 @@
+import { matrixMap } from '@xmatter/util-kit';
 import { Chess, Square } from 'chess.js';
-import { matrixMap } from 'apps/chessroulette-web/lib/matrix';
 import { GeneralPieceLayoutState, RelativeCoord } from 'chessterrain-react';
 
 type ChessBoard = ReturnType<Chess['board']>;

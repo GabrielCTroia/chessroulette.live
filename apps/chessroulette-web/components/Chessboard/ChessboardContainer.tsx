@@ -41,6 +41,7 @@ export type ChessboardContainerProps = Omit<
   onArrowsChange?: (arrows: ArrowsMap) => void;
   onCircleDraw?: (circleTuple: CircleDrawTuple) => void;
   onClearCircles?: () => void;
+  inCheckSquare?: Square;
 };
 
 export const ChessboardContainer = ({
@@ -50,6 +51,7 @@ export const ChessboardContainer = ({
   circlesMap,
   onArrowsChange = noop,
   onCircleDraw = noop,
+  inCheckSquare,
   ...props
 }: ChessboardContainerProps) => {
   const boardOrientation = useMemo(
@@ -99,16 +101,24 @@ export const ChessboardContainer = ({
           Object.values(circlesMap),
           ([sq]) => sq,
           ([_, hex]) => ({
-            // backgroundImage: `url("data:image/svg+xml,${circleSvg}")`,
-            // background: 'red',
-            // circleSvg
-            borderRadius: '100%',
-            border: `${props.sizePx / 64}px ${hex || 'red'} solid`,
-            // marginTop: `-${props.sizePx / 64}px`,
+            borderRadius: '50%',
+            background: `radial-gradient(ellipse at center, 
+              rgba(255,113,12,0) 80%,
+              ${hex} 51.5%)`,
           })
         )),
+      ...(inCheckSquare && {
+        [inCheckSquare]: {
+          borderRadius: '50%',
+          // backdropFilter: 'blur(200px)',
+          backdropFilter: 'blur(10px)',
+          background: 'rgba(255, 0, 0, .6)',
+          clipPath: 'circle(40%)',
+          // border: `${props.sizePx / 64}px ${hex || 'red'} solid`,
+        },
+      }),
     };
-  }, [lastMove, circlesMap, props.sizePx]);
+  }, [lastMove, circlesMap, props.sizePx, inCheckSquare]);
 
   const [promoMove, setPromoMove] = useState<ShortChessMove>();
   const [localBoardArrowsMap, setLocalBoardArrowsMap] = useState<ArrowsMap>({});

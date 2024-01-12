@@ -7,7 +7,6 @@ import { ContainerWithDimensions } from 'apps/chessroulette-web/components/Conta
 import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { LearnTemplate } from './LearnTemplate';
 import { GameHistory } from 'apps/chessroulette-web/components/GameHistory';
-import { getNewChessGame } from 'apps/chessroulette-web/lib/chess';
 import { ChessFEN, ChessPGN, getRandomInt } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { useMemo, useState } from 'react';
@@ -124,6 +123,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           sizePx={s.height} // TODO: Here this fails when the height is super small! need to look into it
                           fen={activityState.fen}
                           lastMove={lastMove}
+                          inCheckSquare='e8'
                           onMove={(payload) => {
                             console.log('learn activity on move', payload);
 

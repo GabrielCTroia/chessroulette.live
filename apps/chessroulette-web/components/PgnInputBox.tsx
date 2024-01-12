@@ -1,8 +1,7 @@
-import React, { useCallback, useState } from 'react';
-import cx from 'classnames';
+import React, { useState } from 'react';
 import { TextArea } from './TextArea';
 import { Button } from './Button';
-import { isValidPgn } from '../lib/chess';
+import { isValidPgn } from '@xmatter/util-kit';
 // import { TextArea } from 'src/components/TextArea';
 
 type Props = {

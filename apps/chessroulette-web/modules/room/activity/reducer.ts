@@ -5,6 +5,10 @@ import {
   ChessMove,
   ChessPGN,
   ChesscircleId,
+  FenBoardPromotionalPieceSymbol,
+  getNewChessGame,
+  isValidPgn,
+  pieceSanToFenBoardPieceSymbol,
 } from '@xmatter/util-kit';
 import {
   addMoveToChessHistory,
@@ -16,14 +20,9 @@ import {
   ChessHistoryIndex,
   ChessRecursiveHistory,
 } from 'apps/chessroulette-web/components/GameHistory/types';
-import { getNewChessGame, isValidPgn } from 'apps/chessroulette-web/lib/chess';
 import { Color } from 'chessterrain-react';
 import { Action } from 'movex-core-util';
-import { Arrow, Square } from 'react-chessboard/dist/chessboard/types';
-import {
-  FenBoardPromotionalPieceSymbol,
-  pieceSanToFenBoardPieceSymbol,
-} from 'util-kit/src/lib/ChessFENBoard/chessUtils';
+import { Square } from 'react-chessboard/dist/chessboard/types';
 
 // type ParticipantId = string;
 
