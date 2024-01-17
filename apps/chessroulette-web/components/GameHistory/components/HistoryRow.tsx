@@ -1,4 +1,14 @@
-import React from 'react';
+import React, { MouseEventHandler } from 'react';
+import {
+  Menu,
+  Item,
+  Separator,
+  Submenu,
+  useContextMenu,
+  ItemProps,
+  ItemParams,
+} from 'react-contexify';
+import 'react-contexify/dist/ReactContexify.css';
 import cx from 'classnames';
 import hexToRgba from 'hex-to-rgba';
 // import { Text } from 'src/components/Text';
@@ -14,16 +24,18 @@ import { Text } from '../../Text';
 import { ChessHistoryIndex, PairedMove } from '../types';
 import { isPartialBlackMove } from '../util';
 import { isChessRecursiveHistoryIndex } from '../lib';
+import { ChessColor, LongChessColor } from '@xmatter/util-kit';
 
 type Props = {
   pairedMove: PairedMove;
   pairedIndex: number;
   startingLinearIndex: number;
-  onFocus: (i: ChessHistoryIndex) => void;
   focusedIndex?: ChessHistoryIndex;
   className?: string;
   containerClassName?: string;
   isNested?: boolean;
+  onFocus: (i: ChessHistoryIndex) => void;
+  onDelete: (i: ChessHistoryIndex) => void;
 };
 
 export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
@@ -33,6 +45,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
       pairedIndex,
       startingLinearIndex,
       onFocus,
+      onDelete,
       className,
       focusedIndex,
       containerClassName,
@@ -50,6 +63,50 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
 
     const whiteMoveLinearIndex = startingLinearIndex;
     const blackMoveLinearIndex = whiteMoveLinearIndex + 1;
+
+    const menuId = `${moveCount}-${whiteMoveLinearIndex}:${blackMoveLinearIndex}`;
+
+    const { show } = useContextMenu({
+      id: menuId,
+    });
+
+    const handleRightClickWhite: MouseEventHandler = (event) => {
+      // event.preventDefault();
+
+      console.log('white move', whiteMove);
+
+      show({
+        event,
+        props: {
+          color: 'white',
+        },
+      });
+    };
+
+    const handleRightClickBlack: MouseEventHandler = (event) => {
+      // event.preventDefault();
+
+      console.log('black move', blackMove);
+
+      show({
+        event,
+        props: {
+          color: 'black',
+        },
+      });
+    };
+
+    const handleOnDelete = (s: ItemParams) => {
+      if (s.props.color === 'white') {
+        console.log('delete pressed', whiteMove);
+        onDelete(whiteMoveLinearIndex);
+      }
+
+      if (s.props.color === 'black') {
+        onDelete(blackMoveLinearIndex);
+        console.log('delete pressed', blackMove);
+      }
+    };
 
     const renderNestedContent = () => {
       const [focusedMoveIndex, focusedBranchIndex, focusedNestedIndex] =
@@ -80,8 +137,15 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
                           nestedIndex,
                         ])
                       }
+                      onDelete={(nestedIndex) =>
+                        onDelete([
+                          whiteMoveLinearIndex,
+                          branchIndex,
+                          nestedIndex,
+                        ])
+                      }
                       // className={cls.nestedHistory}
-                      className='pl-2'
+                      className="pl-2"
                       rootPairedIndex={pairedIndex} // continue this move
                       focusedIndex={focusedIndexPerBranch}
                       isNested={true}
@@ -131,9 +195,12 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
                 onRefocus={(nestedIndex) =>
                   onFocus([blackMoveLinearIndex, branchIndex, nestedIndex])
                 }
+                onDelete={(nestedIndex) =>
+                  onDelete([blackMoveLinearIndex, branchIndex, nestedIndex])
+                }
                 key={`${blackMove.san}-branch-${branchIndex}`}
                 // className={cls.nestedHistory}
-                className='pl-2'
+                className="pl-2"
                 rootPairedIndex={pairedIndex + 1} // start a new move
                 focusedIndex={focusedIndexPerBranch}
                 isNested={true}
@@ -167,6 +234,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
                 whiteMoveLinearIndex === focusedIndex ? 'font-black' : ''
               }`}
               onClick={() => onFocus(whiteMoveLinearIndex)}
+              onContextMenu={handleRightClickWhite}
             >
               {whiteMove.san}
             </Text>
@@ -174,6 +242,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
             <Text
               // className={cx(cls.text, cls.move, cls.whiteMove)}
               className="flex-1 cursor-pointer sfont-bold"
+              onContextMenu={handleRightClickWhite}
             >
               ...
             </Text>
@@ -182,6 +251,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
             <Text
               // className={cx(cls.text, cls.move, cls.blackMove)}
               className="flex-1 cursor-pointer sfont-bold"
+              onContextMenu={handleRightClickBlack}
             >
               ...
             </Text>
@@ -194,11 +264,21 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
                 blackMoveLinearIndex === focusedIndex ? 'font-black' : ''
               }`}
               onClick={() => onFocus(blackMoveLinearIndex)}
+              onContextMenu={handleRightClickBlack}
             >
               {blackMove?.san}
             </Text>
           )}
         </div>
+        <Menu id={menuId}>
+          <Item
+            id="delete"
+            onClick={handleOnDelete}
+            className="hover:cursor-pointer"
+          >
+            Delete
+          </Item>
+        </Menu>
         {renderNestedContent()}
       </div>
     );

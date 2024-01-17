@@ -7,6 +7,7 @@ export type GameHistoryProps = {
   history: ChessRecursiveHistory;
   focusedIndex: HistoryListProps['focusedIndex'];
   onRefocus: HistoryListProps['onRefocus'];
+  onDelete: HistoryListProps['onDelete'];
 
   emptyContent?: string | React.ReactNode;
 
@@ -24,6 +25,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   showRows = 4,
   focusedIndex = 0,
   onRefocus,
+  onDelete,
   ...props
 }) => {
   useKeysToRefocusHistory(history, focusedIndex, onRefocus);
@@ -34,6 +36,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
         history={history}
         focusedIndex={focusedIndex}
         onRefocus={onRefocus}
+        onDelete={onDelete}
         className="flex flex-1 flex-col"
         rowClassName="pb-3 border-b border-slate-600"
       />

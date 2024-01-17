@@ -123,7 +123,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           sizePx={s.height} // TODO: Here this fails when the height is super small! need to look into it
                           fen={activityState.fen}
                           lastMove={lastMove}
-                          inCheckSquare='e8'
+                          inCheckSquare="e8"
                           onMove={(payload) => {
                             console.log('learn activity on move', payload);
 
@@ -263,6 +263,12 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                                       payload: { index },
                                     });
                                   }}
+                                  onDelete={(atIndex) => {
+                                    dispatch({
+                                      type: 'deleteHistoryMove',
+                                      payload: { atIndex },
+                                    });
+                                  }}
                                   // containerClassName="px-1"
                                 />
                                 <div className="pt-3 overflow-x-scroll">
@@ -285,22 +291,20 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                             Import
                           </Button>
                         ),
-                        renderContent: (p) => {
-                          return (
-                            <PgnInputBox
-                              containerClassName="flex-1 h-full"
-                              contentClassName="p-3 bg-slate-500"
-                              onChange={(nextPgn) => {
-                                dispatch({
-                                  type: 'importPgn',
-                                  payload: nextPgn,
-                                });
+                        renderContent: (p) => (
+                          <PgnInputBox
+                            containerClassName="flex-1 h-full"
+                            contentClassName="p-3 bg-slate-500"
+                            onChange={(nextPgn) => {
+                              dispatch({
+                                type: 'importPgn',
+                                payload: nextPgn,
+                              });
 
-                                p.focus(0);
-                              }}
-                            />
-                          );
-                        },
+                              p.focus(0);
+                            }}
+                          />
+                        ),
                       },
                     ]}
                   />

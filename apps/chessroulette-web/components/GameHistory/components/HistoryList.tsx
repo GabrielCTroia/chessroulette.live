@@ -17,6 +17,7 @@ import { getChessHistoryMoveIndex } from './util';
 export type HistoryListProps = {
   history: ChessRecursiveHistory;
   onRefocus: (nextIndex: ChessHistoryIndex) => void;
+  onDelete: (atIndex: ChessHistoryIndex) => void;
   focusedIndex?: ChessHistoryIndex;
   rootPairedIndex?: number;
   className?: string;
@@ -32,6 +33,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
   history,
   focusedIndex,
   onRefocus,
+  onDelete,
   className,
   rootPairedIndex = 0,
   rowClassName,
@@ -91,6 +93,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
           }
           focusedIndex={focusedIndex}
           onFocus={onRefocus}
+          onDelete={onDelete}
           containerClassName={rowClassName}
           isNested={isNested}
         />

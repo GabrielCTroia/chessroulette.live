@@ -55,7 +55,7 @@ export const PgnInputBox: React.FC<Props> = ({
             fileData.readAsText(f);
           }}
         >
-          <div className="">Upload or Drop a File here</div>
+          <div className="">Upload or Drop a PGN File here</div>
         </DragAndDrop>
       </div>
       <div className="flex gap-2">

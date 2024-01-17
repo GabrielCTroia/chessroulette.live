@@ -13,6 +13,7 @@ import {
 import {
   addMoveToChessHistory,
   addMoveToChessHistoryAtNextAvailableIndex,
+  decrementChessHistoryIndex,
   getChessHistoryAtIndex,
   pgnToHistory,
 } from 'apps/chessroulette-web/components/GameHistory/lib';
@@ -88,6 +89,7 @@ export type ActivityActions =
         index: ChessHistoryIndex;
       }
     >
+  | Action<'deleteHistoryMove', { atIndex: ChessHistoryIndex }>
   | Action<'changeBoardOrientation', Color>
   | Action<'arrowChange', ArrowsMap>
   | Action<'drawCircle', CircleDrawTuple>
@@ -199,8 +201,13 @@ export default (
         prev.activityState.history.startingFen
       );
 
-      historyAtFocusedIndex.forEach((m) => {
-        instance.move(m.from, m.to);
+      historyAtFocusedIndex.forEach((m, i) => {
+        try {
+          instance.move(m.from, m.to);
+        } catch (e) {
+          console.log('failed at m', m, 'i', i);
+          throw e;
+        }
       });
 
       const nextFen = instance.fen;
@@ -218,6 +225,39 @@ export default (
       };
 
       // const fenPiece = instance.piece(from);
+    }
+
+    if (action.type === 'deleteHistoryMove') {
+      const nextIndex = decrementChessHistoryIndex(action.payload.atIndex);
+      const nextMoves = getChessHistoryAtIndex(
+        prev.activityState.history.moves,
+        nextIndex
+      );
+
+      const instance = new ChessFENBoard(
+        prev.activityState.history.startingFen
+      );
+
+      nextMoves.forEach((m, i) => {
+        instance.move(m.from, m.to);
+      });
+
+      const nextFen = instance.fen;
+
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          circles: {},
+          arrows: {},
+          fen: nextFen,
+          history: {
+            ...prev.activityState.history,
+            focusedIndex: nextIndex,
+            moves: nextMoves,
+          },
+        },
+      };
     }
 
     if (action.type === 'changeBoardOrientation') {

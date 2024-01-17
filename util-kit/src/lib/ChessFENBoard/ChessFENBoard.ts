@@ -1,3 +1,4 @@
+import { getNewChessGame } from '../Chess/lib';
 import { ChessFEN, DetailedChessMove } from '../Chess/types';
 import { invoke } from '../misc';
 import {
@@ -9,7 +10,7 @@ import {
   fenBoardPieceSymbolToPieceSymbol,
   getFileRank,
 } from './chessUtils';
-import type { PieceSymbol, Square } from 'chess.js';
+import type { Color, PieceSymbol, Square } from 'chess.js';
 
 export class ChessFENBoard {
   static STARTING_FEN: ChessFEN = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR';
@@ -88,7 +89,12 @@ export class ChessFENBoard {
 
     // const piece = this.piece(from);
     if (!piece) {
-      throw new Error('Move Error: the from square was empty');
+      console.error('Move Error: the from square was empty', {
+        from,
+        to,
+        promoteTo,
+      });
+      throw new Error(`Move Error: the from square (${from}) was empty!`);
     }
 
     const toPiece = this.piece(to);
@@ -101,9 +107,20 @@ export class ChessFENBoard {
     // TODO: here the fen gets recalculate 2 times
     this.clear(from);
 
-    const nextFen = this.fen;
+    console.log('fen', this.fen);
 
-    // const chessInstance = getNewChessGame
+    const chessInstance = getNewChessGame({ fen: this.fen });
+
+    const state = {
+      inCheck: chessInstance.inCheck(),
+      // isCheck: chessInstance.isCheck(),
+      isCheckmate: chessInstance.isCheckmate(),
+      isGameOver: chessInstance.isGameOver(),
+    };
+
+    console.log('chess state', state);
+
+    // console.log('chess instance', chessInstance.fen(), chessInstance.pgn());
 
     const detailedPiece = fenBoardPieceSymbolToDetailedChessPiece(piece);
 
@@ -149,6 +166,10 @@ export class ChessFENBoard {
     }
 
     const nextBoard = ChessFENBoard.calculateBoard(fen);
+
+    const fenStateNotation = fen.slice(fen.indexOf(' '));
+
+    console.log('fenStateNotation', fenStateNotation);
 
     this._state = {
       board: nextBoard,
@@ -203,7 +224,30 @@ export class ChessFENBoard {
     return nextBoard;
   }
 
-  private static calculateFen(fromBoard: FENBoard): ChessFEN {
+  private static calculateFen(
+    fromBoard: FENBoard,
+    state: {
+      turn?: Color;
+      castlingRights?: {
+        w: { kingSide: boolean; queenSide: boolean };
+        b: { kingSide: boolean; queenSide: boolean };
+      };
+      enPassant?: Square | undefined;
+      halfMoves?: number;
+      fullMoves?: number;
+    } = {}
+  ): ChessFEN {
+    const {
+      turn = 'w',
+      castlingRights = {
+        w: { kingSide: false, queenSide: false },
+        b: { kingSide: false, queenSide: false },
+      },
+      enPassant = undefined,
+      halfMoves = 0,
+      fullMoves = 1,
+    } = state;
+
     const nextFen = [];
     for (let i = 0; i < 8; i++) {
       let empty = 0;
@@ -226,7 +270,17 @@ export class ChessFENBoard {
     }
     nextFen.pop();
 
-    return nextFen.join('');
+    const cr = castlingRights;
+    const castlingRightsNotation = `${cr.w.kingSide ? 'K' : ''}${
+      cr.w.kingSide ? 'Q' : ''
+    }${cr.b.kingSide ? 'k' : ''}${cr.b.queenSide ? 'q' : ''}`;
+
+    return (
+      nextFen.join('') +
+      ` ${turn} ${castlingRightsNotation || '-'} ${
+        enPassant || '-'
+      } ${halfMoves} ${fullMoves}`
+    );
   }
 
   loadBoard(fenBoard: FENBoard) {
