@@ -20,6 +20,7 @@
     "classnames": "^2.3.2",
     "date-fns": "^2.30.0",
     "debounce": "^2.0.0",
+    "deepmerge-ts": "^5.1.0",
     "deox": "^3.3.1",
     "fp-ts": "^2.16.1",
     "hex-to-rgba": "^2.0.1",

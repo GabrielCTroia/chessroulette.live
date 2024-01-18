@@ -64,3 +64,6 @@ export const keyInObject = <X extends {}, Y extends PropertyKey>(
   obj: X,
   prop: Y
 ): obj is X & Record<Y, unknown> => prop in obj;
+
+export const isOneOf = <T>(k: T, listOfOptions: T[]) =>
+  listOfOptions.indexOf(k) > -1;

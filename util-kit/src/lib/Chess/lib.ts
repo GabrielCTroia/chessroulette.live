@@ -7,6 +7,15 @@ import {
 } from './types';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
 
+export const isShortChessColor = (s: string): s is ShortChessColor =>
+  s === 'b' || s === 'w';
+
+export const isLongChessColor = (s: string): s is LongChessColor =>
+  s === 'black' || s === 'white';
+
+export const isChessColor = (s: string): s is ChessColor =>
+  isShortChessColor(s) || isLongChessColor(s);
+
 export const toShortColor = (c: ChessColor): ShortChessColor =>
   c[0] as ShortChessColor;
 
