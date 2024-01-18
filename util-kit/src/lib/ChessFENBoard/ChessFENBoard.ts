@@ -1,5 +1,5 @@
 import { deepmerge } from 'deepmerge-ts';
-import { getNewChessGame, isShortChessColor } from '../Chess/lib';
+import { getNewChessGame, isShortChessColor, toShortColor } from '../Chess/lib';
 import { ChessFEN, DetailedChessMove } from '../Chess/types';
 import { invoke, isOneOf } from '../misc';
 import {
@@ -10,6 +10,7 @@ import {
   fenBoardPieceSymbolToDetailedChessPiece,
   fenBoardPieceSymbolToPieceSymbol,
   getFileRank,
+  toOppositeColor,
 } from './chessUtils';
 import { SQUARES, type Color, type PieceSymbol, type Square } from 'chess.js';
 import { Err, Ok, Result } from 'ts-results';
@@ -35,8 +36,8 @@ export class ChessFENBoard {
     return {
       turn: 'w',
       castlingRights: {
-        w: { kingSide: false, queenSide: false },
-        b: { kingSide: false, queenSide: false },
+        w: { kingSide: true, queenSide: true },
+        b: { kingSide: true, queenSide: true },
       },
       enPassant: undefined,
       halfMoves: 0,
@@ -88,13 +89,13 @@ export class ChessFENBoard {
       piece
     );
 
-    const nextFen = ChessFENBoard.calculateFen(nextBoard);
+    const next = ChessFENBoard.calculateFen(nextBoard, this._state.fenState);
 
     // TODO: Can Optimize to not calc fen all the time
     this._state = {
       board: nextBoard,
-      fen: nextFen.fen,
-      fenState: nextFen.fenState,
+      fen: next.fen,
+      fenState: next.fenState,
     };
   }
 
@@ -130,19 +131,28 @@ export class ChessFENBoard {
       ? fenBoardPieceSymbolToPieceSymbol(toPiece)
       : undefined;
 
-    this.put(to, piece);
+    const castlingMove = this.isCastlingMove(from, to);
 
-    // TODO: here the fen gets recalculate 2 times
+    // TODO: here the fen gets recalculate 2 times (one for put one for clear)
+    this.put(to, piece);
     this.clear(from);
 
-    const chessInstance = getNewChessGame({ fen: this.fen });
+    // Check for castling
+    if (castlingMove) {
+      const rookPiece = this.piece(castlingMove.rookFrom);
+      // Move the rook as well
+      this.put(castlingMove.rookTo, rookPiece);
+      this.clear(castlingMove.rookFrom);
+    }
 
-    const state = {
-      inCheck: chessInstance.inCheck(),
-      // isCheck: chessInstance.isCheck(),
-      isCheckmate: chessInstance.isCheckmate(),
-      isGameOver: chessInstance.isGameOver(),
-    };
+    // const chessInstance = getNewChessGame({ fen: this.fen });
+
+    // const MoveState = {
+    //   inCheck: chessInstance.inCheck(),
+    //   // isCheck: chessInstance.isCheck(),
+    //   isCheckmate: chessInstance.isCheckmate(),
+    //   isGameOver: chessInstance.isGameOver(),
+    // };
 
     const detailedPiece = fenBoardPieceSymbolToDetailedChessPiece(piece);
 
@@ -163,6 +173,42 @@ export class ChessFENBoard {
     });
 
     const san = `${sanPiece}${sanCaptured}${to}`;
+    const prevFenState = this._state.fenState;
+
+    // Refresh the Fen State
+    this.setFenNotation({
+      fromState: {
+        turn: prevFenState.turn === 'b' ? 'w' : 'b',
+
+        ...(castlingMove && {
+          // Remove the castling rights if applied this move
+          castlingRights: {
+            [prevFenState.turn]: {
+              kingSide: false,
+              queenSide: false,
+            },
+          },
+        }),
+
+        /**
+         * Half Moves reset when there is a capture or a pawn advance otherwise they increment
+         *
+         * See this https://www.chess.com/terms/fen-chess#halfmove-clock
+         */
+        halfMoves:
+          captured || detailedPiece.piece === 'p'
+            ? 0
+            : prevFenState.halfMoves + 1,
+
+        /**
+         * Full Moves increment when there is a black move (complete turn)
+         *
+         * See this https://www.chess.com/terms/fen-chess#fullmove-number
+         */
+        fullMoves:
+          prevFenState.fullMoves + (detailedPiece.color === 'b' ? 1 : 0),
+      },
+    });
 
     return {
       color: detailedPiece.color,
@@ -172,6 +218,107 @@ export class ChessFENBoard {
       to,
       from,
     };
+  }
+
+  private isCastlingMove(
+    from: Square,
+    to: Square
+  ): null | { rookFrom: Square; rookTo: Square } {
+    const piece = this.piece(from);
+
+    if (!piece) {
+      throw new Error(`Move Error: the from square (${from}) was empty!`);
+    }
+
+    if (!isOneOf(piece, ['K', 'k'])) {
+      return null;
+    }
+
+    // white
+    if (piece === 'K') {
+      if (!isOneOf(to, ['g1', 'c1'])) {
+        return null;
+      }
+
+      // If King side
+      if (to === 'g1') {
+        if (!this._state.fenState.castlingRights.w.kingSide) {
+          return null;
+        }
+
+        // If there are piece at f1 or g1 fail
+        if (this.piece('f1') || this.piece('g1')) {
+          return null;
+        }
+
+        if (this.piece('h1') !== 'R') {
+          return null;
+        }
+
+        return { rookFrom: 'h1', rookTo: 'f1' };
+      }
+
+      // If Queen side
+      else if (to === 'c1') {
+        if (!this._state.fenState.castlingRights.w.queenSide) {
+          return null;
+        }
+
+        if (this.piece('d1') || this.piece('c1')) {
+          return null;
+        }
+
+        if (this.piece('a1') !== 'R') {
+          return null;
+        }
+
+        return { rookFrom: 'a1', rookTo: 'c1' };
+      }
+    }
+
+    // black
+    if (piece === 'k') {
+      if (!isOneOf(to, ['g8', 'c8'])) {
+        return null;
+      }
+
+      // If King side
+      if (to === 'g8') {
+        if (!this._state.fenState.castlingRights.b.kingSide) {
+          return null;
+        }
+
+        // If there are piece at f1 or g1 fail
+        if (this.piece('f8') || this.piece('g8')) {
+          return null;
+        }
+
+        if (this.piece('h8') !== 'r') {
+          return null;
+        }
+
+        return { rookFrom: 'h8', rookTo: 'f8' };
+      }
+
+      // If Queen side
+      else if (to === 'c8') {
+        if (!this._state.fenState.castlingRights.b.queenSide) {
+          return null;
+        }
+
+        if (this.piece('d8') || this.piece('c8')) {
+          return null;
+        }
+
+        if (this.piece('a8') !== 'r') {
+          return null;
+        }
+
+        return { rookFrom: 'a8', rookTo: 'c8' };
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -201,7 +348,7 @@ export class ChessFENBoard {
 
     const nextFen = ChessFENBoard.calculateFen(
       nextBoard,
-      fenStateNotation ? nextFenStateResult.val : undefined
+      nextFenStateResult.val
     );
 
     this._state = {
@@ -326,7 +473,6 @@ export class ChessFENBoard {
 
     let state: FenState = ChessFENBoard.STARTING_FEN_STATE;
 
-    // TODO: Left it here, need to do this in oder to have the castling working, which makes the history refocus break!
     if (turn && isShortChessColor(turn)) {
       state = {
         ...state,
@@ -454,7 +600,7 @@ export class ChessFENBoard {
 
   private static calculateFen(
     fromBoard: FENBoard,
-    fenState: Partial<FenState> = {}
+    fenState: FenState
   ): {
     fen: ChessFEN;
     fenState: FenState;
@@ -482,22 +628,17 @@ export class ChessFENBoard {
     }
     nextFen.pop();
 
-    const nextFenState = {
-      ...ChessFENBoard.STARTING_FEN_STATE,
-      ...fenState,
-    };
-
-    const isValidFenStateResult = ChessFENBoard.validateFenState(nextFenState);
+    const isValidFenStateResult = ChessFENBoard.validateFenState(fenState);
 
     if (isValidFenStateResult.err) {
       throw isValidFenStateResult.val;
     }
 
-    const nextFenNotation = ChessFENBoard.fenStateToFenNotation(nextFenState);
+    const nextFenNotation = ChessFENBoard.fenStateToFenNotation(fenState);
 
     return {
       fen: nextFen.join('') + ` ${nextFenNotation}`,
-      fenState: nextFenState,
+      fenState: fenState,
       fenStateNotation: nextFenNotation,
     };
   }

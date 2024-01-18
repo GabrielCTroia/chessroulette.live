@@ -44,7 +44,7 @@ describe('Fen State Notation', () => {
     test('Invalid Turn', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R u KQkq - 0 1' // Notice the invalid 'u' in the 1st position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R u KQkq - 0 1' // Notice the invalid 'u' in the 2nd position
         );
       };
 
@@ -76,7 +76,7 @@ describe('Fen State Notation', () => {
     test('Invalid Castling Rights Notatoin', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w Kskq - 0 1' // Notice the invalid 's' in the 2nd position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w Kskq - 0 1' // Notice the invalid 's' in the 3rd position
         );
       };
 
@@ -138,7 +138,7 @@ describe('Fen State Notation', () => {
     test('Fails when enPassant is invalid', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - e 0 1' // Notice the invalid 'e' in the 3rd position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - e 0 1' // Notice the invalid 'e' in the 4th position
         );
       };
 
@@ -148,7 +148,7 @@ describe('Fen State Notation', () => {
     test('Fails when enPassant Square is invalid', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - e9 0 1' // Notice the invalid 'e9' in the 3rd position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - e9 0 1' // Notice the invalid 'e9' in the 4th position
         );
       };
 
@@ -190,7 +190,7 @@ describe('Fen State Notation', () => {
     test('Negative Half Moves Count', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - -2 1' // Notice the invalid '-2' in the 4th position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - -2 1' // Notice the invalid '-2' in the 5th position
         );
       };
 
@@ -200,7 +200,7 @@ describe('Fen State Notation', () => {
     test('Half Moves as String', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - s 1' // Notice the invalid 's' in the 4th position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - s 1' // Notice the invalid 's' in the 5th position
         );
       };
 
@@ -222,7 +222,7 @@ describe('Fen State Notation', () => {
     test('Negative Full Moves Count', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - 0 -1' // Notice the invalid '-1' in the 5th position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - 0 -1' // Notice the invalid '-1' in the 6th position
         );
       };
 
@@ -232,7 +232,7 @@ describe('Fen State Notation', () => {
     test('Zero Full Moves Count (needs to always be positive)', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - 0 0' // Notice the invalid '0' in the 5th position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - 0 0' // Notice the invalid '0' in the 6th position
         );
       };
 
@@ -242,7 +242,7 @@ describe('Fen State Notation', () => {
     test('Full Moves as String', () => {
       const actual = () => {
         new ChessFENBoard(
-          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - 0 s' // Notice the invalid 's' in the 5th position
+          'rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w - - 0 s' // Notice the invalid 's' in the 6th position
         );
       };
 
@@ -272,7 +272,7 @@ describe('put', () => {
     chessFenBoard.put('a1', '');
 
     expect(chessFenBoard.fen).toBe(
-      'rnbqkbnr/pppppppp/8/8/1Pp5/k7/PPPPPPPP/1NBQKBqR w - - 0 1'
+      'rnbqkbnr/pppppppp/8/8/1Pp5/k7/PPPPPPPP/1NBQKBqR w KQkq - 0 1'
     );
 
     expect(chessFenBoard.board).toEqual([
@@ -300,7 +300,7 @@ describe('Set Fen Notation', () => {
           fullMoves: 1,
           castlingRights: {
             w: {
-              kingSide: true,
+              kingSide: false,
             },
           },
         },
@@ -309,7 +309,7 @@ describe('Set Fen Notation', () => {
       const actual = chessFenBoard.fen;
 
       expect(actual).toBe(
-        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b K - 5 1'
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR b Qkq - 5 1'
       );
     });
 
@@ -406,7 +406,7 @@ describe('move', () => {
     chessFenBoard.move('e8', 'd1');
 
     expect(chessFenBoard.fen).toBe(
-      'rnbq1bnr/pppppppp/8/P7/2R5/8/1PPPPPPP/RNBkKBN1 w - - 0 1'
+      'rnbq1bnr/pppppppp/8/P7/2R5/8/1PPPPPPP/RNBkKBN1 b KQkq - 0 2'
     );
 
     expect(chessFenBoard.board).toEqual([
@@ -453,19 +453,88 @@ describe('move', () => {
     const actual = chessFenBoard.fen;
 
     expect(actual).toBe(
-      'Qnbqkbnr/pppppppp/8/8/8/8/1PPPPPPP/RNBQKBNR w - - 0 1'
+      'Qnbqkbnr/pppppppp/8/8/8/8/1PPPPPPP/RNBQKBNR b KQkq - 0 1'
     );
   });
 
-  // test('moves with castling', () => {
-  //   const chessFenBoard = new ChessFENBoard('rnbqkb1r/5ppp/p2ppn2/1p6/3NP3/1BN5/PPP2PPP/R1BQK2R w - - 0 ');
+  test('moves with castling', () => {
+    const chessFenBoard = new ChessFENBoard(
+      'rnbqkb1r/5ppp/p2ppn2/1p6/3NP3/1BN5/PPP2PPP/R1BQK2R w KQkq - 0 1'
+    );
 
-  //   chessFenBoard.move('a2', 'a8', 'Q');
+    chessFenBoard.move('e1', 'g1');
 
-  //   const actual = chessFenBoard.fen;
+    const actual = chessFenBoard.fen;
 
-  //   expect(actual).toBe('Qnbqkbnr/pppppppp/8/8/8/8/1PPPPPPP/RNBQKBNR');
-  // });
+    expect(actual).toBe(
+      'rnbqkb1r/5ppp/p2ppn2/1p6/3NP3/1BN5/PPP2PPP/R1BQ1RK1 b kq - 1 1'
+    );
+  });
+
+  test('full moves get counted correctly', () => {
+    const chessFenBoard = new ChessFENBoard();
+
+    expect(chessFenBoard.fen).toBe(
+      'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+    );
+
+    chessFenBoard.move('e2', 'e4');
+
+    expect(chessFenBoard.fen).toBe(
+      'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1'
+    );
+
+    chessFenBoard.move('d7', 'd6');
+
+    // Increments Full Move
+    expect(chessFenBoard.fen).toBe(
+      'rnbqkbnr/ppp1pppp/3p4/8/4P3/8/PPPP1PPP/RNBQKBNR w KQkq - 0 2'
+    );
+
+    chessFenBoard.move('d1', 'g4');
+
+    // Increments Full Move & Half Move b/c it's not a pawn move
+    expect(chessFenBoard.fen).toBe(
+      'rnbqkbnr/ppp1pppp/3p4/8/4P1Q1/8/PPPP1PPP/RNB1KBNR b KQkq - 1 2'
+    );
+
+    chessFenBoard.move('g8', 'f6');
+
+    // Increments Full Move & Half Move b/c it's not a pawn move
+    expect(chessFenBoard.fen).toBe(
+      'rnbqkb1r/ppp1pppp/3p1n2/8/4P1Q1/8/PPPP1PPP/RNB1KBNR w KQkq - 2 3'
+    );
+
+    chessFenBoard.move('a2', 'a3');
+
+    // Resets Half Move b/c it's a pawn move, and does not increment Full Move b/c it's not black
+    expect(chessFenBoard.fen).toBe(
+      'rnbqkb1r/ppp1pppp/3p1n2/8/4P1Q1/P7/1PPP1PPP/RNB1KBNR b KQkq - 0 3'
+    );
+
+    chessFenBoard.move('c8', 'g4');
+
+    // Increments Full Move & Half Move b/c it's not a pawn move
+    expect(chessFenBoard.fen).toBe(
+      'rn1qkb1r/ppp1pppp/3p1n2/8/4P1b1/P7/1PPP1PPP/RNB1KBNR w KQkq - 0 4'
+    );
+
+    // More moves
+    chessFenBoard.move('f1', 'c4');
+    chessFenBoard.move('b8', 'c6');
+    chessFenBoard.move('g1', 'f3');
+    chessFenBoard.move('d8', 'd7');
+
+    expect(chessFenBoard.fen).toBe(
+      'r3kb1r/pppqpppp/2np1n2/8/2B1P1b1/P4N2/1PPP1PPP/RNB1K2R w KQkq - 4 6'
+    );
+
+    // Castle Move
+    chessFenBoard.move('e1', 'g1');
+    expect(chessFenBoard.fen).toBe(
+      'r3kb1r/pppqpppp/2np1n2/8/2B1P1b1/P4N2/1PPP1PPP/RNB2RK1 b kq - 5 6'
+    );
+  });
 });
 
 describe('piece', () => {
