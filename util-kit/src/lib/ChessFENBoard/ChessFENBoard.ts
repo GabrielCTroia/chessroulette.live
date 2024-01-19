@@ -1,6 +1,10 @@
 import { deepmerge } from 'deepmerge-ts';
 import { isShortChessColor } from '../Chess/lib';
-import { ChessFEN, DetailedChessMove } from '../Chess/types';
+import {
+  ChessFEN,
+  ChessFENStateNotation,
+  DetailedChessMove,
+} from '../Chess/types';
 import { invoke, isOneOf } from '../misc';
 import {
   FENBoard,
@@ -328,13 +332,18 @@ export class ChessFENBoard {
 
     const nextBoard = ChessFENBoard.calculateBoard(fen);
 
-    const fenStateNotation = fen.slice(fen.indexOf(' '));
+    // const fenStateNotation = ;
 
-    const nextFenStateResult =
-      ChessFENBoard.fenNotationToFenState(fenStateNotation);
+    const nextFenStateResult = ChessFENBoard.extractFenStateNotation(
+      fen
+    ).andThen(ChessFENBoard.fenNotationToFenState);
 
     // Throw for now
     if (nextFenStateResult.err) {
+      // console.error(nextFenStateResult.val);
+      // console.log({ fen, fenStateNotation });
+      // console.trace('where?');
+
       throw nextFenStateResult.val;
     }
 
@@ -356,9 +365,9 @@ export class ChessFENBoard {
       | { fromState?: undefined; fromNotation: string }
   ) {
     const prevFen = this.fen;
-    const prevFenWithoutNotation = prevFen
-      .slice(0, prevFen.indexOf(' '))
-      .trim();
+    const prevFenWithoutNotation =
+      ChessFENBoard.extractFenPositionNotation(prevFen);
+
     const prevFenState = this._state.fenState;
 
     if (p.fromState) {
@@ -395,8 +404,12 @@ export class ChessFENBoard {
     }
   }
 
-  getFenNotation(): string {
-    return this.fen.slice(this.fen.indexOf(' '));
+  getFenStateNotation() {
+    return ChessFENBoard.extractFenStateNotation(this.fen);
+  }
+
+  getFenPositionNotation() {
+    return ChessFENBoard.extractFenPositionNotation(this.fen);
   }
 
   getFenState() {
@@ -483,9 +496,11 @@ export class ChessFENBoard {
         'Kkq',
         'Qkq',
         'Kk',
-        'Qq',
         'Kq',
+        'Qq',
         'Qk',
+        'KQ',
+        'kq',
         'K',
         'Q',
         'k',
@@ -565,11 +580,13 @@ export class ChessFENBoard {
       return new Err('InvalidFenState:InvalidHalfMoves');
     }
 
-    return Ok.EMPTY;
+    return new Ok(s as FenState);
   }
 
-  private static validateFenNotation(s: string) {
-    return ChessFENBoard.fenNotationToFenState(s);
+  static validateFenNotation(str: string) {
+    return ChessFENBoard.fenNotationToFenState(str).map(
+      () => str as ChessFENStateNotation
+    );
   }
 
   private static fenStateToFenNotation(fenState: FenState) {
@@ -663,6 +680,20 @@ export class ChessFENBoard {
 
     return square;
   }
+
+  static extractFenStateNotation = (fen: ChessFEN) => {
+    const notation = fen.slice(fen.indexOf(' ')).trim();
+
+    if (!notation) {
+      return new Err('InvalidFen:AbsentNotation'); // TODO: Add a FEN Validator that will throw this error automatically
+    }
+
+    return ChessFENBoard.validateFenNotation(notation);
+  };
+
+  static extractFenPositionNotation = (fen: ChessFEN) => {
+    return fen.slice(0, fen.indexOf(' ')).trim();
+  };
 
   private static setPieceInBoard = (
     board: FENBoard,

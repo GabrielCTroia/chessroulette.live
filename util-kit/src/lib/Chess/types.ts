@@ -20,6 +20,16 @@ export type DetailedChessMove = Pick<
 
 export type ChessPGN = string; // TODO: Brand this type
 export type ChessFEN = string; // TODO: Brand this type
+
+// This idea is 100% borrowed from this article:
+//  https://spin.atomicobject.com/2017/06/19/strongly-typed-date-string-typescript/
+// It works pretty nice o be able to take a string and brand with a nominal type!
+// Also see https://basarat.gitbooks.io/typescript/docs/tips/nominalTyping.html
+export enum ChessFENStateNotationBrand {
+  _ = '',
+}
+export type ChessFENStateNotation = ChessFENStateNotationBrand & string;
+
 export type ChessMoveSan = string; // TODO: Brand this type
 
 export type WhiteShortColor = 'w';
