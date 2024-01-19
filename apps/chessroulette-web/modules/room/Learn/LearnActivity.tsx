@@ -7,7 +7,15 @@ import { ContainerWithDimensions } from 'apps/chessroulette-web/components/Conta
 import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { LearnTemplate } from './LearnTemplate';
 import { GameHistory } from 'apps/chessroulette-web/components/GameHistory';
-import { ChessFEN, ChessPGN, getRandomInt } from '@xmatter/util-kit';
+import {
+  ChessFEN,
+  ChessFENBoard,
+  ChessPGN,
+  getNewChessGame,
+  getRandomInt,
+  invoke,
+  toDictIndexedBy,
+} from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { useMemo, useState } from 'react';
 import Streaming from '../Streaming';
@@ -22,6 +30,7 @@ import {
   decrementChessHistoryIndex,
   getMoveAtIndex,
 } from 'apps/chessroulette-web/components/GameHistory/lib';
+import { SquareMap } from '../activity/reducer';
 
 type ChessColor = 'white' | 'black';
 
@@ -111,7 +120,52 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                   history.focusedIndex
                 );
 
-                // const g
+                // Don't leeave this here as it's not optimal
+                const inCheckSquaresMap = invoke((): SquareMap => {
+                  let result: Square[] = [];
+
+                  const fenBoardInstance = new ChessFENBoard(activityState.fen);
+
+                  fenBoardInstance.setFenNotation({ fromState: { turn: 'w' } });
+
+                  const fenAsWhiteTurn = fenBoardInstance.fen;
+
+                  fenBoardInstance.setFenNotation({ fromState: { turn: 'b' } });
+
+                  const fenAsBlackTurn = fenBoardInstance.fen;
+
+                  const chessInstanceAsWhite = getNewChessGame({
+                    fen: fenAsWhiteTurn,
+                  });
+
+                  if (chessInstanceAsWhite.isCheck()) {
+                    const whiteKingSquare = fenBoardInstance.getKingSquare('w');
+
+                    if (whiteKingSquare) {
+                      result = [whiteKingSquare];
+                    }
+                  }
+
+                  const chessInstanceAsBlack = getNewChessGame({
+                    fen: fenAsBlackTurn,
+                  });
+
+                  if (chessInstanceAsBlack.isCheck()) {
+                    const blackKingSquare = fenBoardInstance.getKingSquare('b');
+
+                    if (blackKingSquare) {
+                      result = [...result, blackKingSquare];
+                    }
+                  }
+
+                  return toDictIndexedBy(
+                    result,
+                    (sq) => sq,
+                    () => undefined
+                  ) as SquareMap;
+                });
+
+                console.log('inCheckSquaresMap', inCheckSquaresMap);
 
                 return (
                   <>
@@ -123,7 +177,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           sizePx={s.height} // TODO: Here this fails when the height is super small! need to look into it
                           fen={activityState.fen}
                           lastMove={lastMove}
-                          inCheckSquare="e8"
+                          inCheckSquares={inCheckSquaresMap}
                           onMove={(payload) => {
                             console.log('learn activity on move', payload);
 

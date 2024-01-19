@@ -24,16 +24,16 @@ export const flatten = <T>(a: T[]) =>
 export const invoke = <T>(fn: () => T): T => fn();
 
 export function toDictIndexedBy<
-  O extends object,
+  O,
   KGetter extends (o: O) => string
 >(list: O[], getKey: KGetter): { [k: string]: O };
 export function toDictIndexedBy<
-  O extends object,
+  O,
   KGetter extends (o: O) => string,
   V
 >(list: O[], getKey: KGetter, getVal: (o: O) => V): { [k: string]: V };
 export function toDictIndexedBy<
-  O extends object,
+  O,
   KGetter extends (o: O) => string,
   V
 >(list: O[], getKey: KGetter, getVal?: (o: O) => V) {

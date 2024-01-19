@@ -12,7 +12,6 @@ import {
 } from '@xmatter/util-kit';
 import {
   addMoveToChessHistory,
-  addMoveToChessHistoryAtNextAvailableIndex,
   decrementChessHistoryIndex,
   getChessHistoryAtIndex,
   pgnToHistory,
@@ -34,6 +33,8 @@ export type ArrowsMap = Record<ChessArrowId, ArrowDrawTuple>;
 
 export type CircleDrawTuple = [at: Square, hex: string];
 export type CirclesMap = Record<ChesscircleId, CircleDrawTuple>;
+
+export type SquareMap = Record<Square, undefined>;
 
 export type LearnActivityState = {
   activityType: 'learn';

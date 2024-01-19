@@ -11,19 +11,25 @@ import {
   useCallbackIf,
 } from '@xmatter/util-kit';
 import { Square } from 'chess.js';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import { Arrow } from 'react-chessboard/dist/chessboard/types';
+import {
+  Arrow,
+  CustomSquareProps,
+} from 'react-chessboard/dist/chessboard/types';
 import { useArrowColor } from './useArrowColor';
 import { isPromotableMove } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
 import {
   ArrowsMap,
   CircleDrawTuple,
   CirclesMap,
+  SquareMap,
 } from 'apps/chessroulette-web/modules/room/activity/reducer';
 import useDeepCompareEffect from 'use-deep-compare-effect';
 import { noop } from 'movex-core-util';
 import { shallowEqualObjects } from 'shallow-equal';
+import { deepmerge } from 'deepmerge-ts';
+import { ChessboardSquare } from './ChessboardSquare';
 
 type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
@@ -41,17 +47,16 @@ export type ChessboardContainerProps = Omit<
   onArrowsChange?: (arrows: ArrowsMap) => void;
   onCircleDraw?: (circleTuple: CircleDrawTuple) => void;
   onClearCircles?: () => void;
-  inCheckSquare?: Square;
+  inCheckSquares?: SquareMap;
 };
 
 export const ChessboardContainer = ({
   fen,
   lastMove,
-  // circledSquare,
   circlesMap,
   onArrowsChange = noop,
   onCircleDraw = noop,
-  inCheckSquare,
+  inCheckSquares,
   ...props
 }: ChessboardContainerProps) => {
   const boardOrientation = useMemo(
@@ -80,45 +85,63 @@ export const ChessboardContainer = ({
   const arrowColor = useArrowColor();
 
   const customSquareStyles = useMemo(() => {
-    // const circleSvg = encodeURI('<svg height="100" width="100"><circle cx="0" cy="0" r="40" stroke="black" stroke-width="10" fill="transparent" /></svg>');
-    // console.log('circleSvg', circleSvg);
-
-    return {
-      ...(lastMove && {
-        [lastMove.from]: {
-          background: isDarkSquare(lastMove.from)
-            ? 'rgba(234, 183, 255, .6)'
-            : 'rgba(234, 183, 255, .3)',
-        },
-        [lastMove.to]: {
-          background: isDarkSquare(lastMove.to)
-            ? 'rgba(234, 183, 255, .6)'
-            : 'rgba(234, 183, 255, .3)',
-        },
-      }),
-      ...(circlesMap &&
-        toDictIndexedBy(
-          Object.values(circlesMap),
-          ([sq]) => sq,
-          ([_, hex]) => ({
-            borderRadius: '50%',
-            background: `radial-gradient(ellipse at center, 
-              rgba(255,113,12,0) 80%,
-              ${hex} 51.5%)`,
-          })
-        )),
-      ...(inCheckSquare && {
-        [inCheckSquare]: {
-          borderRadius: '50%',
-          // backdropFilter: 'blur(200px)',
-          backdropFilter: 'blur(10px)',
-          background: 'rgba(255, 0, 0, .6)',
-          clipPath: 'circle(40%)',
-          // border: `${props.sizePx / 64}px ${hex || 'red'} solid`,
-        },
-      }),
+    const lastMoveStyle = lastMove && {
+      [lastMove.from]: {
+        background: isDarkSquare(lastMove.from)
+          ? 'rgba(234, 183, 255, .6)'
+          : 'rgba(234, 183, 255, .3)',
+      },
+      [lastMove.to]: {
+        background: isDarkSquare(lastMove.to)
+          ? 'rgba(234, 183, 255, .6)'
+          : 'rgba(234, 183, 255, .3)',
+      },
     };
-  }, [lastMove, circlesMap, props.sizePx, inCheckSquare]);
+
+    const circledStyle =
+      circlesMap &&
+      toDictIndexedBy(
+        Object.values(circlesMap),
+        ([sq]) => sq,
+        ([_, hex]) => ({
+          position: 'relative',
+          '> .circleDiv': {
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            right: '0',
+            bottom: '0',
+            background: `radial-gradient(ellipse at     center, 
+              rgba(255,113,12,0) 60%,
+              ${hex} 51.5%)`,
+            borderRadius: '50%',
+          },
+        })
+      );
+
+    const checkedStyle =
+      inCheckSquares &&
+      toDictIndexedBy(
+        objectKeys(inCheckSquares),
+        (sq) => sq,
+        () => ({
+          position: 'relative',
+          '> .inCheckDiv': {
+            // content: `''`,
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            right: '0',
+            bottom: '0',
+            background: 'red',
+            borderRadius: '50%',
+            opacity: 0.7,
+          },
+        })
+      );
+
+    return deepmerge(lastMoveStyle, circledStyle, checkedStyle);
+  }, [lastMove, circlesMap, props.sizePx, inCheckSquares]);
 
   const [promoMove, setPromoMove] = useState<ShortChessMove>();
   const [localBoardArrowsMap, setLocalBoardArrowsMap] = useState<ArrowsMap>({});
@@ -203,6 +226,7 @@ export const ChessboardContainer = ({
         customBoardStyle={customStyles.customBoardStyle}
         customLightSquareStyle={customStyles.customLightSquareStyle}
         customDarkSquareStyle={customStyles.customDarkSquareStyle}
+        customSquare={ChessboardSquare}
         onPieceDrop={(from, to) => {
           // resetCircles();
           // resetArrows();

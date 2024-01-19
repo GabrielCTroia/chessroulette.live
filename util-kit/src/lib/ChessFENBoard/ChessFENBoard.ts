@@ -1,5 +1,5 @@
 import { deepmerge } from 'deepmerge-ts';
-import { getNewChessGame, isShortChessColor, toShortColor } from '../Chess/lib';
+import { isShortChessColor } from '../Chess/lib';
 import { ChessFEN, DetailedChessMove } from '../Chess/types';
 import { invoke, isOneOf } from '../misc';
 import {
@@ -10,11 +10,12 @@ import {
   fenBoardPieceSymbolToDetailedChessPiece,
   fenBoardPieceSymbolToPieceSymbol,
   getFileRank,
-  toOppositeColor,
+  matrixIndexToSquare,
 } from './chessUtils';
 import { SQUARES, type Color, type PieceSymbol, type Square } from 'chess.js';
 import { Err, Ok, Result } from 'ts-results';
 import { DeepPartial } from '../miscType';
+import { matrixFind } from '../matrix';
 
 export type FenState = {
   turn: Color;
@@ -144,15 +145,6 @@ export class ChessFENBoard {
       this.put(castlingMove.rookTo, rookPiece);
       this.clear(castlingMove.rookFrom);
     }
-
-    // const chessInstance = getNewChessGame({ fen: this.fen });
-
-    // const MoveState = {
-    //   inCheck: chessInstance.inCheck(),
-    //   // isCheck: chessInstance.isCheck(),
-    //   isCheckmate: chessInstance.isCheckmate(),
-    //   isGameOver: chessInstance.isGameOver(),
-    // };
 
     const detailedPiece = fenBoardPieceSymbolToDetailedChessPiece(piece);
 
@@ -653,6 +645,23 @@ export class ChessFENBoard {
 
   get fen() {
     return this._state.fen;
+  }
+
+  getKingSquare(color: Color) {
+    const kingSymbol = color === 'b' ? 'k' : 'K';
+
+    let square: Square | undefined = undefined;
+
+    matrixFind(this.board, (p, index) => {
+      if (p === kingSymbol) {
+        square = matrixIndexToSquare(index);
+        return true;
+      }
+
+      return false;
+    });
+
+    return square;
   }
 
   private static setPieceInBoard = (
