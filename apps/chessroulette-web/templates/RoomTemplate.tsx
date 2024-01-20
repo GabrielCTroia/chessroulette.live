@@ -2,7 +2,9 @@ import Header from '../components/Header';
 import { Avatar } from '../components/Avatar';
 import { AspectRatio } from '../components/AspectRatio';
 
-type Props = React.PropsWithChildren;
+type Props = React.PropsWithChildren & {
+  contentClassname?: string;
+};
 
 export default function RoomTemplate(props: Props) {
   return (
@@ -11,8 +13,13 @@ export default function RoomTemplate(props: Props) {
         <Header />
 
         {/* TODO: This needs to be dynamic per page based on the width but also height!!! */}
-        {/* <div className="w-full h-full flex flex-1"> */}
-        <AspectRatio aspectRatio={16 / 8.5}>{props.children}</AspectRatio>
+        <div className={`w-full h-full ${props.contentClassname}`}>
+          <AspectRatio
+            aspectRatio={16 / 8.5}
+          >
+            {props.children}
+          </AspectRatio>
+        </div>
         {/* <div className='pb-10' /> */}
         {/* {props.children} */}
         {/* </div> */}

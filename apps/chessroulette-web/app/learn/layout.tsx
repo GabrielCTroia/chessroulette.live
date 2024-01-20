@@ -13,5 +13,9 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <RoomTemplate>{children}</RoomTemplate>;
+  return (
+    <RoomTemplate contentClassname="flex flex-col flex-1 justify-center">
+      {children}
+    </RoomTemplate>
+  );
 }
