@@ -7,7 +7,6 @@ import {
   ChessHistoryBlackMove_NEW,
   ChessHistoryIndex_NEW,
   ChessHistoryMove_NEW,
-  ChessHistory_NEW,
 } from './types';
 import {
   addMoveToChessHistory,
@@ -24,13 +23,6 @@ describe('History Index', () => {
     expect(getStartingHistoryIndex()).toEqual([0, 0]);
   });
 
-  test('increment index at move level', () => {
-    const starting: ChessHistoryIndex_NEW = [0, 0];
-    const actual = incrementHistoryIndex(starting);
-
-    expect(actual).toEqual([0, 1]);
-  });
-
   test('increment index at turn level', () => {
     const starting: ChessHistoryIndex_NEW = [0, 0];
     const actual = incrementHistoryIndex(incrementHistoryIndex(starting));
@@ -38,11 +30,11 @@ describe('History Index', () => {
     expect(actual).toEqual([1, 0]);
   });
 
-  test('decrement index at move level', () => {
-    const starting: ChessHistoryIndex_NEW = [2, 1];
-    const actual = decrementHistoryIndex(starting);
+  test('increment index at move level', () => {
+    const starting: ChessHistoryIndex_NEW = [0, 0];
+    const actual = incrementHistoryIndex(starting);
 
-    expect(actual).toEqual([2, 0]);
+    expect(actual).toEqual([0, 1]);
   });
 
   test('decrement index at turn level', () => {
@@ -50,6 +42,13 @@ describe('History Index', () => {
     const actual = decrementHistoryIndex(starting);
 
     expect(actual).toEqual([1, 1]);
+  });
+
+  test('decrement index at move level', () => {
+    const starting: ChessHistoryIndex_NEW = [2, 1];
+    const actual = decrementHistoryIndex(starting);
+
+    expect(actual).toEqual([2, 0]);
   });
 
   test('get last index from last half index', () => {
@@ -81,7 +80,7 @@ describe('Find move At Index', () => {
   });
 });
 
-describe('history', () => {
+describe('History', () => {
   describe('Get History To Index', () => {
     test('Get History At Starting Index', () => {
       const actual = getHistoryToIndex(
@@ -92,13 +91,11 @@ describe('history', () => {
       expect(actual).toEqual([]);
     });
 
-    test('Get History At Longer Index', () => {
+    test('Get History At Longer than length Index', () => {
       const actual = getHistoryToIndex(
         LONG_HISTORY_WITH_HALF_LAST_TURN,
         [19, 1]
       );
-
-      console.log('actual', actual);
 
       expect(actual).toEqual(LONG_HISTORY_WITH_HALF_LAST_TURN);
     });
@@ -231,8 +228,6 @@ describe('Add move to history', () => {
 
     const actual = addMoveToChessHistory(history, newMove);
 
-    console.log('actual', JSON.stringify(actual, null, 2));
-
     const expectedHistory = [...history, [newMove]];
     const expectedIndex = [1, 0];
     const expected = [expectedHistory, expectedIndex];
@@ -249,8 +244,6 @@ describe('Add move to history', () => {
 
     const actual = addMoveToChessHistory(HISTORY_WITH_HALF_LAST_TURN, newMove);
 
-    console.log('actual', JSON.stringify(actual, null, 2));
-
     const expectedHistory = [
       HISTORY_WITH_HALF_LAST_TURN[0],
       [
@@ -262,8 +255,6 @@ describe('Add move to history', () => {
         newMove,
       ],
     ];
-
-    console.log('expected', expectedHistory);
 
     const expectedIndex = [1, 1];
     const expected = [expectedHistory, expectedIndex];
