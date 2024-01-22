@@ -15,6 +15,7 @@ import {
   ChessHistoryTurn_NEW,
   ChessHistory_NEW,
 } from '../history/types';
+import { HistoryRowProps } from './HistoryRow';
 
 type Props = {
   branchedHistories: ChessHistory_NEW[];
@@ -28,6 +29,7 @@ type Props = {
   focusedIndex?: ChessHistoryIndex_NEW;
   // whiteMove?: ChessRecursiveWhiteMove;
   // blackMove?: ChessRecursiveBlackMove;
+  rowClassName?: HistoryRowProps['className']; 
   className?: string;
 };
 
@@ -35,6 +37,7 @@ export const NestedHistories = ({
   branchedHistories,
   historyIndex,
   className,
+  rowClassName,
   onFocus,
   onDelete,
 }: Props) => {
@@ -69,6 +72,7 @@ export const NestedHistories = ({
             onDelete(constructNestedIndex(nestedIndex, branchIndex));
           }}
           className={className}
+          rowClassName={rowClassName}
           isNested={true}
         />
       ))}

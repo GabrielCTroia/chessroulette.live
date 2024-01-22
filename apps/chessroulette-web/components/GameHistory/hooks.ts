@@ -1,17 +1,19 @@
 import useEventListener from '@use-it/event-listener';
 import { keyInObject } from '@xmatter/util-kit';
 import {
-  decrementChessHistoryIndex,
-  getBranchedHistoryLastIndex,
-  incrementChessHistoryIndex,
-  normalizeChessHistoryIndex,
-} from './lib';
-import { ChessHistoryIndex, ChessRecursiveHistory } from './types';
+  ChessHistoryIndex_NEW,
+  ChessRecursiveHistory_NEW,
+} from './history/types';
+import {
+  decrementHistoryIndex,
+  findMoveAtIndex,
+  incrementHistoryIndex,
+} from './history/util';
 
 export const useKeysToRefocusHistory = (
-  history: ChessRecursiveHistory,
-  currentIndex: ChessHistoryIndex,
-  onRefocus: (i: ChessHistoryIndex) => void
+  history: ChessRecursiveHistory_NEW,
+  currentIndex: ChessHistoryIndex_NEW,
+  onRefocus: (i: ChessHistoryIndex_NEW) => void
 ) => {
   useEventListener('keydown', (event: object) => {
     if (
@@ -23,22 +25,13 @@ export const useKeysToRefocusHistory = (
       return;
     }
 
-    const normalizedDisplayedIndex = normalizeChessHistoryIndex(currentIndex);
+    const nextIndex =
+      event.key === 'ArrowRight'
+        ? incrementHistoryIndex(currentIndex)
+        : decrementHistoryIndex(currentIndex);
 
-    const lastInCurrentBranch = getBranchedHistoryLastIndex(
-      history,
-      currentIndex
-    );
-    const normalizedLastInCurrentBranch =
-      normalizeChessHistoryIndex(lastInCurrentBranch);
-
-    if (
-      event.key === 'ArrowRight' &&
-      normalizedDisplayedIndex < normalizedLastInCurrentBranch
-    ) {
-      onRefocus(incrementChessHistoryIndex(currentIndex));
-    } else if (event.key === 'ArrowLeft' && normalizedDisplayedIndex >= 0) {
-      onRefocus(decrementChessHistoryIndex(currentIndex));
+    if (findMoveAtIndex(history, nextIndex)) {
+      onRefocus(nextIndex);
     }
   });
 };

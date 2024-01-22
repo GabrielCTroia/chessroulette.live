@@ -63,6 +63,10 @@ export const HistoryList: React.FC<HistoryListProps> = ({
     }
   }, []);
 
+  console.log('focus', focusedIndex);
+
+  const [focusedHistoryTurnIndex, focusedMovePosition] = focusedIndex || [];
+
   return (
     <div className={className} ref={(e) => (containerElementRef.current = e)}>
       {history.map((historyTurn, historyTurnIndex) => {
@@ -81,6 +85,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
             onDelete={onDelete}
             containerClassName={rowClassName}
             isNested={isNested}
+            focus={focusedHistoryTurnIndex === historyTurnIndex ? focusedMovePosition : undefined}
           />
         );
       })}

@@ -24,25 +24,25 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
 
   emptyContent = 'Wow, so empty!',
   showRows = 4,
-  focusedIndex = 0,
+  focusedIndex = [-1, 1],
   onRefocus,
   onDelete,
   ...props
 }) => {
   // TODO: Add this back
-  // useKeysToRefocusHistory(history, focusedIndex, onRefocus);
+  useKeysToRefocusHistory(history, focusedIndex, onRefocus);
 
-  console.log('Game History', history);
+  // console.log('Game History', history);
 
   return (
     <div className={`flex flex-1 ${props.containerClassName}`}>
       <HistoryList
         history={history}
-        // focusedIndex={focusedIndex}
+        focusedIndex={focusedIndex}
         onRefocus={onRefocus}
         onDelete={onDelete}
         className="flex flex-1 flex-col"
-        rowClassName="pb-3 border-b border-slate-600"
+        rowClassName="border-b border-slate-600"
       />
     </div>
   );

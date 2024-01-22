@@ -7,7 +7,8 @@ import {
   LONG_HISTORY_WITH_FULL_LAST_TURN,
   LONG_HISTORY_WITH_PARALEL_HISTORIES,
 } from './history/specUtils';
-import { ChessHistory_NEW } from './history/types';
+import { ChessHistoryIndex_NEW, ChessHistory_NEW } from './history/types';
+import { useState } from 'react';
 
 const meta: Meta<typeof GameHistory> = {
   component: GameHistory,
@@ -91,23 +92,29 @@ const historyWithOneGenBranch = [
 ] as ChessHistory_NEW;
 
 export const NestedHistory: Story = {
-  render: () => (
-    <div className="p-2 border border-slate-600" style={{ width: '400px' }}>
-      <GameHistory
-        history={historyWithOneGenBranch}
-        onDelete={(p) => {
-          console.log('on delete', p)
-          
-          action('OnDelete')(p)
-        }}
-        onRefocus={(p) => {
-          console.log('on refocus', p)
-          action('OnRefocus')(p)
-        }}
-        focusedIndex={[0, 1]}
-      />
-    </div>
-  ),
+  render: () => {
+    const [currentIndex, setCurrentIndex] = useState<ChessHistoryIndex_NEW>([
+      0, 1,
+    ]);
+
+    return (
+      <div className="p-2 border border-slate-600" style={{ width: '400px' }}>
+        <GameHistory
+          history={historyWithOneGenBranch}
+          onDelete={(p) => {
+            console.log('on delete', p);
+
+            action('OnDelete')(p);
+          }}
+          onRefocus={(p) => {
+            setCurrentIndex(p);
+            action('OnRefocus')(p);
+          }}
+          focusedIndex={currentIndex}
+        />
+      </div>
+    );
+  },
 };
 
 // /* eslint-disable import/no-extraneous-dependencies */
