@@ -1,9 +1,11 @@
 import { Square } from 'chess.js';
 import {
+  BlackColor,
   ChessArrowId,
   ChessColor,
   LongChessColor,
   ShortChessColor,
+  WhiteColor,
 } from './types';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
 
@@ -21,6 +23,12 @@ export const toShortColor = (c: ChessColor): ShortChessColor =>
 
 export const toLongColor = (c: ChessColor): LongChessColor =>
   c === 'b' || c === 'black' ? 'black' : 'white';
+
+export const isWhiteColor = (c: ChessColor): c is WhiteColor =>
+  toShortColor(c) === 'w';
+
+export const isBlackColor = (c: ChessColor): c is BlackColor =>
+  toShortColor(c) === 'b';
 
 export const isDarkSquare = (s: Square): boolean => {
   const [file, rank] = s;

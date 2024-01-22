@@ -63,7 +63,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
       const elm = rowElementRefs.current[moveIndex];
 
       if (elm) {
-        scrollIntoView(elm);
+        // scrollIntoView(elm);
       }
     },
     100,
@@ -72,7 +72,8 @@ export const HistoryList: React.FC<HistoryListProps> = ({
 
   useEffect(() => {
     if (containerElementRef.current) {
-      containerElementRef.current.scrollTo(0, 9999);
+      console.log('here')
+      containerElementRef.current.scrollTo(0, -99099);
     }
   }, []);
 

@@ -1,9 +1,5 @@
 import { BlackColor, DetailedChessMove, WhiteColor } from '@xmatter/util-kit';
 
-type ChessRecursiveBaseMove = {
-  branchedHistories?: ChessRecursiveHistory[] | undefined;
-};
-
 export type ChessHistoryBaseMove = DetailedChessMove;
 
 export type ChessHistoryWhiteMove = ChessHistoryBaseMove & {
@@ -17,6 +13,11 @@ export type ChessHistoryBlackMove = ChessHistoryBaseMove & {
 export type ChessHistoryMove = ChessHistoryWhiteMove | ChessHistoryBlackMove;
 
 export type ChessLinearHistory = ChessHistoryMove[];
+
+export type ChessRecursiveBaseMove = {
+  // Rename this to "branches"
+  branchedHistories?: ChessRecursiveHistory[] | undefined;
+};
 
 export type ChessRecursiveWhiteMove = ChessHistoryWhiteMove &
   ChessRecursiveBaseMove;
@@ -46,6 +47,7 @@ export type PartialWhiteMove = [ChessRecursiveWhiteMove];
 export type PartialBlackMove = [ChessRecursiveBlackMove];
 
 export type PartialMove = [ChessRecursiveMove];
+
 export type FullMove = [ChessRecursiveWhiteMove, ChessRecursiveBlackMove];
 
 export type PairedMove = PartialMove | FullMove;

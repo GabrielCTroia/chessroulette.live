@@ -15,7 +15,7 @@ export type ChessHistoryBaseNonMove_NEW = {
 
 export type ChessHistoryBaseRealMove_NEW = {
   isNonMove?: false;
-} & Pick<DetailedChessMove, 'from' | 'to' | 'color'>; // TODO: This can expand later on
+} & Pick<DetailedChessMove, 'from' | 'to' | 'color' | 'san'>; // TODO: This can expand later on
 
 export type ChessHistoryBaseMove_NEW =
   | ChessHistoryBaseRealMove_NEW
@@ -79,12 +79,15 @@ export type ChessRecursiveHistory_NEW =
 //   | ChessLinearHistoryIndex_NEW
 //   | ChessRecursiveHistoryIndex_NEW;
 
+export type ChessHistoryTurn_NEW = ChessRecursiveHistoryTurn_NEW;
 export type ChessHistory_NEW = ChessRecursiveHistory_NEW;
+
+export type ChessHistoryIndexMovePosition_NEW = 0 | 1; // 0 = white, 1 = black
 
 export type ChessRecursiveHistoryIndex_NEW =
   | [
       turn: number, // 0, 1, 2, 3
-      move: 0 | 1, // 0 = white, 1 = black
+      move: ChessHistoryIndexMovePosition_NEW,
       recursiveIndexes?: ChessHistoryRecursiveIndexes
     ];
 

@@ -108,7 +108,7 @@ export const addMoveToChessHistory = (
 //  In case of a nested move it simply adds a new branch if the move not already there
 //  If the move is already present as a following move (on the main or branched histories) it simply refocuses
 //  Otherwise it appends it to the given history
-export const addMoveToChessHistoryAtNextAvailableIndex = (
+const addMoveToChessHistoryAtNextAvailableIndex = (
   history: ChessRecursiveHistory,
   atIndex: ChessHistoryIndex,
   move: ChessHistoryMove
@@ -262,7 +262,7 @@ export const getAlternativeFollowingMoves = (
   }
 
   const deconstructedAtIndex: ChessHistoryIndex[] = [];
-  every(atIndex, (i) => deconstructedAtIndex.push(i), { reverse: true });
+  everyMove(atIndex, (i) => deconstructedAtIndex.push(i), { reverse: true });
 
   return move.branchedHistories
     .map((branch, branchIndex) => {
@@ -293,7 +293,7 @@ export const getAlternativeFollowingMoves = (
 // The fn params:
 //   - i as number -> means it's the last one,
 //   - i as BranchHistoryIndex -> means it has another nested one
-export const every = (
+const everyMove = (
   index: ChessHistoryIndex,
   fn: (i: ChessHistoryIndex) => void,
   p: { reverse?: boolean } = {}
@@ -306,11 +306,11 @@ export const every = (
   const [moveIndex, branchIndex, nestedBranchedIndex] = index;
 
   if (p.reverse) {
-    every(nestedBranchedIndex || 0, fn, p);
+    everyMove(nestedBranchedIndex || 0, fn, p);
     fn([moveIndex, branchIndex]);
   } else {
     fn([moveIndex, branchIndex]);
-    every(nestedBranchedIndex || 0, fn, p);
+    everyMove(nestedBranchedIndex || 0, fn, p);
   }
 };
 

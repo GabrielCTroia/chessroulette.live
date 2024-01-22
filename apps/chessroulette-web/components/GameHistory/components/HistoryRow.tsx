@@ -1,30 +1,12 @@
 import React, { MouseEventHandler } from 'react';
-import {
-  Menu,
-  Item,
-  Separator,
-  Submenu,
-  useContextMenu,
-  ItemProps,
-  ItemParams,
-} from 'react-contexify';
+import { Menu, Item, useContextMenu, ItemParams } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
-import cx from 'classnames';
-import hexToRgba from 'hex-to-rgba';
-// import { Text } from 'src/components/Text';
-// import { createUseStyles } from 'src/lib/jss';
-// import { spacers } from 'src/theme/spacers';
-// import { isPartialBlackMove, PairedMove } from '../../../lib';
 import { HistoryList } from './HistoryList';
-// import { softBorderRadius } from 'src/theme';
-// import { HTMLDivElement } from 'window-or-global';
-// import { ChessHistoryIndex } from 'chessroulette-io';
-// import { isChessRecursiveHistoryIndex } from 'chessroulette-io/dist/analysis/analysisActions';
 import { Text } from '../../Text';
 import { ChessHistoryIndex, PairedMove } from '../types';
 import { isPartialBlackMove } from '../util';
 import { isChessRecursiveHistoryIndex } from '../lib';
-import { ChessColor, LongChessColor } from '@xmatter/util-kit';
+import { NestedHistoryRow } from './NestedHistoryRow';
 
 type Props = {
   pairedMove: PairedMove;
@@ -53,8 +35,6 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
     },
     ref
   ) => {
-    // const cls = useStyles();
-
     const moveCount = pairedIndex + 1;
 
     const [whiteMove, blackMove] = isPartialBlackMove(pairedMove)
@@ -71,10 +51,6 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
     });
 
     const handleRightClickWhite: MouseEventHandler = (event) => {
-      // event.preventDefault();
-
-      console.log('white move', whiteMove);
-
       show({
         event,
         props: {
@@ -84,10 +60,6 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
     };
 
     const handleRightClickBlack: MouseEventHandler = (event) => {
-      // event.preventDefault();
-
-      console.log('black move', blackMove);
-
       show({
         event,
         props: {
@@ -98,13 +70,11 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
 
     const handleOnDelete = (s: ItemParams) => {
       if (s.props.color === 'white') {
-        console.log('delete pressed', whiteMove);
         onDelete(whiteMoveLinearIndex);
       }
 
       if (s.props.color === 'black') {
         onDelete(blackMoveLinearIndex);
-        console.log('delete pressed', blackMove);
       }
     };
 
@@ -223,14 +193,14 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
         >
           <Text
             // className={cx(cls.text, cls.rowIndex)}
-            className="flex-1 cursor-pointer sfont-bold"
+            className="flex-1 cursor-pointer"
           >{`${moveCount}.`}</Text>
           {whiteMove ? (
             <Text
               // className={cx(cls.text, cls.move, cls.whiteMove, {
               //   [cls.activeMove]: whiteMoveLinearIndex === focusedIndex,
               // })}
-              className={`flex-1 cursor-pointer sfont-bold ${
+              className={`flex-1 cursor-pointer bg-slate-400 hover:bg-slate-500 ${
                 whiteMoveLinearIndex === focusedIndex ? 'font-black' : ''
               }`}
               onClick={() => onFocus(whiteMoveLinearIndex)}
@@ -241,7 +211,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
           ) : (
             <Text
               // className={cx(cls.text, cls.move, cls.whiteMove)}
-              className="flex-1 cursor-pointer sfont-bold"
+              className="flex-1 cursor-pointer hover:bg-red-100 bg-red-500"
               onContextMenu={handleRightClickWhite}
             >
               ...
@@ -250,7 +220,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
           {blackMove && whiteMove?.branchedHistories ? (
             <Text
               // className={cx(cls.text, cls.move, cls.blackMove)}
-              className="flex-1 cursor-pointer sfont-bold"
+              className="flex-1 cursor-pointer hover:bg-red-100 bg-red-500"
               onContextMenu={handleRightClickBlack}
             >
               ...
@@ -260,7 +230,7 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
               // className={cx(cls.text, cls.move, cls.blackMove, {
               //   [cls.activeMove]: blackMoveLinearIndex === focusedIndex,
               // })}
-              className={`flex-1 cursor-pointer sfont-bold ${
+              className={`flex-1 cursor-pointer bg-slate-400 ${
                 blackMoveLinearIndex === focusedIndex ? 'font-black' : ''
               }`}
               onClick={() => onFocus(blackMoveLinearIndex)}
@@ -276,10 +246,19 @@ export const HistoryRow = React.forwardRef<HTMLDivElement | null, Props>(
             onClick={handleOnDelete}
             className="hover:cursor-pointer"
           >
-            Delete
+            Delete from here
           </Item>
         </Menu>
-        {renderNestedContent()}
+        <NestedHistoryRow
+          focusedIndex={focusedIndex}
+          pairedIndex={pairedIndex}
+          startingLinearIndex={startingLinearIndex}
+          onFocus={onFocus}
+          onDelete={onDelete}
+          className={className}
+          pairedMove={pairedMove}
+        />
+        {/* {renderNestedContent()} */}
       </div>
     );
   }

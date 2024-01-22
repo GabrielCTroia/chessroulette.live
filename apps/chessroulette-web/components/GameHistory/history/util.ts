@@ -1,7 +1,12 @@
-import { ChessColor, invoke, isWhiteColor } from '@xmatter/util-kit';
 import {
-  ChessHistoryBaseMove_NEW,
-  ChessHistoryBaseNonMove_NEW,
+  ChessColor,
+  ChessPGN,
+  getNewChessGame,
+  invoke,
+  isWhiteColor,
+  toShortColor,
+} from '@xmatter/util-kit';
+import {
   ChessHistoryBlackMove_NEW,
   ChessHistoryIndex_NEW,
   ChessHistoryMove_NEW,
@@ -15,7 +20,7 @@ import {
   ChessRecursiveHistoryTurn_NEW,
   ChessRecursiveHistory_NEW,
 } from './types';
-import { toShortColor } from 'chessterrain-react';
+import { ChessLinearHistory } from '../types';
 
 export const getHistoryNonMoveWhite = (): ChessHistoryWhiteMove_NEW => ({
   color: 'w',
@@ -82,7 +87,7 @@ export const addMoveToChessHistory = (
   nextHistory: ChessRecursiveHistory_NEW,
   nextIndex: ChessHistoryIndex_NEW
 ] => {
-  // console.log('addMoveToChessHistory', history, atIndex);
+  console.log('addMoveToChessHistory', history, atIndex);
 
   // Branched History
   if (atIndex) {
@@ -122,9 +127,14 @@ export const addMoveToChessHistory = (
           );
 
           const nextBranchedHistories: ChessRecursiveHistory_NEW[] = [
-            ...(prevMoveAtIndex.branchedHistories || []).slice(0, paralelBranchesIndex),
+            ...(prevMoveAtIndex.branchedHistories || []).slice(
+              0,
+              paralelBranchesIndex
+            ),
             nextHistoryBranch,
-            ...(prevMoveAtIndex.branchedHistories || []).slice(paralelBranchesIndex + 1),
+            ...(prevMoveAtIndex.branchedHistories || []).slice(
+              paralelBranchesIndex + 1
+            ),
           ];
 
           return {
@@ -145,7 +155,7 @@ export const addMoveToChessHistory = (
           ? [move]
           : [getHistoryNonMoveWhite(), move];
 
-          // console.log('heererere parallel branch')
+        // console.log('heererere parallel branch')
 
         const nextHistoryBranch: ChessRecursiveHistory_NEW = [
           // ...(prevMoveAtIndex.branchedHistories?.[0] || []),
@@ -268,3 +278,48 @@ export const isWhiteMove = (
 export const isBlackMove = (
   m: ChessHistoryMove_NEW
 ): m is ChessHistoryBlackMove_NEW => !isWhiteColor(m.color);
+
+export const pgnToHistory = (pgn: ChessPGN): ChessHistory_NEW =>
+  linearToTurnHistory(getNewChessGame({ pgn }).history({ verbose: true }));
+
+export const linearToTurnHistory = (
+  linearHistory: ChessLinearHistory
+): ChessHistory_NEW => {
+  type U = {
+    turns: ChessHistory_NEW;
+    cached: ChessHistoryWhiteMove_NEW | undefined;
+  };
+
+  // TODO: This is the most ridiculous thing, I have to recast to U each time
+  //  otherwise the reducer thinks it's not the right one
+  return linearHistory.reduce<U>(
+    (prev, nextMove, i) => {
+      // On Every half turn
+      if (i % 2 === 0) {
+        if (nextMove.color === 'w') {
+          return {
+            ...prev,
+            cached: nextMove,
+          };
+        } else {
+          // TODO: If the next move is not white this is an error
+          throw new Error(
+            `LinearToTurnHistory Error: Move (${i}) ${nextMove.from} ${nextMove.to} is not of correct color!`
+          );
+        }
+
+        // return {
+        // } as U;
+      }
+
+      // On Every Full Turn
+      const nextTurn = [prev.cached, nextMove];
+
+      return {
+        cached: undefined,
+        turns: [...prev.turns, nextTurn],
+      } as U;
+    },
+    { turns: [], cached: undefined }
+  ).turns;
+};

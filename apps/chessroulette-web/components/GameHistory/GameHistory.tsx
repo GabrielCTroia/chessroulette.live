@@ -1,10 +1,11 @@
 import React from 'react';
-import { HistoryList, HistoryListProps } from './components/HistoryList';
+import { HistoryList, HistoryListProps } from './components_NEW/HistoryList';
 import { ChessRecursiveHistory } from './types';
 import { useKeysToRefocusHistory } from './hooks';
+import { ChessRecursiveHistory_NEW } from './history/types';
 
 export type GameHistoryProps = {
-  history: ChessRecursiveHistory;
+  history: ChessRecursiveHistory_NEW;
   focusedIndex: HistoryListProps['focusedIndex'];
   onRefocus: HistoryListProps['onRefocus'];
   onDelete: HistoryListProps['onDelete'];
@@ -28,13 +29,14 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   onDelete,
   ...props
 }) => {
-  useKeysToRefocusHistory(history, focusedIndex, onRefocus);
+  // TODO: Add this back
+  // useKeysToRefocusHistory(history, focusedIndex, onRefocus);
 
   return (
     <div className={`flex flex-1 ${props.containerClassName}`}>
       <HistoryList
         history={history}
-        focusedIndex={focusedIndex}
+        // focusedIndex={focusedIndex}
         onRefocus={onRefocus}
         onDelete={onDelete}
         className="flex flex-1 flex-col"

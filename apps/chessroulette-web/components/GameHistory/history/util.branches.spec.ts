@@ -21,6 +21,7 @@ describe('Add Nested Move', () => {
       from: 'f7',
       to: 'f6',
       color: 'b',
+      san: 'f6',
     };
 
     const actual = addMoveToChessHistory(
@@ -42,12 +43,14 @@ describe('Add Nested Move', () => {
           from: 'd2',
           to: 'd4',
           color: 'w',
+          san: 'd4',
           branchedHistories: [[expectedTurn]],
         },
         {
           from: 'd7',
           to: 'd5',
           color: 'b',
+          san: 'd5',
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
@@ -65,6 +68,7 @@ describe('Add Nested Move', () => {
       from: 'f2',
       to: 'f3',
       color: 'w',
+      san: 'f3',
     };
 
     const actual = addMoveToChessHistory(
@@ -83,11 +87,13 @@ describe('Add Nested Move', () => {
           from: 'd2',
           to: 'd4',
           color: 'w',
+          san: 'd4',
         },
         {
           from: 'd7',
           to: 'd5',
           color: 'b',
+          san: 'd5',
           branchedHistories: [[expectedTurn]],
         },
       ],
@@ -110,11 +116,13 @@ describe('Add Nested Move', () => {
           from: 'd2',
           to: 'd4',
           color: 'w',
+          san: 'd4',
         },
         {
           from: 'd7',
           to: 'd5',
           color: 'b',
+          san: 'd5',
           branchedHistories: [branchedHistory],
         },
       ],
@@ -125,6 +133,7 @@ describe('Add Nested Move', () => {
       color: 'w',
       from: 'h2',
       to: 'h3',
+      san: 'h2',
     };
 
     const actual = addMoveToChessHistory(historyWithBranches, move, [
@@ -143,11 +152,13 @@ describe('Add Nested Move', () => {
           from: 'd2',
           to: 'd4',
           color: 'w',
+          san: 'd4',
         },
         {
           from: 'd7',
           to: 'd5',
           color: 'b',
+          san: 'd5',
           branchedHistories: [[...branchedHistory, expectedTurn]],
         },
       ],
@@ -166,6 +177,7 @@ describe('Add Nested Move', () => {
       color: 'w',
       from: 'h2',
       to: 'h3',
+      san: 'h2',
     };
 
     const actual = addMoveToChessHistory(
@@ -185,11 +197,13 @@ describe('Add Nested Move', () => {
         {
           from: 'd2',
           to: 'd4',
+          san: 'd4',
           color: 'w',
         },
         {
           from: 'd7',
           to: 'd5',
+          san: 'd5',
           color: 'b',
           branchedHistories: [
             BRANCHED_HISTORY_1,
@@ -210,6 +224,7 @@ describe('Add Nested Move', () => {
     const move: ChessHistoryMove_NEW = {
       color: 'b',
       from: 'h7',
+      san: 'h7',
       to: 'h5',
     };
 
@@ -233,11 +248,13 @@ describe('Add Nested Move', () => {
         {
           from: 'd2',
           to: 'd4',
+          san: 'd4',
           color: 'w',
         },
         {
           from: 'd7',
           to: 'd5',
+          san: 'd5',
           color: 'b',
           branchedHistories: [
             [...BRANCHED_HISTORY_1.slice(0, 1), expectedTurn],
@@ -262,11 +279,13 @@ describe('Add Nested Move', () => {
         {
           from: 'd2',
           to: 'd4',
+          san: 'd4',
           color: 'w',
         },
         {
           from: 'd7',
           to: 'd5',
+          san: 'd5',
           color: 'b',
           branchedHistories: [branchedHistory],
         },
@@ -277,6 +296,7 @@ describe('Add Nested Move', () => {
     const move: ChessHistoryMove_NEW = {
       color: 'w',
       from: 'f2',
+      san: 'f2',
       to: 'f4',
     };
 
@@ -290,11 +310,13 @@ describe('Add Nested Move', () => {
         {
           from: 'd2',
           to: 'd4',
+          san: 'd4',
           color: 'w',
         },
         {
           from: 'd7',
           to: 'd5',
+          san: 'd5',
           color: 'b',
           branchedHistories: [branchedHistory, expectedNewBranchedHistory],
         },
@@ -314,6 +336,7 @@ describe('Multi level nested histories', () => {
       color: 'b',
       from: 'h7',
       to: 'h5',
+      san: 'h5',
     };
 
     // Added black move to branched history
@@ -335,6 +358,7 @@ describe('Multi level nested histories', () => {
       color: 'w',
       from: 'h2',
       to: 'h4',
+      san: 'h4',
     };
 
     const actual = addMoveToChessHistory(
@@ -358,11 +382,13 @@ describe('Multi level nested histories', () => {
         {
           from: 'd2',
           to: 'd4',
+          san: 'd4',
           color: 'w',
         },
         {
           from: 'd7',
           to: 'd5',
+          san: 'd5',
           color: 'b',
           branchedHistories: [
             // [...BRANCHED_HISTORY_1.slice(0, 1), expectedTurn],

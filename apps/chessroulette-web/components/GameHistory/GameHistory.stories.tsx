@@ -1,13 +1,58 @@
+import type { Meta, StoryObj } from '@storybook/react';
+import { action } from '@storybook/addon-actions';
+import { GameHistory } from './GameHistory';
+import { pgnToHistory } from './history/util';
+
+const meta: Meta<typeof GameHistory> = {
+  component: GameHistory,
+  title: 'GameHistory',
+};
+
+export default meta;
+type Story = StoryObj<typeof GameHistory>;
+
+const x = pgnToHistory(
+  '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6'
+);
+
+console.log('x', x);
+
+// export const Main: Story = {
+//   args: {
+//     history: pgnToHistory(
+//       '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6'
+//     ),
+//     // sizePx: 500,
+//     // playingColor: 'black',
+//     // showAnnotations: true,
+//   },
+// };
+
+export const LinearHistory: Story = {
+  render: () => (
+    <div style={{ width: '400px' }}>
+      <GameHistory
+        history={pgnToHistory(
+          '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6'
+        )}
+        onDelete={action('OnDelete')}
+        onRefocus={action('OnRefocus')}
+        focusedIndex={[0, 1]}
+      />
+    </div>
+  ),
+};
+
 // /* eslint-disable import/no-extraneous-dependencies */
 // import { action } from '@storybook/addon-actions';
-// import { ChessHistoryIndex } from 'chessroulette-io';
-// import { addMoveToChessHistory } from 'chessroulette-io/dist/analysis/analysisActions';
-// import { chessGameTimeLimitMsMap } from 'chessroulette-io/dist/metadata/game';
+// // import { ChessHistoryIndex } from 'chessroulette-io';
+// // import { addMoveToChessHistory } from 'chessroulette-io/dist/analysis/analysisActions';
+// // import { chessGameTimeLimitMsMap } from 'chessroulette-io/dist/metadata/game';
 // import React, { useState } from 'react';
-// import { second } from 'src/lib/time';
-// import { pgnToChessHistory } from 'src/mocks/records';
-// import { StorybookBaseProvider } from 'src/storybook/StorybookBaseProvider';
-// import { themes } from 'src/theme';
+// // import { second } from 'src/lib/time';
+// // import { pgnToChessHistory } from 'src/mocks/records';
+// // import { StorybookBaseProvider } from 'src/storybook/StorybookBaseProvider';
+// // import { themes } from 'src/theme';
 // import { GameHistory } from './GameHistory';
 
 // const getHistory = (pgn: string) => {

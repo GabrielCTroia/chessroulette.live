@@ -69,6 +69,7 @@ describe('Find Move At Index', () => {
     expect(actual).toEqual({
       from: 'e7',
       to: 'e6',
+      san: 'e6',
       color: 'b',
     });
   });
@@ -102,11 +103,13 @@ describe('Get History To Index', () => {
           from: 'e2',
           to: 'e4',
           color: 'w',
+          san: 'e4',
         },
         {
           from: 'e7',
           to: 'e6',
           color: 'b',
+          san: 'e6',
         },
       ],
     ]);
@@ -121,11 +124,13 @@ describe('Get History To Index', () => {
           from: 'e2',
           to: 'e4',
           color: 'w',
+          san: 'e4',
         },
         {
           from: 'e7',
           to: 'e6',
           color: 'b',
+          san: 'e6',
         },
       ],
       [
@@ -133,6 +138,7 @@ describe('Get History To Index', () => {
           from: 'd2',
           to: 'd4',
           color: 'w',
+          san: 'd4',
         },
       ],
     ]);
@@ -147,11 +153,13 @@ describe('Get History To Index', () => {
           from: 'e2',
           to: 'e4',
           color: 'w',
+          san: 'e4',
         },
         {
           from: 'e7',
           to: 'e6',
           color: 'b',
+          san: 'e6',
         },
       ],
       [
@@ -159,11 +167,13 @@ describe('Get History To Index', () => {
           from: 'd2',
           to: 'd4',
           color: 'w',
+          san: 'd4',
         },
         {
           from: 'd7',
           to: 'd5',
           color: 'b',
+          san: 'd5',
         },
       ],
     ]);
@@ -178,11 +188,13 @@ describe('Get History To Index', () => {
           from: 'e2',
           to: 'e4',
           color: 'w',
+          san: 'e4',
         },
         {
           from: 'e7',
           to: 'e6',
           color: 'b',
+          san: 'e6',
         },
       ],
       [
@@ -190,6 +202,7 @@ describe('Get History To Index', () => {
           from: 'd2',
           to: 'd4',
           color: 'w',
+          san: 'd4',
         },
       ],
     ]);
@@ -204,6 +217,7 @@ describe('Add Move', () => {
       from: 'a2',
       to: 'a3',
       color: 'w',
+      san: 'a3',
     };
 
     const actual = addMoveToChessHistory(history, newMove);
@@ -220,6 +234,7 @@ describe('Add Move', () => {
       from: 'a7',
       to: 'a6',
       color: 'b',
+      san: 'a6',
     };
 
     const actual = addMoveToChessHistory(HISTORY_WITH_HALF_LAST_TURN, newMove);
@@ -231,6 +246,7 @@ describe('Add Move', () => {
           from: 'a2',
           to: 'a3',
           color: 'w',
+          san: 'a3',
         },
         newMove,
       ],
