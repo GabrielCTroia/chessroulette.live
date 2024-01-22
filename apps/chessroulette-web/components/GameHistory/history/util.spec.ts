@@ -62,7 +62,7 @@ describe('History Index', () => {
   });
 });
 
-describe('Find move At Index', () => {
+describe('Find Move At Index', () => {
   test('Gets an existent move', () => {
     const actual = findMoveAtIndex(HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
 
@@ -80,143 +80,123 @@ describe('Find move At Index', () => {
   });
 });
 
-describe('History', () => {
-  describe('Get History To Index', () => {
-    test('Get History At Starting Index', () => {
-      const actual = getHistoryToIndex(
-        LONG_HISTORY_WITH_HALF_LAST_TURN,
-        [0, 0]
-      );
+describe('Get History To Index', () => {
+  test('Get History At Starting Index', () => {
+    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 0]);
 
-      expect(actual).toEqual([]);
-    });
+    expect(actual).toEqual([]);
+  });
 
-    test('Get History At Longer than length Index', () => {
-      const actual = getHistoryToIndex(
-        LONG_HISTORY_WITH_HALF_LAST_TURN,
-        [19, 1]
-      );
+  test('Get History At Longer than length Index', () => {
+    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [19, 1]);
 
-      expect(actual).toEqual(LONG_HISTORY_WITH_HALF_LAST_TURN);
-    });
+    expect(actual).toEqual(LONG_HISTORY_WITH_HALF_LAST_TURN);
+  });
 
-    test('Get History At 1st Full Turn Index ', () => {
-      const actual = getHistoryToIndex(
-        LONG_HISTORY_WITH_HALF_LAST_TURN,
-        [0, 1]
-      );
+  test('Get History At 1st Full Turn Index ', () => {
+    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
 
-      expect(actual).toEqual([
-        [
-          {
-            from: 'e2',
-            to: 'e4',
-            color: 'w',
-          },
-          {
-            from: 'e7',
-            to: 'e6',
-            color: 'b',
-          },
-        ],
-      ]);
-    });
+    expect(actual).toEqual([
+      [
+        {
+          from: 'e2',
+          to: 'e4',
+          color: 'w',
+        },
+        {
+          from: 'e7',
+          to: 'e6',
+          color: 'b',
+        },
+      ],
+    ]);
+  });
 
-    test('Get History At Half Turn Index ', () => {
-      const actual = getHistoryToIndex(
-        LONG_HISTORY_WITH_HALF_LAST_TURN,
-        [1, 0]
-      );
+  test('Get History At Half Turn Index ', () => {
+    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 0]);
 
-      expect(actual).toEqual([
-        [
-          {
-            from: 'e2',
-            to: 'e4',
-            color: 'w',
-          },
-          {
-            from: 'e7',
-            to: 'e6',
-            color: 'b',
-          },
-        ],
-        [
-          {
-            from: 'd2',
-            to: 'd4',
-            color: 'w',
-          },
-        ],
-      ]);
-    });
+    expect(actual).toEqual([
+      [
+        {
+          from: 'e2',
+          to: 'e4',
+          color: 'w',
+        },
+        {
+          from: 'e7',
+          to: 'e6',
+          color: 'b',
+        },
+      ],
+      [
+        {
+          from: 'd2',
+          to: 'd4',
+          color: 'w',
+        },
+      ],
+    ]);
+  });
 
-    test('Get History At Full Turn Index ', () => {
-      const actual = getHistoryToIndex(
-        LONG_HISTORY_WITH_HALF_LAST_TURN,
-        [1, 1]
-      );
+  test('Get History At Full Turn Index ', () => {
+    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 1]);
 
-      expect(actual).toEqual([
-        [
-          {
-            from: 'e2',
-            to: 'e4',
-            color: 'w',
-          },
-          {
-            from: 'e7',
-            to: 'e6',
-            color: 'b',
-          },
-        ],
-        [
-          {
-            from: 'd2',
-            to: 'd4',
-            color: 'w',
-          },
-          {
-            from: 'd7',
-            to: 'd5',
-            color: 'b',
-          },
-        ],
-      ]);
-    });
+    expect(actual).toEqual([
+      [
+        {
+          from: 'e2',
+          to: 'e4',
+          color: 'w',
+        },
+        {
+          from: 'e7',
+          to: 'e6',
+          color: 'b',
+        },
+      ],
+      [
+        {
+          from: 'd2',
+          to: 'd4',
+          color: 'w',
+        },
+        {
+          from: 'd7',
+          to: 'd5',
+          color: 'b',
+        },
+      ],
+    ]);
+  });
 
-    test('Get History At Half Turn Index ', () => {
-      const actual = getHistoryToIndex(
-        LONG_HISTORY_WITH_HALF_LAST_TURN,
-        [1, 0]
-      );
+  test('Get History At Half Turn Index ', () => {
+    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 0]);
 
-      expect(actual).toEqual([
-        [
-          {
-            from: 'e2',
-            to: 'e4',
-            color: 'w',
-          },
-          {
-            from: 'e7',
-            to: 'e6',
-            color: 'b',
-          },
-        ],
-        [
-          {
-            from: 'd2',
-            to: 'd4',
-            color: 'w',
-          },
-        ],
-      ]);
-    });
+    expect(actual).toEqual([
+      [
+        {
+          from: 'e2',
+          to: 'e4',
+          color: 'w',
+        },
+        {
+          from: 'e7',
+          to: 'e6',
+          color: 'b',
+        },
+      ],
+      [
+        {
+          from: 'd2',
+          to: 'd4',
+          color: 'w',
+        },
+      ],
+    ]);
   });
 });
 
-describe('Add move to history', () => {
+describe('Add Move', () => {
   test('adds a white move at the end of history', () => {
     const history = HISTORY_WITH_FULL_LAST_TURN;
 

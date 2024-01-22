@@ -1,15 +1,21 @@
-import { BlackColor, DetailedChessMove, WhiteColor } from '@xmatter/util-kit';
+import {
+  BlackColor,
+  ChessColor,
+  DetailedChessMove,
+  WhiteColor,
+} from '@xmatter/util-kit';
 
 export type ChessHistoryBaseNonMove_NEW = {
   isNonMove: true;
   san: '...';
+  color: ChessColor;
   from?: undefined;
   to?: undefined;
 };
 
 export type ChessHistoryBaseRealMove_NEW = {
   isNonMove?: false;
-} & Pick<DetailedChessMove, 'from' | 'to'>; // TODO: This can expand later on
+} & Pick<DetailedChessMove, 'from' | 'to' | 'color'>; // TODO: This can expand later on
 
 export type ChessHistoryBaseMove_NEW =
   | ChessHistoryBaseRealMove_NEW
@@ -29,20 +35,24 @@ export type ChessHistoryMove_NEW =
   | ChessHistoryBlackMove_NEW;
 
 export type ChessRecursiveHistoryBaseMove_NEW = {
-  histories?: ChessRecursiveHistory_NEW[];
+  branchedHistories?: ChessRecursiveHistory_NEW[];
 };
 
-export type ChessRecursiveHistoryWhiteMove = ChessRecursiveHistoryBaseMove_NEW &
-  ChessHistoryWhiteMove_NEW;
-export type ChessRecursiveHistoryBlackMove = ChessRecursiveHistoryBaseMove_NEW &
-  ChessHistoryBlackMove_NEW;
+export type ChessRecursiveHistoryWhiteMove_NEW =
+  ChessRecursiveHistoryBaseMove_NEW & ChessHistoryWhiteMove_NEW;
+export type ChessRecursiveHistoryBlackMove_NEW =
+  ChessRecursiveHistoryBaseMove_NEW & ChessHistoryBlackMove_NEW;
+
+export type ChessRecursiveHistoryMove_NEW =
+  | ChessRecursiveHistoryWhiteMove_NEW
+  | ChessRecursiveHistoryBlackMove_NEW;
 
 export type ChessRecursiveHistoryHalfTurn_NEW = [
-  whiteMove: ChessRecursiveHistoryWhiteMove
+  whiteMove: ChessRecursiveHistoryWhiteMove_NEW
 ];
 export type ChessRecursiveHistoryFullTurn_NEW = [
-  whiteMove: ChessRecursiveHistoryWhiteMove,
-  blackMove: ChessRecursiveHistoryBlackMove
+  whiteMove: ChessRecursiveHistoryWhiteMove_NEW,
+  blackMove: ChessRecursiveHistoryBlackMove_NEW
 ];
 
 export type ChessRecursiveHistoryTurn_NEW =
@@ -71,9 +81,29 @@ export type ChessRecursiveHistory_NEW =
 
 export type ChessHistory_NEW = ChessRecursiveHistory_NEW;
 
-export type ChessHistoryIndex_NEW =
+export type ChessRecursiveHistoryIndex_NEW =
   | [
       turn: number, // 0, 1, 2, 3
-      move: 0 | 1,
-      branches?: ChessHistoryIndex_NEW[]
+      move: 0 | 1, // 0 = white, 1 = black
+      recursiveIndexes?: ChessHistoryRecursiveIndexes
     ];
+
+export type ChessHistoryRecursiveIndexes = [
+  recursiveHistoryIndex: -1 | ChessRecursiveHistoryIndex_NEW, // '-1' = end of history
+  paralelBranchesIndex?: number // Defaults to 0 (root), '-1' = apends?
+];
+
+export type ChessHistoryIndex_NEW = ChessRecursiveHistoryIndex_NEW;
+// | [
+//     turn: number, // 0, 1, 2, 3
+//     move: 0 | 1,
+//     // This is the index of the branch or the nested index
+//     branchIndex: 0 // Defaults to Root Branch '0'
+//   ]
+// | [
+//     turn: number, // 0, 1, 2, 3
+//     move: 0 | 1,
+//     branchIndex: number, // When bigger than 0
+//     // This is the index of the branch or the nested index
+//     branchRecursiveIndex: ChessHistoryIndex_NEW
+//   ];
