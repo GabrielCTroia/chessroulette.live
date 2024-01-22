@@ -92,6 +92,7 @@ export const addMoveToChessHistory = (
     // if move isn't find return Prev
     if (!prevMoveAtIndex) {
       // console.log('and fails here');
+      // TODO: Add test case for this
 
       return [history, getHistoryLastIndex(history)];
     }
@@ -121,8 +122,9 @@ export const addMoveToChessHistory = (
           );
 
           const nextBranchedHistories: ChessRecursiveHistory_NEW[] = [
-            // ...(prevMoveAtIndex.branchedHistories || []),
+            ...(prevMoveAtIndex.branchedHistories || []).slice(0, paralelBranchesIndex),
             nextHistoryBranch,
+            ...(prevMoveAtIndex.branchedHistories || []).slice(paralelBranchesIndex + 1),
           ];
 
           return {
@@ -142,6 +144,8 @@ export const addMoveToChessHistory = (
         )
           ? [move]
           : [getHistoryNonMoveWhite(), move];
+
+          // console.log('heererere parallel branch')
 
         const nextHistoryBranch: ChessRecursiveHistory_NEW = [
           // ...(prevMoveAtIndex.branchedHistories?.[0] || []),
