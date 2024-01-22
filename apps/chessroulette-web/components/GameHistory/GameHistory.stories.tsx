@@ -2,6 +2,12 @@ import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { GameHistory } from './GameHistory';
 import { pgnToHistory } from './history/util';
+import {
+  BRANCHED_HISTORY_1,
+  LONG_HISTORY_WITH_FULL_LAST_TURN,
+  LONG_HISTORY_WITH_PARALEL_HISTORIES,
+} from './history/specUtils';
+import { ChessHistory_NEW } from './history/types';
 
 const meta: Meta<typeof GameHistory> = {
   component: GameHistory,
@@ -15,8 +21,6 @@ const x = pgnToHistory(
   '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6'
 );
 
-console.log('x', x);
-
 // export const Main: Story = {
 //   args: {
 //     history: pgnToHistory(
@@ -28,15 +32,78 @@ console.log('x', x);
 //   },
 // };
 
+const BASIC_HISTORY = pgnToHistory(
+  '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6 7. h3'
+);
+
 export const LinearHistory: Story = {
   render: () => (
     <div style={{ width: '400px' }}>
       <GameHistory
-        history={pgnToHistory(
-          '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6'
-        )}
+        history={BASIC_HISTORY}
         onDelete={action('OnDelete')}
         onRefocus={action('OnRefocus')}
+        focusedIndex={[0, 1]}
+      />
+    </div>
+  ),
+};
+
+const historyWithOneGenBranch = [
+  ...BASIC_HISTORY.slice(0, 1),
+  [
+    {
+      ...BASIC_HISTORY[1][0],
+      branchedHistories: [
+        [
+          [
+            {
+              isNonMove: true,
+              san: '...',
+              color: 'w',
+            },
+            {
+              from: 'd7',
+              to: 'd6',
+              san: 'd6',
+              color: 'b',
+            },
+          ],
+        ] as ChessHistory_NEW,
+      ],
+    },
+    {
+      ...BASIC_HISTORY[1][1],
+    },
+  ],
+  ...BASIC_HISTORY.slice(2, 4),
+  [
+    BASIC_HISTORY[4][0],
+    {
+      ...BASIC_HISTORY[4][1],
+      branchedHistories: [
+        pgnToHistory('1. e3 c5 2. Nf3 e6 3. d4 d6'),
+        pgnToHistory('1. e4 c5 2. Nf3 e5 3. d3'),
+      ],
+    },
+  ],
+  ...BASIC_HISTORY.slice(5),
+] as ChessHistory_NEW;
+
+export const NestedHistory: Story = {
+  render: () => (
+    <div className="p-2 border border-slate-600" style={{ width: '400px' }}>
+      <GameHistory
+        history={historyWithOneGenBranch}
+        onDelete={(p) => {
+          console.log('on delete', p)
+          
+          action('OnDelete')(p)
+        }}
+        onRefocus={(p) => {
+          console.log('on refocus', p)
+          action('OnRefocus')(p)
+        }}
         focusedIndex={[0, 1]}
       />
     </div>

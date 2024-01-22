@@ -292,7 +292,7 @@ export const linearToTurnHistory = (
 
   // TODO: This is the most ridiculous thing, I have to recast to U each time
   //  otherwise the reducer thinks it's not the right one
-  return linearHistory.reduce<U>(
+  const { turns, cached } = linearHistory.reduce<U>(
     (prev, nextMove, i) => {
       // On Every half turn
       if (i % 2 === 0) {
@@ -321,5 +321,7 @@ export const linearToTurnHistory = (
       } as U;
     },
     { turns: [], cached: undefined }
-  ).turns;
+  );
+
+  return cached ? ([...turns, [cached]] as ChessHistory_NEW) : turns;
 };

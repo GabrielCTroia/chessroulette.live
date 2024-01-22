@@ -32,6 +32,8 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   // TODO: Add this back
   // useKeysToRefocusHistory(history, focusedIndex, onRefocus);
 
+  console.log('Game History', history);
+
   return (
     <div className={`flex flex-1 ${props.containerClassName}`}>
       <HistoryList
