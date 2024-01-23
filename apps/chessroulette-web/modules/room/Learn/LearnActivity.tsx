@@ -206,7 +206,9 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
           }}
         >
           <div className="flex flex-col flex-1 min-h-0 gap-4">
-            <Streaming rid={props.rid} iceServers={iceServers} />
+            <div className='overflow-hidden rounded-lg'>
+              <Streaming rid={props.rid} iceServers={iceServers} />
+            </div>
 
             <MovexBoundResource
               movexDefinition={movexConfig}
@@ -221,8 +223,8 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                 return (
                   <Tabs
                     headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
-                    containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0"
-                    contentClassName="flex-1 flex min-h-0 "
+                    containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 overflow-hidden rounded-lg"
+                    contentClassName="flex-1 flex min-h-"
                     currentIndex={0}
                     renderContainerHeader={({ tabs, focus }) => (
                       <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">

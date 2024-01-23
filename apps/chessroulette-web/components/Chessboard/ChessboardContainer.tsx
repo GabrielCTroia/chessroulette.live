@@ -213,7 +213,7 @@ export const ChessboardContainer = ({
   );
 
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden rounded-lg">
       <Chessboard
         position={fen}
         boardWidth={props.sizePx}
