@@ -179,7 +179,7 @@ export class ChessFENBoard {
         ...(castlingMove && {
           // Remove the castling rights if applied this move
           castlingRights: {
-            [prevFenState.turn]: {
+            [detailedPiece.color]: {
               kingSide: false,
               queenSide: false,
             },
@@ -268,7 +268,7 @@ export class ChessFENBoard {
           return null;
         }
 
-        return { rookFrom: 'a1', rookTo: 'c1' };
+        return { rookFrom: 'a1', rookTo: 'd1' };
       }
     }
 

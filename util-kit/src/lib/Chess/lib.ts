@@ -61,19 +61,24 @@ export const getNewChessGame = (
 ) => {
   const instance = new Chess();
 
-  if (props?.pgn) {
-    instance.loadPgn(props.pgn);
+  try {
+    if (props?.pgn) {
+      instance.loadPgn(props.pgn);
+
+      return instance;
+    }
+
+    if (props?.fen) {
+      instance.load(props.fen);
+
+      return instance;
+    }
 
     return instance;
-  }
-
-  if (props?.fen) {
-    instance.load(props.fen);
-
+  } catch (e) {
+    console.error('GetNewChessGame', e);
     return instance;
   }
-
-  return instance;
 };
 
 export const isValidPgn = (s: string): s is ChessPGN => {
