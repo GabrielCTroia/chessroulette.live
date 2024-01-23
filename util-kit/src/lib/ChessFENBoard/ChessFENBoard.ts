@@ -478,8 +478,6 @@ export class ChessFENBoard {
 
     let state: FenState = ChessFENBoard.STARTING_FEN_STATE;
 
-    console.log('validate', fenNotation);
-
     if (turn && isShortChessColor(turn)) {
       state = {
         ...state,

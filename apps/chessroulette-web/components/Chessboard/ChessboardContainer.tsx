@@ -226,11 +226,18 @@ export const ChessboardContainer = ({
         customDarkSquareStyle={customStyles.customDarkSquareStyle}
         customSquare={ChessboardSquare}
         onPieceDrop={(from, to) => {
-          // resetCircles();
-          // resetArrows();
-
           // As long as the on PromotionPieceSelect is present this doesn't get triggered with a pieceSelect
           return !!props.onMove?.({ from, to });
+        }}
+        onSquareClick={() => {
+          // Reset the Arrows and Circles if present
+          if (circlesMap && Object.keys(circlesMap).length > 0) {
+            resetCircles();
+          }
+
+          if (props.arrowsMap && Object.keys(props.arrowsMap).length > 0) {
+            resetArrows();
+          }
         }}
         customSquareStyles={customSquareStyles}
         customArrows={arrowsToRender}
