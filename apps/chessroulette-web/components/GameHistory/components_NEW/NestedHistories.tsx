@@ -43,10 +43,10 @@ export const NestedHistories = ({
     ];
   };
 
-  console.log(
-    'Nested histories: focusedRecursiveIndexes',
-    focusedRecursiveIndexes
-  );
+  // console.log(
+  //   'Nested histories: focusedRecursiveIndexes',
+  //   focusedRecursiveIndexes
+  // );
 
   return (
     <>
@@ -84,7 +84,6 @@ export const NestedHistories = ({
           <HistoryList
             key={`${turnIndex}-${movePosition}--${branchIndex}`}
             history={branchedHistory}
-            rootTurnIndex={turnIndex}
             onRefocus={(nestedIndex) => {
               onFocus(constructNestedIndex(nestedIndex, branchIndex));
             }}
@@ -93,8 +92,9 @@ export const NestedHistories = ({
             }}
             className={className}
             rowClassName={rowClassName}
-            isNested
             focusedIndex={focusedIndex}
+            isNested
+            historyRootTurnIndex={turnIndex}
           />
         );
       })}

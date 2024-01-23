@@ -6,7 +6,6 @@ import {
   ChessHistoryIndex_NEW,
   ChessRecursiveHistory_NEW,
 } from '../history/types';
-import { findMoveAtIndex, findTurnAtIndex } from '../history/util';
 
 export type HistoryListProps = {
   history: ChessRecursiveHistory_NEW;

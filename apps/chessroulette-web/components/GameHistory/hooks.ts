@@ -5,8 +5,10 @@ import {
   ChessRecursiveHistory_NEW,
 } from './history/types';
 import {
+  areHistoryIndexesEqual,
   decrementHistoryIndex,
   findMoveAtIndex,
+  getStartingHistoryIndex,
   incrementHistoryIndex,
 } from './history/util';
 
@@ -30,7 +32,12 @@ export const useKeysToRefocusHistory = (
         ? incrementHistoryIndex(currentIndex)
         : decrementHistoryIndex(currentIndex);
 
-    if (findMoveAtIndex(history, nextIndex)) {
+    const isStartingIndex = areHistoryIndexesEqual(
+      nextIndex,
+      getStartingHistoryIndex()
+    );
+
+    if (findMoveAtIndex(history, nextIndex) || isStartingIndex) {
       onRefocus(nextIndex);
     }
   });

@@ -1,7 +1,15 @@
 import type { Color, PieceSymbol, Square, Move, Piece } from 'chess.js';
 import { Chess } from 'chess.js';
 import { Matrix, MatrixIndex, matrixMap } from '../matrix';
-import { BlackColor, ChessMove, ChessPGN, PieceSan, ShortChessColor, WhiteColor } from '../Chess/types';
+import {
+  BlackColor,
+  ChessColor,
+  ChessMove,
+  ChessPGN,
+  PieceSan,
+  ShortChessColor,
+  WhiteColor,
+} from '../Chess/types';
 import { toShortColor } from '../Chess/lib';
 
 export const ranks = { 1: 7, 2: 6, 3: 5, 4: 4, 5: 3, 6: 2, 7: 1, 8: 0 };
@@ -159,10 +167,10 @@ export const isPromotableMove = (m: ChessMove, pieceSan: PieceSan) => {
 // I don't know why this needs to be typed like this
 //  with a function declaration but if it's declared
 //  as an anonymous function it throws a tsc error
-export function swapColor<C extends Color>(
+export function swapColor<C extends ChessColor>(
   c: C
 ): C extends WhiteColor ? BlackColor : WhiteColor;
-export function swapColor<C extends Color>(c: C) {
+export function swapColor<C extends ChessColor>(c: C) {
   return toShortColor(c) === 'w' ? 'black' : 'white';
 }
 

@@ -3,13 +3,12 @@ import { Menu, Item, useContextMenu, ItemParams } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
 import { Text } from '../../Text';
 import {
-  ChessHistoryIndexMovePosition_NEW,
   ChessHistoryIndex_NEW,
   ChessHistoryTurn_NEW,
   ChessRecursiveHistoryIndex_NEW,
 } from '../history/types';
 import { NestedHistories } from './NestedHistories';
-import { ChessColor, invoke } from '@xmatter/util-kit';
+import { invoke } from '@xmatter/util-kit';
 
 export type HistoryRowProps = {
   rowId: string;
@@ -18,11 +17,18 @@ export type HistoryRowProps = {
   onFocus: (i: ChessHistoryIndex_NEW) => void;
   onDelete: (i: ChessHistoryIndex_NEW) => void;
   focusedIndex?: ChessRecursiveHistoryIndex_NEW;
-  // isFocused?: ChessColor;
-  isNested?: boolean;
   className?: string;
   containerClassName?: string;
-};
+} & (
+  | {
+      isNested: true;
+      historyRootTurnIndex: number;
+    }
+  | {
+      isNested?: boolean;
+      historyRootTurnIndex?: undefined;
+    }
+);
 
 export const HistoryRow = React.forwardRef<
   HTMLDivElement | null,
@@ -36,16 +42,15 @@ export const HistoryRow = React.forwardRef<
       onFocus,
       onDelete,
       className,
-      // focus,
       focusedIndex,
       containerClassName,
       isNested = false,
+      historyRootTurnIndex,
     },
     ref
   ) => {
     const whiteMoveIndex: ChessHistoryIndex_NEW = [historyTurnIndex, 0];
     const blackMoveIndex: ChessHistoryIndex_NEW = [historyTurnIndex, 1];
-
     const moveCount = historyTurnIndex + 1;
 
     const { show } = useContextMenu({ id: rowId });
@@ -63,7 +68,7 @@ export const HistoryRow = React.forwardRef<
     const [focusedTurnIndex, focusedMovePosition, focusedNestedIndex] =
       focusedIndex || [];
     const focus = invoke(() => {
-      console.log("row invoke foucs", focusedIndex, focusedTurnIndex, historyTurnIndex)
+      // console.log("row invoke foucs", focusedIndex, focusedTurnIndex, historyTurnIndex)
 
       if (focusedNestedIndex) {
         return undefined;
@@ -76,15 +81,6 @@ export const HistoryRow = React.forwardRef<
 
     return (
       <div className={containerClassName} ref={isNested ? undefined : ref}>
-        <Menu id={rowId}>
-          <Item
-            id="delete"
-            onClick={handleOnDelete}
-            className="hover:cursor-pointer"
-          >
-            Delete from here
-          </Item>
-        </Menu>
         <div className={`flex ${className}`}>
           <Text className="flex-0 p-1 pr-2 cursor-pointer">{moveCount}.</Text>
           <Text
@@ -96,7 +92,10 @@ export const HistoryRow = React.forwardRef<
               show({ event, props: { color: 'white' } })
             }
           >
-            {whiteMove.san}
+            {whiteMove.san} |{' '}
+            <Text className="text-xs text-gray-100">
+              ({historyTurnIndex} 0)
+            </Text>
           </Text>
 
           {blackMove ? (
@@ -109,7 +108,10 @@ export const HistoryRow = React.forwardRef<
                 show({ event, props: { color: 'black' } })
               }
             >
-              {blackMove.san}
+              {blackMove.san}{' '}
+              <Text className="text-xs text-gray-100">
+                ({historyTurnIndex} 1)
+              </Text>
             </Text>
           ) : (
             <div className="flex-1" />
@@ -137,6 +139,15 @@ export const HistoryRow = React.forwardRef<
             focusedRecursiveIndexes={focusedNestedIndex}
           />
         )}
+        <Menu id={rowId}>
+          <Item
+            id="delete"
+            onClick={handleOnDelete}
+            className="hover:cursor-pointer"
+          >
+            Delete from here
+          </Item>
+        </Menu>
       </div>
     );
   }

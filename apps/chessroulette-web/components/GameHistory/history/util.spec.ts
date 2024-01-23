@@ -16,11 +16,12 @@ import {
   findMoveAtIndex,
   getHistoryLastIndex,
   getHistoryAtIndex,
+  areHistoryIndexesEqual,
 } from './util';
 
 describe('History Index', () => {
   test('starting index', () => {
-    expect(getStartingHistoryIndex()).toEqual([0, 0]);
+    expect(getStartingHistoryIndex()).toEqual([-1, 1]);
   });
 
   test('increment index at turn level', () => {
@@ -59,6 +60,32 @@ describe('History Index', () => {
   test('get last index from last full index', () => {
     const actual = getHistoryLastIndex(HISTORY_WITH_FULL_LAST_TURN);
     expect(actual).toEqual([0, 1]);
+  });
+
+  describe('areHistoryIndexesEqual', () => {
+    test('true when equal non recursive', () => {
+      expect(areHistoryIndexesEqual([0, 1], [0, 1])).toBe(true);
+    });
+
+    test('true when equal recursive', () => {
+      expect(
+        areHistoryIndexesEqual([0, 1, [[0, 1], 0]], [0, 1, [[0, 1], 0]])
+      ).toBe(true);
+    });
+
+    test('false when not equal non recursive', () => {
+      expect(areHistoryIndexesEqual([0, 1], [0, 0])).toBe(false);
+      expect(areHistoryIndexesEqual([0, 0], [1, 0])).toBe(false);
+    });
+
+    test('false when not equal recusive', () => {
+      expect(
+        areHistoryIndexesEqual([0, 1, [[0, 0], 0]], [0, 1, [[0, 1], 0]])
+      ).toBe(false);
+      expect(
+        areHistoryIndexesEqual([0, 1, [[0, 1], 1]], [0, 1, [[0, 1], 0]])
+      ).toBe(false);
+    });
   });
 });
 

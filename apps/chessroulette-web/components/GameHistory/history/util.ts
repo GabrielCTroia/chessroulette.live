@@ -47,7 +47,36 @@ export const getHistoryIndex = (
   color: ChessColor
 ): ChessHistoryIndex_NEW => [turn, toShortColor(color) === 'b' ? 1 : 0];
 
-export const getStartingHistoryIndex = () => getHistoryIndex(0, 'w');
+export const getStartingHistoryIndex = () => getHistoryIndex(-1, 'b');
+
+export const areHistoryIndexesEqual = (
+  a: ChessHistoryIndex_NEW | -1,
+  b: ChessHistoryIndex_NEW | -1
+): boolean => {
+  if (a === -1 || b === -1) {
+    return a === b;
+  }
+
+  const [aTurnIndex, aMoveIndex, aRecursiveIndex] = a;
+  const [bTurnIndex, bMoveIndex, bRecursiveIndex] = b;
+
+  const recursivesAreEqual = () => {
+    if (aRecursiveIndex && bRecursiveIndex) {
+      return (
+        aRecursiveIndex[1] === bRecursiveIndex[1] && // the paralels are equal
+        areHistoryIndexesEqual(aRecursiveIndex[0], bRecursiveIndex[0])
+      );
+    }
+    // return true;
+    return typeof aRecursiveIndex === typeof bRecursiveIndex;
+  };
+
+  return !!(
+    aTurnIndex === bTurnIndex &&
+    aMoveIndex === bMoveIndex &&
+    recursivesAreEqual()
+  );
+};
 
 export const incrementHistoryIndex = ([turn, move]: ChessHistoryIndex_NEW) =>
   (move === 1 ? [turn + 1, 0] : [turn, move + 1]) as ChessHistoryIndex_NEW;
@@ -101,6 +130,8 @@ export const addMoveToChessHistory = (
 ] => {
   const isRecursive = atIndex && findMoveAtIndex(history, atIndex);
 
+  console.log('addMoveToChessHistory', history, move, atIndex);
+
   // Branched History
   if (isRecursive) {
     const [turnIndex, moveIndex, recursiveIndexes] = atIndex;
@@ -108,10 +139,9 @@ export const addMoveToChessHistory = (
 
     // if move isn't find return Prev
     if (!prevMoveAtIndex) {
-      console.log('and fails here');
+      // console.log('and fails here');
       // TODO: Add test case for this
-
-      return [history, getHistoryLastIndex(history)];
+      throw new Error('AddMoveToChessHistory() Error: This should not happen');
     }
 
     //TODO: Add use case for when there already are branched histories

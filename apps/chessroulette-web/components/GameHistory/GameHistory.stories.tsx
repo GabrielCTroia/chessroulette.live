@@ -98,21 +98,24 @@ export const NestedHistory: Story = {
     ]);
 
     return (
-      <div className="p-2 border border-slate-600" style={{ width: '400px' }}>
-        <GameHistory
-          history={historyWithOneGenBranch}
-          onDelete={(p) => {
-            console.log('on delete', p);
+      <>
+        <div className="p-2 border border-slate-600" style={{ width: '400px' }}>
+          <GameHistory
+            history={historyWithOneGenBranch}
+            onDelete={(p) => {
+              console.log('on delete', p);
 
-            action('OnDelete')(p);
-          }}
-          onRefocus={(p) => {
-            setCurrentIndex(p);
-            action('OnRefocus')(p);
-          }}
-          focusedIndex={currentIndex}
-        />
-      </div>
+              action('OnDelete')(p);
+            }}
+            onRefocus={(p) => {
+              setCurrentIndex(p);
+              action('OnRefocus')(p);
+            }}
+            focusedIndex={currentIndex}
+          />
+        </div>
+        {currentIndex.join(', ')}
+      </>
     );
   },
 };
