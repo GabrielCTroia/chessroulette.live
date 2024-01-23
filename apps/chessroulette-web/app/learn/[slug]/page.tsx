@@ -4,15 +4,15 @@ import {
   toResourceIdentifierObj,
 } from 'movex-core-util';
 import LearnActivity from 'apps/chessroulette-web/modules/room/Learn/LearnActivity';
-import Twilio from 'twilio';
+import { Twilio } from 'twilio';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID as string;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN as string;
 
-const twilioClient = Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+const twilioClient: any = new Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
-export const twilio = {
+const twilio = {
   getTokens: async () => twilioClient.tokens.create(),
 };
 

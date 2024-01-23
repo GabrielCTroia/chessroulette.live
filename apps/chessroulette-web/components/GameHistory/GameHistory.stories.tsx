@@ -114,7 +114,7 @@ export const NestedHistory: Story = {
             focusedIndex={currentIndex}
           />
         </div>
-        {currentIndex.join(', ')}
+        {currentIndex.join(' ')}
       </>
     );
   },
