@@ -11,12 +11,19 @@ export type HistoryListProps = {
   history: ChessRecursiveHistory_NEW;
   onRefocus: (atIndex: ChessHistoryIndex_NEW) => void;
   onDelete: (atIndex: ChessHistoryIndex_NEW) => void;
-  rootTurnIndex?: number;
   focusedIndex?: ChessHistoryIndex_NEW;
-  isNested?: boolean;
   className?: string;
   rowClassName?: string;
-};
+} & (
+  | {
+      isNested: true;
+      historyRootTurnIndex: number;
+    }
+  | {
+      isNested?: boolean;
+      historyRootTurnIndex?: undefined;
+    }
+);
 
 const scrollIntoView = debounce((elm: HTMLDivElement) => {
   elm.scrollIntoView({ block: 'end', behavior: 'smooth' });
@@ -28,8 +35,8 @@ export const HistoryList: React.FC<HistoryListProps> = ({
   onRefocus,
   onDelete,
   className,
-  rootTurnIndex = 0,
   rowClassName,
+  historyRootTurnIndex = 0,
   isNested = false,
 }) => {
   const rowElementRefs = useRef<Record<number, HTMLDivElement | null>>({});
@@ -73,18 +80,10 @@ export const HistoryList: React.FC<HistoryListProps> = ({
     }
   }, []);
 
-  // console.group('History list', isNested ? 'nested' : 'root', findTurnAtIndex(history, [rootTurnIndex, 0])?.[0].san);
-  // console.log('focused index', focusedIndex)
-  // console.log('history', history.map((s, i) => [`${i}:`, s[0].san, s[1]?.san]).join(' '))
-  // // console.log('branched?', history.map((s) => [s[0].san, s[1]?.san]).join(' '))
-  // console.groupEnd();
-
-  // const [focusedHistoryTurnIndex, focusedMovePosition] = focusedIndex || [];
-
   return (
     <div className={className} ref={(e) => (containerElementRef.current = e)}>
       {history.map((historyTurn, historyTurnIndex) => {
-        const rowId = `${rootTurnIndex + historyTurnIndex}.${
+        const rowId = `${historyRootTurnIndex + historyTurnIndex}.${
           historyTurn[0].san
         }-${historyTurn[1]?.san || ''}`;
 
@@ -94,7 +93,8 @@ export const HistoryList: React.FC<HistoryListProps> = ({
             rowId={rowId}
             ref={(r) => (rowElementRefs.current[historyTurnIndex] = r)}
             historyTurn={historyTurn}
-            historyTurnIndex={rootTurnIndex + historyTurnIndex}
+            historyTurnIndex={historyTurnIndex}
+            moveCount={historyRootTurnIndex + historyTurnIndex}
             onFocus={onRefocus}
             onDelete={onDelete}
             containerClassName={rowClassName}

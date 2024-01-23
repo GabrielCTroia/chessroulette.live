@@ -1,6 +1,8 @@
 import {
+  ChessColor,
   ChessFEN,
   GetComponentProps,
+  LongChessColor,
   ShortChessMove,
   isDarkSquare,
   objectKeys,
@@ -13,10 +15,7 @@ import {
 import { Square } from 'chess.js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
-import {
-  Arrow,
-  CustomSquareProps,
-} from 'react-chessboard/dist/chessboard/types';
+import { Arrow } from 'react-chessboard/dist/chessboard/types';
 import { useArrowColor } from './useArrowColor';
 import { isPromotableMove } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
 import {
@@ -35,7 +34,7 @@ type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
 export type ChessboardContainerProps = Omit<
   ChessBoardProps,
-  'position' | 'onArrowsChange'
+  'position' | 'onArrowsChange' | 'boardOrientation'
 > & {
   fen: ChessFEN;
   sizePx: number;
@@ -48,6 +47,7 @@ export type ChessboardContainerProps = Omit<
   onCircleDraw?: (circleTuple: CircleDrawTuple) => void;
   onClearCircles?: () => void;
   inCheckSquares?: SquareMap;
+  boardOrientation?: ChessColor;
 };
 
 export const ChessboardContainer = ({
@@ -57,14 +57,9 @@ export const ChessboardContainer = ({
   onArrowsChange = noop,
   onCircleDraw = noop,
   inCheckSquares,
+  boardOrientation = 'white',
   ...props
 }: ChessboardContainerProps) => {
-  const boardOrientation = useMemo(
-    () =>
-      props.boardOrientation ? toLongColor(props.boardOrientation) : undefined,
-    [props.boardOrientation]
-  );
-
   const customStyles = useMemo(
     () => ({
       customDarkSquareStyle: props.customDarkSquareStyle || {
@@ -220,7 +215,7 @@ export const ChessboardContainer = ({
         position={fen}
         boardWidth={props.sizePx}
         showBoardNotation
-        boardOrientation={boardOrientation}
+        boardOrientation={toLongColor(boardOrientation)}
         snapToCursor={false}
         arePiecesDraggable
         customBoardStyle={customStyles.customBoardStyle}

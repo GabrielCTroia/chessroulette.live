@@ -19,16 +19,9 @@ export type HistoryRowProps = {
   focusedIndex?: ChessRecursiveHistoryIndex_NEW;
   className?: string;
   containerClassName?: string;
-} & (
-  | {
-      isNested: true;
-      historyRootTurnIndex: number;
-    }
-  | {
-      isNested?: boolean;
-      historyRootTurnIndex?: undefined;
-    }
-);
+  moveCount?: number;
+  isNested?: boolean;
+};
 
 export const HistoryRow = React.forwardRef<
   HTMLDivElement | null,
@@ -45,13 +38,12 @@ export const HistoryRow = React.forwardRef<
       focusedIndex,
       containerClassName,
       isNested = false,
-      historyRootTurnIndex,
+      moveCount = historyTurnIndex + 1,
     },
     ref
   ) => {
     const whiteMoveIndex: ChessHistoryIndex_NEW = [historyTurnIndex, 0];
     const blackMoveIndex: ChessHistoryIndex_NEW = [historyTurnIndex, 1];
-    const moveCount = historyTurnIndex + 1;
 
     const { show } = useContextMenu({ id: rowId });
 
@@ -68,8 +60,6 @@ export const HistoryRow = React.forwardRef<
     const [focusedTurnIndex, focusedMovePosition, focusedNestedIndex] =
       focusedIndex || [];
     const focus = invoke(() => {
-      // console.log("row invoke foucs", focusedIndex, focusedTurnIndex, historyTurnIndex)
-
       if (focusedNestedIndex) {
         return undefined;
       }

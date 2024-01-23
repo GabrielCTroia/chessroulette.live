@@ -28,6 +28,8 @@ import {
   findMoveAtIndex,
   getHistoryNonMoveWhite,
   getHistoryNonMove,
+  areHistoryIndexesEqual,
+  isLastHistoryIndexInBranch,
 } from 'apps/chessroulette-web/components/GameHistory/history/util';
 import {
   // addMoveToChessHistory,
@@ -170,11 +172,23 @@ export default (
           prev.activityState.history.focusedIndex
         );
 
+        const { moves: prevHistoryMoves, focusedIndex: prevFocusedIndex } =
+          prev.activityState.history;
+
         // If the moves are the same introduce a non move
         const [nextHistory, addedAtIndex] = invoke(() => {
-          const addAtIndex = incrementHistoryIndex(
-            prev.activityState.history.focusedIndex
+          const isFocusedIndexLastInBranch = isLastHistoryIndexInBranch(
+            prevHistoryMoves,
+            prevFocusedIndex
           );
+
+          console.log('isFocusedIndexLastInBranch', isFocusedIndexLastInBranch);
+
+          const addAtIndex = isFocusedIndexLastInBranch
+            ? incrementHistoryIndex(prev.activityState.history.focusedIndex)
+            : prev.activityState.history.focusedIndex;
+
+          prev.activityState.history.focusedIndex;
 
           // TODO: Add back for invalid moves
           // if (prevMove?.color === nextMove.color) {
@@ -186,12 +200,12 @@ export default (
 
           //   return addMoveToChessHistory(nextHistory, nextMove, addedAtIndex);
           // } else {
-            return addMoveToChessHistory(
-              prev.activityState.history.moves,
-              nextMove,
-              addAtIndex
-              // prev.activityState.history.focusedIndex
-            );
+          return addMoveToChessHistory(
+            prev.activityState.history.moves,
+            nextMove,
+            addAtIndex
+            // prev.activityState.history.focusedIndex
+          );
           // }
         });
 
@@ -204,8 +218,8 @@ export default (
         //   // prev.activityState.history.focusedIndex
         // );
 
-        // console.log('next history', nextHistory, nextHistory.length);
-        // console.log('addedAtIndex', addedAtIndex);
+        console.log('next history', nextHistory, nextHistory.length);
+        console.log('addedAtIndex', addedAtIndex);
 
         return {
           ...prev,

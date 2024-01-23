@@ -15,6 +15,7 @@ import {
   getRandomInt,
   invoke,
   toDictIndexedBy,
+  wrap,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { useMemo, useState } from 'react';
@@ -31,6 +32,8 @@ import {
   getMoveAtIndex,
 } from 'apps/chessroulette-web/components/GameHistory/lib';
 import { SquareMap } from '../activity/reducer';
+import { findMoveAtIndex } from 'apps/chessroulette-web/components/GameHistory/history/util';
+// import { ChessHistoryBaseRealMove } from 'apps/chessroulette-web/components/GameHistory/types';
 
 type ChessColor = 'white' | 'black';
 
@@ -110,15 +113,18 @@ export default ({ playingColor = 'white', ...props }: Props) => {
 
                 const { activityState } = state.activity;
 
-                console.log('activity state', activityState);
-
+                console.group('Learn Activity');
+                console.log('Activity State', activityState);
+                console.log('History', activityState.history.moves);
+                console.log('Focused Index', activityState.history.focusedIndex);
+                console.groupEnd();
+                
                 const { history } = activityState;
 
                 // const lastMove =   history.moves.slice(-1)[0];
-                const lastMove = getMoveAtIndex(
-                  history.moves,
-                  history.focusedIndex
-                );
+                // TODO: Bring last move back
+                const lm = findMoveAtIndex(history.moves, history.focusedIndex);
+                const lastMove = lm?.isNonMove ? undefined : lm;
 
                 // Don't leeave this here as it's not optimal
                 const inCheckSquaresMap = invoke((): SquareMap => {
@@ -165,7 +171,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                   ) as SquareMap;
                 });
 
-                console.log('inCheckSquaresMap', inCheckSquaresMap);
+                // console.log('inCheckSquaresMap', inCheckSquaresMap);
 
                 return (
                   <>
@@ -179,7 +185,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                           lastMove={lastMove}
                           inCheckSquares={inCheckSquaresMap}
                           onMove={(payload) => {
-                            console.log('learn activity on move', payload);
+                            // console.log('learn activity on move', payload);
 
                             dispatch({ type: 'dropPiece', payload });
 
@@ -311,13 +317,20 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                                     activityState.history.focusedIndex
                                   }
                                   onRefocus={(index) => {
-                                    // console.log('on refocus', index);
                                     dispatch({
                                       type: 'focusHistoryIndex',
                                       payload: { index },
                                     });
+                                    // console.log('on refocus', index);
+                                    // TODO: Bring this back
+                                    // dispatch({
+                                    //   type: 'focusHistoryIndex',
+                                    //   payload: { index },
+                                    // });
                                   }}
                                   onDelete={(atIndex) => {
+                                    console.log('delete at index', atIndex);
+
                                     dispatch({
                                       type: 'deleteHistoryMove',
                                       payload: { atIndex },
@@ -325,9 +338,9 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                                   }}
                                   // containerClassName="px-1"
                                 />
-                                <div className="pt-3 overflow-x-scroll">
+                                <p className="pt-3 overflow-x-scroll text-wrap break-all">
                                   FEN: {activityState.fen}
-                                </div>
+                                </p>
                               </div>
                             </div>
                           </>

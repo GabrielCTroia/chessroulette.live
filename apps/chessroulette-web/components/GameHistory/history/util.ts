@@ -49,6 +49,16 @@ export const getHistoryIndex = (
 
 export const getStartingHistoryIndex = () => getHistoryIndex(-1, 'b');
 
+export const isStartingHistoryIndex = (i: ChessHistoryIndex_NEW) =>
+  areHistoryIndexesEqual(getStartingHistoryIndex(), i);
+
+export const isLastHistoryIndexInBranch = (
+  h: ChessHistory_NEW,
+  i: ChessHistoryIndex_NEW
+) =>
+  !isStartingHistoryIndex(i) && // not the starting one
+  areHistoryIndexesEqual(getHistoryLastIndex(h), i);
+
 export const areHistoryIndexesEqual = (
   a: ChessHistoryIndex_NEW | -1,
   b: ChessHistoryIndex_NEW | -1
