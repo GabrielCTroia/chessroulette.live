@@ -134,7 +134,11 @@ export const ChessboardContainer = ({
         })
       );
 
-    return deepmerge(lastMoveStyle, circledStyle, checkedStyle);
+    return deepmerge(
+      lastMoveStyle || {},
+      circledStyle || {},
+      checkedStyle || {}
+    );
   }, [lastMove, circlesMap, props.sizePx, inCheckSquares, boardTheme]);
 
   const [promoMove, setPromoMove] = useState<ShortChessMove>();

@@ -166,7 +166,6 @@ export default (
 
         // If the moves are the same introduce a non move
         const [nextHistory, addedAtIndex] = invoke(() => {
-          
           const isFocusedIndexLastInBranch = isLastHistoryIndexInBranch(
             prevHistoryMoves,
             prevFocusedIndex
@@ -176,7 +175,11 @@ export default (
           console.log('prevFocusedIndex', prevFocusedIndex);
 
           // const isFocusIndexNested = !!prevFocusedIndex[2];
-          const [prevFocusTurnIndex, prevFocusMovePosition, prevFocusRecursiveIndexes] = prevFocusedIndex;
+          const [
+            prevFocusTurnIndex,
+            prevFocusMovePosition,
+            prevFocusRecursiveIndexes,
+          ] = prevFocusedIndex;
 
           if (prevFocusRecursiveIndexes) {
             console.log('prevFocusRecursiveIndexes', prevFocusRecursiveIndexes);
@@ -196,7 +199,7 @@ export default (
               return addMoveToChessHistory(
                 nextHistory,
                 nextMove,
-                incrementNestedHistoryIndex(addedAtIndex),
+                incrementNestedHistoryIndex(addedAtIndex)
                 // addAtIndex
                 // prev.activityState.history.focusedIndex
               );
@@ -205,7 +208,7 @@ export default (
             return addMoveToChessHistory(
               prev.activityState.history.moves,
               nextMove,
-              addAt,
+              addAt
               // addAtIndex
               // prev.activityState.history.focusedIndex
             );
@@ -214,7 +217,9 @@ export default (
           // console.log('isFocusedIndexLastInBranch', isFocusedIndexLastInBranch);
 
           const addAtIndex = isFocusedIndexLastInBranch
-            ? incrementNestedHistoryIndex(prev.activityState.history.focusedIndex)
+            ? incrementNestedHistoryIndex(
+                prev.activityState.history.focusedIndex
+              )
             : prev.activityState.history.focusedIndex;
 
           // prev.activityState.history.focusedIndex;
@@ -229,13 +234,12 @@ export default (
             return addMoveToChessHistory(nextHistory, nextMove);
           }
 
-
           // If it's not the last branch
           if (!isFocusedIndexLastInBranch) {
             return addMoveToChessHistory(
               prev.activityState.history.moves,
               nextMove,
-              prevFocusedIndex,
+              prevFocusedIndex
               // addAtIndex
               // prev.activityState.history.focusedIndex
             );
@@ -254,7 +258,7 @@ export default (
 
           return addMoveToChessHistory(
             prev.activityState.history.moves,
-            nextMove,
+            nextMove
             // addAtIndex
             // prev.activityState.history.focusedIndex
           );
@@ -327,7 +331,7 @@ export default (
       const historyAtFocusedIndex = getHistoryAtIndex(
         prev.activityState.history.moves,
         action.payload.index
-        // TODO: Add recursive 
+        // TODO: Add recursive
       );
 
       // TOOO// Need to create a history with the branched histories

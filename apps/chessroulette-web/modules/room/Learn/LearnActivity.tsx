@@ -122,11 +122,11 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                 const { activityState } = state.activity;
 
-                // console.group('Learn Activity');
-                // console.log('Activity State', activityState);
-                // console.log('History', activityState.history.moves);
-                // console.log('Focused Index', activityState.history.focusedIndex);
-                // console.groupEnd();
+                console.group('Learn Activity Rerender');
+                console.log('Activity State', activityState);
+                console.log('History', activityState.history.moves);
+                console.log('Focused Index', activityState.history.focusedIndex);
+                console.groupEnd();
 
                 const { history } = activityState;
 
