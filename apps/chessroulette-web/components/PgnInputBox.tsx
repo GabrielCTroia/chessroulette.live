@@ -1,48 +1,68 @@
 import React, { useState } from 'react';
 import { TextArea } from './TextArea';
 import { Button } from './Button';
-import { isValidPgn } from '@xmatter/util-kit';
+import { ChessFENBoard, isValidPgn } from '@xmatter/util-kit';
 import { DragAndDrop } from './DragAndDrop';
+import { Err, Ok, Result } from 'ts-results';
+import useDebouncedEffect from 'use-debounced-effect';
 
 type Props = {
-  onChange: (s: string) => void;
+  onChange: (type: 'FEN' | 'PGN', s: string) => void;
   value?: string;
   isInvalid?: boolean;
   containerClassName?: string;
   contentClassName?: string;
 };
 
-// TODO: Validate PGN
+const isValidFenOrPGN = (input: string): Result<'FEN' | 'PGN', void> => {
+  if (!input) {
+    return Err.EMPTY;
+  }
 
-export const PgnInputBox: React.FC<Props> = ({
-  value = '',
-  isInvalid = false,
-  ...props
-}) => {
+  if (ChessFENBoard.validateFenString(input).ok) {
+    return new Ok('FEN');
+  } else if (isValidPgn(input)) {
+    return new Ok('PGN');
+  }
+
+  return Err.EMPTY;
+};
+
+export const PgnInputBox: React.FC<Props> = ({ value = '', ...props }) => {
   const [input, setInput] = useState<string>();
+  const [validType, setValidType] = useState<'FEN' | 'PGN' | null>();
 
-  // const isValid = useCallback(() => {
-  //   if ()
-  // }, [input])
+  useDebouncedEffect(
+    () => {
+      if (!input) {
+        setValidType(undefined);
+        return;
+      }
+
+      const validType = isValidFenOrPGN(input || '');
+
+      setValidType(validType.ok ? validType.val : null);
+    },
+    250,
+    [input]
+  );
 
   return (
-    <div
-      className={`flex flex-col flex-1 gap-3 bg-slate-600s sp-3 ${props.containerClassName}`}
-    >
+    <div className={`flex flex-col flex-1 gap-3 ${props.containerClassName}`}>
       <div className={`mb-0 flex-1 flex flex-col ${props.contentClassName}`}>
         <TextArea
-          // label="Import PGN"
           value={input}
-          className="h-full bg-red-500"
+          containerClassName={`flex-1 rounded-lg p-1 ${
+            input && validType === null ? 'border border-red-400' : ''
+          }`}
           rows={5}
-          // onChange={(e) => props.onChange(e.target.value)}
           onChange={(e) => setInput(e.target.value)}
-          placeholder="Paste PGN here"
-          hasValidationError={isInvalid}
+          placeholder="Paste or Drag & Drop PGN or FEN here"
+          hasValidationError={!!validType}
         />
         <DragAndDrop
-          fileTypes={['PGN', 'TXT']}
-          className="mt-2 p-2 border-dashed border rounded-md border-slate-600 text-gray-300"
+          fileTypes={['PGN', 'FEN', 'TXT']}
+          className="mt-2 sp-2 border-dashed border rounded-md border-slate-600 text-gray-300"
           onUpload={(f: any) => {
             // TODO: Validate PGN
 
@@ -55,21 +75,30 @@ export const PgnInputBox: React.FC<Props> = ({
             fileData.readAsText(f);
           }}
         >
-          <div className="">Upload or Drop a PGN File here</div>
+          <div className="border p-2 border-dashed rounded-md cursor-pointer">
+            Upload or Drop a PGN or FEN File
+          </div>
         </DragAndDrop>
       </div>
       <div className="flex gap-2">
         <Button
           className="flex-1"
-          disabled={!input}
+          // disabled={!input}
+          disabled={!validType}
           size="sm"
           onClick={() => {
-            if (input && isValidPgn(input)) {
-              props.onChange(input);
+            if (!input) {
+              return;
+            }
+
+            if (ChessFENBoard.validateFenString(input).ok) {
+              props.onChange('FEN', input);
+            } else if (isValidPgn(input)) {
+              props.onChange('PGN', input);
             }
           }}
         >
-          Import
+          Import {validType}
         </Button>
         <Button
           type="clear"

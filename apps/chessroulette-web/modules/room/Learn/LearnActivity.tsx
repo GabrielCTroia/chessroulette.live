@@ -26,7 +26,10 @@ import { Square } from 'react-chessboard/dist/chessboard/types';
 import { SquareMap } from '../activity/reducer';
 import { findMoveAtIndex } from 'apps/chessroulette-web/components/GameHistory/history/util';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
-import { ArrowsUpDownIcon } from '@heroicons/react/16/solid';
+import {
+  ArrowsUpDownIcon,
+  DocumentDuplicateIcon,
+} from '@heroicons/react/16/solid';
 
 type ChessColor = 'white' | 'black';
 
@@ -281,9 +284,18 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                 });
                               }}
                             />
-                            <p className="pt-3 overflow-x-scroll text-wrap break-all">
-                              FEN: {activityState.fen}
-                            </p>
+                            <div className="flex items-space-between p-1 pl-3 border border-slate-400 rounded-lg">
+                              <p className="flex-1 overflow-x-scroll text-wrap break-all text-slate-400">
+                                FEN: {activityState.fen}
+                              </p>
+                              <ClipboardCopyButton
+                                value={activityState.fen}
+                                type="secondary"
+                                size="sm"
+                              >
+                                <DocumentDuplicateIcon className="w-5 h-5 text-slate-400 hover:text-slate-200" />
+                              </ClipboardCopyButton>
+                            </div>
                           </div>
                         ),
                       },
@@ -302,12 +314,19 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         renderContent: (p) => (
                           <PgnInputBox
                             containerClassName="flex-1 h-full"
-                            contentClassName="p-3 bg-slate-500"
-                            onChange={(nextPgn) => {
-                              dispatch({
-                                type: 'importPgn',
-                                payload: nextPgn,
-                              });
+                            contentClassName="p-3 bg-slate-600 rounded-b-lg"
+                            onChange={(inputType, nextInput) => {
+                              if (inputType === 'FEN') {
+                                dispatch({
+                                  type: 'importFen',
+                                  payload: nextInput,
+                                });
+                              } else if (inputType === 'PGN') {
+                                dispatch({
+                                  type: 'importPgn',
+                                  payload: nextInput,
+                                });
+                              }
 
                               p.focus(0);
                             }}

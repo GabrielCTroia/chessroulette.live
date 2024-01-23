@@ -120,7 +120,8 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
     action.type === 'arrowChange' ||
     action.type === 'drawCircle' ||
     action.type === 'clearCircles' ||
-    action.type === 'deleteHistoryMove'
+    action.type === 'deleteHistoryMove' ||
+    action.type === 'importFen'
   ) {
     // console.log('heere')
     return {

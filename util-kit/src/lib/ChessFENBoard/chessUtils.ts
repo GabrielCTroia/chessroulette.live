@@ -160,7 +160,7 @@ export const isPromotableMove = (m: ChessMove, pieceSan: PieceSan) => {
   return (
     piece.type === 'p' && // is pawn
     ((piece.color === 'w' && m.to[1] === '8') || // when white is on the 8th rank
-      (piece.color === 'b' && m.to[1] === '1')) // when black is on the 1st rankƒ
+      (piece.color === 'b' && m.to[1] === '1')) // when black is on the 1st rank
   );
 };
 

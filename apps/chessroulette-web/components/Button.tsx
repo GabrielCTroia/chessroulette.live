@@ -1,5 +1,5 @@
 import React from 'react';
-import { PropsWithChildren, useMemo } from 'react';
+import { PropsWithChildren } from 'react';
 
 export type ButtonProps = PropsWithChildren<{
   type?: 'primary' | 'secondary' | 'clear' | 'custom';
@@ -30,9 +30,11 @@ export const Button: React.FC<ButtonProps> = ({
 }) => {
   return (
     <button
-      className={`hover:cursor-pointer ${classes[type]} ${classes[size]} ${className}`}
+      className={`hover:cursor-pointer ${classes[type]} ${classes[size]} ${
+        disabled ? 'bg-slate-400 hover:bg-slate-400' : ''
+      } ${className}`}
       onClick={onClick}
-      disabled={disabled}
+      disabled={disabled === true}
     >
       {children}
     </button>

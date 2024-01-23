@@ -94,6 +94,7 @@ export const initialLearnActivityState: LearnActivityState = {
 export type ActivityActions =
   | Action<'dropPiece', ChessMove>
   | Action<'importPgn', ChessPGN>
+  | Action<'importFen', ChessFEN>
   | Action<
       'focusHistoryIndex',
       {
@@ -299,7 +300,33 @@ export default (
       }
     }
     // TODO: Bring all of these back
-    else if (action.type === 'importPgn') {
+    else if (action.type === 'importFen') {
+      if (!ChessFENBoard.validateFenString(action.payload).ok) {
+        return prev;
+      }
+
+      const instance = getNewChessGame({
+        fen: action.payload,
+      });
+
+      const nextHistoryMovex = pgnToHistory(action.payload);
+
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          fen: instance.fen(),
+          circles: {},
+          arrows: {},
+          history: {
+            startingFen: ChessFENBoard.STARTING_FEN,
+            moves: nextHistoryMovex,
+            // focusedIndex: nextHistoryMovex.length - 1,
+            focusedIndex: getHistoryLastIndex(nextHistoryMovex),
+          },
+        },
+      };
+    } else if (action.type === 'importPgn') {
       if (!isValidPgn(action.payload)) {
         return prev;
       }

@@ -1,5 +1,5 @@
 import { deepmerge } from 'deepmerge-ts';
-import { isShortChessColor } from '../Chess/lib';
+import { getNewChessGame, isShortChessColor } from '../Chess/lib';
 import {
   ChessFEN,
   ChessFENStateNotation,
@@ -478,6 +478,8 @@ export class ChessFENBoard {
 
     let state: FenState = ChessFENBoard.STARTING_FEN_STATE;
 
+    console.log('validate', fenNotation);
+
     if (turn && isShortChessColor(turn)) {
       state = {
         ...state,
@@ -583,10 +585,26 @@ export class ChessFENBoard {
     return new Ok(s as FenState);
   }
 
-  static validateFenNotation(str: string) {
+  static validateFenStateNotation(str: string) {
     return ChessFENBoard.fenNotationToFenState(str).map(
       () => str as ChessFENStateNotation
     );
+  }
+
+  static validateFenString(str: string) {
+    const slots = str.split(' ');
+
+    if (slots.length !== 6) {
+      return new Err('InvalidState:InvalidNumberOfSlots');
+    }
+
+    try {
+      getNewChessGame().load(str);
+
+      return new Ok(str as ChessFEN);
+    } catch (e) {
+      return new Err(e);
+    }
   }
 
   private static fenStateToFenNotation(fenState: FenState) {
@@ -688,7 +706,7 @@ export class ChessFENBoard {
       return new Err('InvalidFen:AbsentNotation'); // TODO: Add a FEN Validator that will throw this error automatically
     }
 
-    return ChessFENBoard.validateFenNotation(notation);
+    return ChessFENBoard.validateFenStateNotation(notation);
   };
 
   static extractFenPositionNotation = (fen: ChessFEN) => {

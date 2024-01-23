@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Logo } from './Logo';
 import ConnectionStatus from './ConnectionStatus';
+import { config } from '../config';
 
 export default () => {
   return (
@@ -8,7 +9,7 @@ export default () => {
       <Link href="/">
         <Logo />
       </Link>
-      <ConnectionStatus />
+      {config.DEV_MODE && <ConnectionStatus />}
     </header>
   );
 };

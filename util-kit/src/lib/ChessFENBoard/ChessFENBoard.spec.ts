@@ -549,3 +549,41 @@ describe('piece', () => {
   const actualBlackKing = chessFenBoard.piece('e8');
   expect(actualBlackKing).toBe('k');
 });
+
+describe('Validate FEN', () => {
+  test('passes with correct fen', () => {
+    const actual = ChessFENBoard.validateFenString(
+      'r3kb1r/pppqpppp/2np1n2/8/2B1P1b1/P4N2/1PPP1PPP/RNB2RK1 b kq - 5 6'
+    );
+
+    expect(actual.ok).toBe(true);
+  });
+
+  test('passes with correct fen', () => {
+    const actual = ChessFENBoard.validateFenString(
+      'r3kb1r/pppqpppp/2np1n2/8/2B1P1b1/P4N2/1PPP1PPP/RNB2RK1 b kq - 5 4'
+    );
+
+    expect(actual.ok).toBe(true);
+  });
+
+  test('fails with incorrect fen state', () => {
+    const actual = ChessFENBoard.validateFenString(
+      'r3kb1r/pppqpppp/2np1n2/8/2 b kqs - 5 6'
+    );
+
+    expect(actual.ok).toBe(false);
+  });
+
+  test('fails with incorrect fen position notation', () => {
+    const actual = ChessFENBoard.validateFenString('  b kq - 5 6');
+
+    expect(actual.ok).toBe(false);
+  });
+
+  test('fails with incorrect fen position notation', () => {
+    const actual = ChessFENBoard.validateFenString('asdasda  b kq - 5 6');
+
+    expect(actual.ok).toBe(false);
+  });
+});

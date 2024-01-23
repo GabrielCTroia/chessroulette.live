@@ -7,9 +7,9 @@ export default () => {
     // <div>Fix me</div>
     <MovexConnection
       render={({ connected, clientId }) => (
-        <div>
-          <div>{connected ? 'Connected' : 'Not Connected'}</div>
-          <div>Client Id: {clientId}</div>
+        <div className='text-sm text-slate-300 text-right'>
+          <div>{connected ? 'Movex Connected' : 'Not Connected'}</div>
+          <div>Movex Client: {clientId}</div>
         </div>
       )}
     />
