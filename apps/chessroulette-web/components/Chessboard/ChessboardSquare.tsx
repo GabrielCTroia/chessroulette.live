@@ -3,8 +3,14 @@ import { CustomSquareProps } from 'react-chessboard/dist/chessboard/types';
 
 type Props = CustomSquareProps;
 
-export const ChessboardSquare = React.forwardRef(
-  ({ square, squareColor, style: allStyles, children, ...props }: Props) => {
+export const ChessboardSquare = React.forwardRef<
+  HTMLDivElement,
+  CustomSquareProps
+>(
+  (
+    { square, squareColor, style: allStyles, children, ...props }: Props,
+    ref
+  ) => {
     const {
       ['> .circleDiv']: circleStyle,
       ['> .inCheckDiv']: inCheckStyle,
@@ -12,7 +18,7 @@ export const ChessboardSquare = React.forwardRef(
     } = allStyles;
 
     return (
-      <div style={style} {...props}>
+      <div style={style} {...props} ref={ref}>
         {inCheckStyle && typeof inCheckStyle === 'object' && (
           <div style={inCheckStyle} />
         )}
