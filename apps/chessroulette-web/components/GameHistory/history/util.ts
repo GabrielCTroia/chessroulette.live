@@ -21,7 +21,6 @@ import {
   ChessRecursiveHistory_NEW,
 } from './types';
 import { ChessLinearHistory } from '../types';
-import { ShortColor } from 'chessterrain-react';
 
 export const getHistoryNonMoveWhite = (): ChessHistoryWhiteMove_NEW => ({
   color: 'w',
@@ -140,7 +139,7 @@ export const addMoveToChessHistory = (
 ] => {
   const isRecursive = atIndex && findMoveAtIndex(history, atIndex);
 
-  console.log('addMoveToChessHistory', history, move, atIndex);
+  // console.log('addMoveToChessHistory', history, move, atIndex);
 
   // Branched History
   if (isRecursive) {

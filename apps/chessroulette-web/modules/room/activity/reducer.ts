@@ -169,7 +169,7 @@ export default (
             prevFocusedIndex
           );
 
-          console.log('isFocusedIndexLastInBranch', isFocusedIndexLastInBranch);
+          // console.log('isFocusedIndexLastInBranch', isFocusedIndexLastInBranch);
 
           const addAtIndex = isFocusedIndexLastInBranch
             ? incrementHistoryIndex(prev.activityState.history.focusedIndex)
@@ -215,8 +215,8 @@ export default (
         //   // prev.activityState.history.focusedIndex
         // );
 
-        console.log('next history', nextHistory, nextHistory.length);
-        console.log('addedAtIndex', addedAtIndex);
+        // console.log('next history', nextHistory, nextHistory.length);
+        // console.log('addedAtIndex', addedAtIndex);
 
         return {
           ...prev,

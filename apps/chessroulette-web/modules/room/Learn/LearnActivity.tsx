@@ -238,7 +238,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
       rightSideComponent={
         <div className="flex flex-1s flex-col space-between w-full h-full relative min-h-0 min-w-0">
           <div className="flex-1 flex flex-col min-h-0 min-w-0 gap-4">
-            <Streaming rid={props.rid} iceServers={iceServers}/>
+            <Streaming rid={props.rid} iceServers={iceServers} />
 
             <MovexBoundResource
               movexDefinition={movexConfig}
@@ -296,9 +296,9 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                           <Button
                             onClick={p.focus}
                             size="sm"
-                            className={
-                              p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
-                            }
+                            className={`bg-slate-600 font-bold hover:bg-slate-800 ${
+                              p.isFocused && 'bg-slate-800'
+                            }`}
                           >
                             Notation
                           </Button>
@@ -325,16 +325,8 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                       type: 'focusHistoryIndex',
                                       payload: { index },
                                     });
-                                    // console.log('on refocus', index);
-                                    // TODO: Bring this back
-                                    // dispatch({
-                                    //   type: 'focusHistoryIndex',
-                                    //   payload: { index },
-                                    // });
                                   }}
                                   onDelete={(atIndex) => {
-                                    console.log('delete at index', atIndex);
-
                                     dispatch({
                                       type: 'deleteHistoryMove',
                                       payload: { atIndex },
@@ -355,9 +347,9 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                           <Button
                             onClick={p.focus}
                             size="sm"
-                            className={
-                              p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
-                            }
+                            className={`bg-slate-600 font-bold hover:bg-slate-800 ${
+                              p.isFocused && 'bg-slate-800'
+                            }`}
                           >
                             Import
                           </Button>
@@ -380,32 +372,11 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                     ]}
                   />
                 );
-
-                // if (showTab === 'import') {
-                //   return (
-                //     <PgnInputBox
-                //       onChange={(nextPgn) => {
-
-                //         dispatch({
-                //           type: 'importPgn',
-                //           payload: nextPgn,
-                //         });
-                //       }}
-                //     />
-                //   );
-                // }
-
-                // return (
-
-                // );
               }}
             />
           </div>
         </div>
       }
-      // rightSideComponent={<RoomParticipants rid={rid} />}
     />
-
-    // </PeerToPeerProvider>
   );
 };

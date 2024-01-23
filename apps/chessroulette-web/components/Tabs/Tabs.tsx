@@ -48,7 +48,7 @@ export const Tabs = (props: Props) => {
         {tabs.map((c) => c)}
       </div>
     );
-  }, [props.renderContainerHeader]);
+  }, [currentTabIndex, props.renderContainerHeader]);
 
   return (
     <div className={props.containerClassName}>

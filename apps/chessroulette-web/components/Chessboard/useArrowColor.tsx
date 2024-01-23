@@ -27,7 +27,7 @@ export const useArrowColor = (colors = outpostColors) => {
       return;
     }
 
-    console.log('')
+    console.log('Key Down:', event.key);
 
     if (event.key === 'Meta') {
       setColorIndex((prev) => prev + 1);
