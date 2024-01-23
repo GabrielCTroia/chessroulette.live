@@ -42,7 +42,7 @@ export const AspectRatio: React.FC<AspectRatioProps> = React.memo(
     return (
       <div style={props.style} className={props.className}>
         <div className="w-full relative" style={aspectStyle}>
-          <div className="absolute w-full h-full top-0 left-0">
+          <div className="absolute w-full h-full top-0 left-0 bottom-0 right-0">
             {props.children}
           </div>
         </div>

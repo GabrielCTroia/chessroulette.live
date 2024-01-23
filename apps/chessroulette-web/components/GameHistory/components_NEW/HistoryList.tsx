@@ -26,7 +26,7 @@ export type HistoryListProps = {
 );
 
 const scrollIntoView = debounce((elm: HTMLDivElement) => {
-  elm.scrollIntoView({ block: 'end', behavior: 'smooth' });
+  elm.scrollIntoView({ block: 'end', behavior: 'auto' });
 }, 5);
 
 export const HistoryList: React.FC<HistoryListProps> = ({
@@ -56,8 +56,6 @@ export const HistoryList: React.FC<HistoryListProps> = ({
         return;
       }
 
-      // TODO: Add this back
-      // const moveIndex = Math.floor(getChessHistoryMoveIndex(focusedIndex) / 2);
       const [focusedTurnIndex] = focusedIndex;
 
       if (!focusedTurnIndex) {
@@ -65,6 +63,8 @@ export const HistoryList: React.FC<HistoryListProps> = ({
       }
 
       const elm = rowElementRefs.current[focusedTurnIndex];
+
+      console.log('focus into view?', elm);
 
       if (elm) {
         scrollIntoView(elm);
@@ -75,9 +75,11 @@ export const HistoryList: React.FC<HistoryListProps> = ({
   );
 
   useEffect(() => {
-    if (containerElementRef.current) {
-      containerElementRef.current.scrollTo(0, 99999);
-    }
+    setTimeout(() => {
+      if (containerElementRef.current) {
+        containerElementRef.current.scrollTo(0, 9999);
+      }
+    }, 100);
   }, []);
 
   return (
@@ -94,7 +96,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
             ref={(r) => (rowElementRefs.current[historyTurnIndex] = r)}
             historyTurn={historyTurn}
             historyTurnIndex={historyTurnIndex}
-            moveCount={(historyRootTurnIndex + 1) + historyTurnIndex}
+            moveCount={historyRootTurnIndex + 1 + historyTurnIndex}
             onFocus={onRefocus}
             onDelete={onDelete}
             containerClassName={rowClassName}

@@ -4,15 +4,15 @@
 
 body {
   background-color: #161A2B;
-  color: white;
+  color: white;  
 }
 
-
-* { 
-  /* box-sizing: border-box; */
-  /* min-width: 0; */
-  /* min-height: 0; */
-}
+/** This is usper important for "flex" to work correctly */
+/* * {  */
+  /* box-sizing: border-box;
+  min-width: 0; 
+  min-height: 0; */
+/* } */
 
 /* 
 html {

@@ -1,49 +1,35 @@
+import { DesktopRoomLayout, DesktopRoomLayoutProps } from './DesktopRoomLayout';
+
 export type Props = {
-  mainComponent: React.ReactNode;
+  mainComponent: DesktopRoomLayoutProps['renderMainComponent'];
   mainContainerClass?: string;
-  leftSideComponent?: React.ReactNode;
-  rightSideComponent?: React.ReactNode;
+  rightSideComponent?: DesktopRoomLayoutProps['renderRightSideComponent'];
   containerClassName?: string;
 };
 
 // TODO Not sure if this should be a next template or not
 
+const LAYOUT_RATIOS = {
+  leftSide: 0,
+  mainArea: 3,
+  rightSide: 2.5,
+};
+
 export const LearnTemplate = ({
-  leftSideComponent,
   mainComponent,
   mainContainerClass = '',
   rightSideComponent,
   containerClassName,
 }: Props) => {
   return (
-    <section
-      className={`flex h-full gap-6 ${containerClassName} flex-1`}
-      style={
-        {
-          // aspectRatio: 16 / 9,
-        }
-      }
-    >
-      {leftSideComponent && (
-        <aside
-          id="left-side"
-          className="grow"
-          style={{
-            flex: 0.5,
-          }}
-        >
-          {leftSideComponent}
-        </aside>
-      )}
-      <main id="main" className={`flex-1 grow ${mainContainerClass}`}>
-        {mainComponent}
-      </main>
-      {rightSideComponent && (
-        <aside id="right-side" className="flex-1">
-          {rightSideComponent}
-        </aside>
-      )}
-    </section>
-    // <div className="bg-indigo-500 p-2 font-mono">{props.children}</div>
+    <DesktopRoomLayout
+      ratios={LAYOUT_RATIOS}
+      className={containerClassName}
+      renderMainComponent={mainComponent}
+      renderRightSideComponent={rightSideComponent}
+      topHeight={0}
+      minSpaceBetween={16}
+      bottomHeight={0}
+    />
   );
 };
