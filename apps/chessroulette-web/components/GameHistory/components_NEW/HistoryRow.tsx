@@ -6,8 +6,10 @@ import {
   ChessHistoryIndexMovePosition_NEW,
   ChessHistoryIndex_NEW,
   ChessHistoryTurn_NEW,
+  ChessRecursiveHistoryIndex_NEW,
 } from '../history/types';
 import { NestedHistories } from './NestedHistories';
+import { ChessColor, invoke } from '@xmatter/util-kit';
 
 export type HistoryRowProps = {
   rowId: string;
@@ -15,7 +17,8 @@ export type HistoryRowProps = {
   historyTurnIndex: number;
   onFocus: (i: ChessHistoryIndex_NEW) => void;
   onDelete: (i: ChessHistoryIndex_NEW) => void;
-  focus?: ChessHistoryIndexMovePosition_NEW;
+  focusedIndex?: ChessRecursiveHistoryIndex_NEW;
+  // isFocused?: ChessColor;
   isNested?: boolean;
   className?: string;
   containerClassName?: string;
@@ -33,7 +36,8 @@ export const HistoryRow = React.forwardRef<
       onFocus,
       onDelete,
       className,
-      focus,
+      // focus,
+      focusedIndex,
       containerClassName,
       isNested = false,
     },
@@ -55,6 +59,20 @@ export const HistoryRow = React.forwardRef<
         onDelete(blackMoveIndex);
       }
     };
+
+    const [focusedTurnIndex, focusedMovePosition, focusedNestedIndex] =
+      focusedIndex || [];
+    const focus = invoke(() => {
+      console.log("row invoke foucs", focusedIndex, focusedTurnIndex, historyTurnIndex)
+
+      if (focusedNestedIndex) {
+        return undefined;
+      }
+
+      if (focusedTurnIndex === historyTurnIndex) {
+        return focusedMovePosition;
+      }
+    });
 
     return (
       <div className={containerClassName} ref={isNested ? undefined : ref}>
@@ -105,6 +123,7 @@ export const HistoryRow = React.forwardRef<
             onDelete={onDelete}
             className="pl-2 mt-2 border-l border-slate-500 ml-1 sbg-red-500"
             rowClassName={containerClassName}
+            focusedRecursiveIndexes={focusedNestedIndex}
           />
         )}
         {blackMove?.branchedHistories && (
@@ -115,6 +134,7 @@ export const HistoryRow = React.forwardRef<
             onDelete={onDelete}
             className="pl-2 mt-2 border-l border-slate-500 ml-1 sbg-blue-500"
             rowClassName={containerClassName}
+            focusedRecursiveIndexes={focusedNestedIndex}
           />
         )}
       </div>

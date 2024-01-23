@@ -6,6 +6,7 @@ import {
   ChessHistoryIndex_NEW,
   ChessRecursiveHistory_NEW,
 } from '../history/types';
+import { findMoveAtIndex, findTurnAtIndex } from '../history/util';
 
 export type HistoryListProps = {
   history: ChessRecursiveHistory_NEW;
@@ -45,13 +46,23 @@ export const HistoryList: React.FC<HistoryListProps> = ({
         return;
       }
 
+      if (!focusedIndex) {
+        return;
+      }
+
       // TODO: Add this back
       // const moveIndex = Math.floor(getChessHistoryMoveIndex(focusedIndex) / 2);
-      // const elm = rowElementRefs.current[moveIndex];
+      const [focusedTurnIndex] = focusedIndex;
 
-      // if (elm) {
-      // scrollIntoView(elm);
-      // }
+      if (!focusedTurnIndex) {
+        return;
+      }
+
+      const elm = rowElementRefs.current[focusedTurnIndex];
+
+      if (elm) {
+        scrollIntoView(elm);
+      }
     },
     100,
     [history, focusedIndex, isNested]
@@ -59,13 +70,17 @@ export const HistoryList: React.FC<HistoryListProps> = ({
 
   useEffect(() => {
     if (containerElementRef.current) {
-      containerElementRef.current.scrollTo(0, -99999);
+      containerElementRef.current.scrollTo(0, 99999);
     }
   }, []);
 
-  console.log('focus', focusedIndex);
+  // console.group('History list', isNested ? 'nested' : 'root', findTurnAtIndex(history, [rootTurnIndex, 0])?.[0].san);
+  // console.log('focused index', focusedIndex)
+  // console.log('history', history.map((s, i) => [`${i}:`, s[0].san, s[1]?.san]).join(' '))
+  // // console.log('branched?', history.map((s) => [s[0].san, s[1]?.san]).join(' '))
+  // console.groupEnd();
 
-  const [focusedHistoryTurnIndex, focusedMovePosition] = focusedIndex || [];
+  // const [focusedHistoryTurnIndex, focusedMovePosition] = focusedIndex || [];
 
   return (
     <div className={className} ref={(e) => (containerElementRef.current = e)}>
@@ -85,7 +100,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
             onDelete={onDelete}
             containerClassName={rowClassName}
             isNested={isNested}
-            focus={focusedHistoryTurnIndex === historyTurnIndex ? focusedMovePosition : undefined}
+            focusedIndex={focusedIndex}
           />
         );
       })}

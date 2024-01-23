@@ -84,17 +84,17 @@ export type ChessHistory_NEW = ChessRecursiveHistory_NEW;
 
 export type ChessHistoryIndexMovePosition_NEW = 0 | 1; // 0 = white, 1 = black
 
+export type ChessHistoryRecursiveIndexes_NEW = [
+  recursiveHistoryIndex: -1 | ChessRecursiveHistoryIndex_NEW, // '-1' = end of history
+  paralelBranchesIndex?: number // Defaults to 0 (root), '-1' = apends?
+];
+
 export type ChessRecursiveHistoryIndex_NEW =
   | [
       turn: number, // 0, 1, 2, 3
       move: ChessHistoryIndexMovePosition_NEW,
-      recursiveIndexes?: ChessHistoryRecursiveIndexes
+      recursiveIndexes?: ChessHistoryRecursiveIndexes_NEW
     ];
-
-export type ChessHistoryRecursiveIndexes = [
-  recursiveHistoryIndex: -1 | ChessRecursiveHistoryIndex_NEW, // '-1' = end of history
-  paralelBranchesIndex?: number // Defaults to 0 (root), '-1' = apends?
-];
 
 export type ChessHistoryIndex_NEW = ChessRecursiveHistoryIndex_NEW;
 // | [

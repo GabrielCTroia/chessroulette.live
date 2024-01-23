@@ -1,41 +1,26 @@
-import { ChessMove } from '@xmatter/util-kit';
-import { isChessRecursiveHistoryIndex } from '../lib';
-import {
-  ChessHistoryIndex,
-  ChessRecursiveBlackMove,
-  ChessRecursiveHistory,
-  ChessRecursiveWhiteMove,
-  PairedMove,
-} from '../types';
 import { HistoryList } from './HistoryList';
-import { Text } from '../../Text';
-import { isPartialBlackMove } from '../util';
 import {
   ChessHistoryIndex_NEW,
-  ChessHistoryTurn_NEW,
+  ChessHistoryRecursiveIndexes_NEW,
   ChessHistory_NEW,
 } from '../history/types';
 import { HistoryRowProps } from './HistoryRow';
+import { invoke } from '@xmatter/util-kit';
 
 type Props = {
   branchedHistories: ChessHistory_NEW[];
-
-  // startingLinearIndex: number;
-  // historyTurn: ChessHistoryTurn_NEW;
   historyIndex: ChessHistoryIndex_NEW;
-  // pairedMove: PairedMove;
   onFocus: (i: ChessHistoryIndex_NEW) => void;
   onDelete: (i: ChessHistoryIndex_NEW) => void;
-  focusedIndex?: ChessHistoryIndex_NEW;
-  // whiteMove?: ChessRecursiveWhiteMove;
-  // blackMove?: ChessRecursiveBlackMove;
-  rowClassName?: HistoryRowProps['className']; 
+  focusedRecursiveIndexes?: ChessHistoryRecursiveIndexes_NEW;
+  rowClassName?: HistoryRowProps['className'];
   className?: string;
 };
 
 export const NestedHistories = ({
   branchedHistories,
   historyIndex,
+  focusedRecursiveIndexes,
   className,
   rowClassName,
   onFocus,
@@ -58,24 +43,61 @@ export const NestedHistories = ({
     ];
   };
 
+  console.log(
+    'Nested histories: focusedRecursiveIndexes',
+    focusedRecursiveIndexes
+  );
+
   return (
     <>
-      {branchedHistories.map((branchedHistory, branchIndex) => (
-        <HistoryList
-          key={`${turnIndex}-${movePosition}--${branchIndex}`}
-          history={branchedHistory}
-          rootTurnIndex={turnIndex}
-          onRefocus={(nestedIndex) => {
-            onFocus(constructNestedIndex(nestedIndex, branchIndex));
-          }}
-          onDelete={(nestedIndex) => {
-            onDelete(constructNestedIndex(nestedIndex, branchIndex));
-          }}
-          className={className}
-          rowClassName={rowClassName}
-          isNested={true}
-        />
-      ))}
+      {branchedHistories.map((branchedHistory, branchIndex) => {
+        const focusedIndex = invoke((): ChessHistoryIndex_NEW | undefined => {
+          if (!focusedRecursiveIndexes) {
+            return undefined;
+          }
+
+          const [recursiveHistoryIndex, paralelBranchesIndex] =
+            focusedRecursiveIndexes;
+
+          if (recursiveHistoryIndex === -1) {
+            return undefined;
+          }
+
+          // If it's not on the branch index return
+          if (paralelBranchesIndex !== branchIndex) {
+            return undefined;
+          }
+
+          const [focusedTurnIndex, focuedMoveCount] = recursiveHistoryIndex;
+
+          // if (focusedTurnIndex !== turnIndex) {
+          //   return undefined;
+          // }
+          // TODO: Fix this!!!
+
+          return [focusedTurnIndex + turnIndex, focuedMoveCount];
+        });
+
+        // console.log('Nested Histories: focused index', focusedIndex);
+
+        return (
+          <HistoryList
+            key={`${turnIndex}-${movePosition}--${branchIndex}`}
+            history={branchedHistory}
+            rootTurnIndex={turnIndex}
+            onRefocus={(nestedIndex) => {
+              onFocus(constructNestedIndex(nestedIndex, branchIndex));
+            }}
+            onDelete={(nestedIndex) => {
+              onDelete(constructNestedIndex(nestedIndex, branchIndex));
+            }}
+            className={className}
+            rowClassName={rowClassName}
+            isNested
+            focusedIndex={focusedIndex}
+          />
+        );
+      })}
     </>
   );
 };

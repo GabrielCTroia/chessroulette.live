@@ -10,7 +10,7 @@ import {
   ChessHistoryBlackMove_NEW,
   ChessHistoryIndex_NEW,
   ChessHistoryMove_NEW,
-  ChessHistoryRecursiveIndexes,
+  ChessHistoryRecursiveIndexes_NEW,
   ChessHistoryWhiteMove_NEW,
   ChessHistory_NEW,
   ChessRecursiveHistoryFullTurn_NEW,
@@ -21,6 +21,7 @@ import {
   ChessRecursiveHistory_NEW,
 } from './types';
 import { ChessLinearHistory } from '../types';
+import { ShortColor } from 'chessterrain-react';
 
 export const getHistoryNonMoveWhite = (): ChessHistoryWhiteMove_NEW => ({
   color: 'w',
@@ -29,6 +30,17 @@ export const getHistoryNonMoveWhite = (): ChessHistoryWhiteMove_NEW => ({
   from: undefined,
   to: undefined,
 });
+
+export const getHistoryNonMove = <T extends ChessHistoryMove_NEW>(
+  color: T['color']
+) =>
+  ({
+    color,
+    san: '...',
+    isNonMove: true,
+    from: undefined,
+    to: undefined,
+  } as ChessHistoryMove_NEW); // TODO: This could be infered more
 
 export const getHistoryIndex = (
   turn: number,
@@ -55,17 +67,17 @@ export const findTurnAtIndex = (
 
 const getHistoryLastTurn = (
   history: ChessHistory_NEW
-): ChessRecursiveHistoryTurn_NEW => history.slice(-1)[0];
+): ChessRecursiveHistoryTurn_NEW | undefined => history.slice(-1)[0];
 
 export const getHistoryLastIndex = (
   history: ChessHistory_NEW,
-  recursiveIndexes?: ChessHistoryRecursiveIndexes
+  recursiveIndexes?: ChessHistoryRecursiveIndexes_NEW
   // branchIndex?: number
 ): ChessHistoryIndex_NEW => {
   const lastTurn = getHistoryLastTurn(history);
 
   // The reason it's done as a tuple is so it can be spread which on undefined it becomes empty
-  const recursiveIndexesTuple: [ChessHistoryRecursiveIndexes] | [] =
+  const recursiveIndexesTuple: [ChessHistoryRecursiveIndexes_NEW] | [] =
     typeof recursiveIndexes !== 'undefined' ? [recursiveIndexes] : [];
 
   if (!lastTurn) {
@@ -87,16 +99,16 @@ export const addMoveToChessHistory = (
   nextHistory: ChessRecursiveHistory_NEW,
   nextIndex: ChessHistoryIndex_NEW
 ] => {
-  console.log('addMoveToChessHistory', history, atIndex);
+  const isRecursive = atIndex && findMoveAtIndex(history, atIndex);
 
   // Branched History
-  if (atIndex) {
+  if (isRecursive) {
     const [turnIndex, moveIndex, recursiveIndexes] = atIndex;
     const prevMoveAtIndex = findMoveAtIndex(history, [turnIndex, moveIndex]);
 
     // if move isn't find return Prev
     if (!prevMoveAtIndex) {
-      // console.log('and fails here');
+      console.log('and fails here');
       // TODO: Add test case for this
 
       return [history, getHistoryLastIndex(history)];
@@ -167,7 +179,7 @@ export const addMoveToChessHistory = (
           nextHistoryBranch,
         ];
 
-        const nextRecursiveIndexes: ChessHistoryRecursiveIndexes = [
+        const nextRecursiveIndexes: ChessHistoryRecursiveIndexes_NEW = [
           [...getHistoryLastIndex(nextHistoryBranch)],
           nextBranchedHistories.length - 1, // The last branch
         ];
@@ -205,11 +217,11 @@ export const addMoveToChessHistory = (
 
   // Linear
 
-  const prevTurn = getHistoryLastTurn(history);
-
   const nextHistory = invoke(() => {
-    if (isHalfTurn(prevTurn)) {
-      const historyWithoutLastTurn = getHistoryToIndex(
+    const prevTurn = getHistoryLastTurn(history);
+
+    if (prevTurn && isHalfTurn(prevTurn)) {
+      const historyWithoutLastTurn = getHistoryAtIndex(
         history,
         decrementHistoryIndex(getHistoryLastIndex(history))
       );
@@ -227,32 +239,33 @@ export const addMoveToChessHistory = (
 };
 
 /**
- * Returns the History up to the given index. Returns all history if the index is greater
+ * Returns the History at the given index (including the index). Returns all history if the index is greater
  *
  * @param history
  * @param toIndex inclusive
  * @returns
  */
-export const getHistoryToIndex = (
+export const getHistoryAtIndex = (
   history: ChessHistory_NEW,
   toIndex: ChessHistoryIndex_NEW
 ): ChessHistory_NEW => {
-  const [turn, move] = toIndex;
-  if (turn === 0 && move === 0) {
+  const [turnIndex, movePosition] = toIndex;
+
+  // Don't return last items as it's the default for array.slice() with negative numbers
+  if (turnIndex < 0) {
     return [];
   }
 
-  const historyToIndex = history.slice(0, turn) as ChessHistory_NEW;
-  const turnAtIndex = history.slice(turn, turn + 1)[0];
+  const turnsToIndex = history.slice(0, turnIndex) as ChessHistory_NEW;
+  const turnAtIndex = history[turnIndex];
 
-  // Return early if 'turnAtIndexæ doesn't exist
   if (!turnAtIndex) {
-    return historyToIndex;
+    return turnsToIndex;
   }
 
   return [
-    ...historyToIndex,
-    move === 0 ? [turnAtIndex[0]] : turnAtIndex,
+    ...turnsToIndex,
+    movePosition === 0 ? [turnAtIndex[0]] : turnAtIndex,
   ] as ChessHistory_NEW;
 };
 

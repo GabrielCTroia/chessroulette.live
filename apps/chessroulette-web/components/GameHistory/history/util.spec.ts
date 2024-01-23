@@ -15,7 +15,7 @@ import {
   decrementHistoryIndex,
   findMoveAtIndex,
   getHistoryLastIndex,
-  getHistoryToIndex,
+  getHistoryAtIndex,
 } from './util';
 
 describe('History Index', () => {
@@ -82,20 +82,29 @@ describe('Find Move At Index', () => {
 });
 
 describe('Get History To Index', () => {
-  test('Get History At Starting Index', () => {
-    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 0]);
+  test('Get Empty History', () => {
+    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [-1, 1]);
 
     expect(actual).toEqual([]);
   });
 
-  test('Get History At Longer than length Index', () => {
-    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [19, 1]);
+  test('Get History At Starting Index', () => {
+    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 0]);
 
-    expect(actual).toEqual(LONG_HISTORY_WITH_HALF_LAST_TURN);
+    expect(actual).toEqual([
+      [
+        {
+          from: 'e2',
+          to: 'e4',
+          color: 'w',
+          san: 'e4',
+        },
+      ],
+    ]);
   });
 
   test('Get History At 1st Full Turn Index ', () => {
-    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
+    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
 
     expect(actual).toEqual([
       [
@@ -116,7 +125,7 @@ describe('Get History To Index', () => {
   });
 
   test('Get History At Half Turn Index ', () => {
-    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 0]);
+    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 0]);
 
     expect(actual).toEqual([
       [
@@ -145,7 +154,7 @@ describe('Get History To Index', () => {
   });
 
   test('Get History At Full Turn Index ', () => {
-    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 1]);
+    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 1]);
 
     expect(actual).toEqual([
       [
@@ -179,33 +188,10 @@ describe('Get History To Index', () => {
     ]);
   });
 
-  test('Get History At Half Turn Index ', () => {
-    const actual = getHistoryToIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 0]);
+  test('Get History At Longer than length Index', () => {
+    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [19, 1]);
 
-    expect(actual).toEqual([
-      [
-        {
-          from: 'e2',
-          to: 'e4',
-          color: 'w',
-          san: 'e4',
-        },
-        {
-          from: 'e7',
-          to: 'e6',
-          color: 'b',
-          san: 'e6',
-        },
-      ],
-      [
-        {
-          from: 'd2',
-          to: 'd4',
-          color: 'w',
-          san: 'd4',
-        },
-      ],
-    ]);
+    expect(actual).toEqual(LONG_HISTORY_WITH_HALF_LAST_TURN);
   });
 });
 
