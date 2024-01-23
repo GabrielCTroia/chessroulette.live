@@ -26,22 +26,9 @@ import {
   incrementHistoryIndex,
   pgnToHistory,
   findMoveAtIndex,
-  getHistoryNonMoveWhite,
   getHistoryNonMove,
-  areHistoryIndexesEqual,
   isLastHistoryIndexInBranch,
 } from 'apps/chessroulette-web/components/GameHistory/history/util';
-import {
-  // addMoveToChessHistory,
-  decrementChessHistoryIndex,
-  getChessHistoryAtIndex,
-  // pgnToHistory,
-} from 'apps/chessroulette-web/components/GameHistory/lib';
-import {
-  ChessHistoryIndex,
-  ChessRecursiveHistory,
-} from 'apps/chessroulette-web/components/GameHistory/types';
-// import { Color } from 'chessterrain-react';
 import { Action } from 'movex-core-util';
 import { Square } from 'react-chessboard/dist/chessboard/types';
 
@@ -190,23 +177,33 @@ export default (
 
           prev.activityState.history.focusedIndex;
 
-          // TODO: Add back for invalid moves
-          // if (prevMove?.color === nextMove.color) {
-          //   const [nextHistory, addedAtIndex] = addMoveToChessHistory(
-          //     prev.activityState.history.moves,
-          //     getHistoryNonMove(swapColor(nextMove.color)),
-          //     addAtIndex
-          //   );
+          // if 1st move is black add a non move
+          if (!prevMove && nextMove.color === 'b') {
+            const [nextHistory, addedAtIndex] = addMoveToChessHistory(
+              prev.activityState.history.moves,
+              getHistoryNonMove(swapColor(nextMove.color))
+            );
 
-          //   return addMoveToChessHistory(nextHistory, nextMove, addedAtIndex);
-          // } else {
+            return addMoveToChessHistory(nextHistory, nextMove);
+          }
+
+          // Add nonMoves for skipping one
+          if (prevMove?.color === nextMove.color) {
+            const [nextHistory, addedAtIndex] = addMoveToChessHistory(
+              prev.activityState.history.moves,
+              getHistoryNonMove(swapColor(nextMove.color)),
+              addAtIndex
+            );
+
+            return addMoveToChessHistory(nextHistory, nextMove);
+          }
+
           return addMoveToChessHistory(
             prev.activityState.history.moves,
             nextMove,
             addAtIndex
             // prev.activityState.history.focusedIndex
           );
-          // }
         });
 
         // console.log('prevMove', prevMove);

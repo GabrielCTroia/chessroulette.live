@@ -77,31 +77,33 @@ export const HistoryRow = React.forwardRef<
             className={`flex-1 cursor-pointer p-1 sbg-slate-600 hover:bg-slate-500 ${
               focus === 0 && 'font-black bg-slate-600'
             }`}
-            onClick={() => onFocus(whiteMoveIndex)}
             onContextMenu={(event) =>
               show({ event, props: { color: 'white' } })
             }
+            onClick={() => {
+              if (!whiteMove.isNonMove) {
+                onFocus(whiteMoveIndex);
+              }
+            }}
           >
-            {whiteMove.san} |{' '}
-            <Text className="text-xs text-gray-100">
-              ({historyTurnIndex} 0)
-            </Text>
+            {whiteMove.san}
           </Text>
 
           {blackMove ? (
             <Text
-              className={`flex-1 cursor-pointer p-1 sbg-slate-400 hover:bg-slate-500 ${
+              className={`flex-1 cursor-pointer p-1 hover:bg-slate-500 ${
                 focus === 1 && 'font-black bg-slate-600'
               }`}
-              onClick={() => onFocus(blackMoveIndex)}
+              onClick={() => {
+                if (!blackMove.isNonMove) {
+                  onFocus(blackMoveIndex);
+                }
+              }}
               onContextMenu={(event) =>
                 show({ event, props: { color: 'black' } })
               }
             >
-              {blackMove.san}{' '}
-              <Text className="text-xs text-gray-100">
-                ({historyTurnIndex} 1)
-              </Text>
+              {blackMove.san}
             </Text>
           ) : (
             <div className="flex-1" />
