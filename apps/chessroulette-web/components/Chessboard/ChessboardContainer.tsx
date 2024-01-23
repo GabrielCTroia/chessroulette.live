@@ -29,6 +29,7 @@ import { noop } from 'movex-core-util';
 import { shallowEqualObjects } from 'shallow-equal';
 import { deepmerge } from 'deepmerge-ts';
 import { ChessboardSquare } from './ChessboardSquare';
+import { useBoardTheme } from './useBoardTheme';
 
 type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
@@ -60,13 +61,15 @@ export const ChessboardContainer = ({
   boardOrientation = 'white',
   ...props
 }: ChessboardContainerProps) => {
+  const boardTheme = useBoardTheme();
+
   const customStyles = useMemo(
     () => ({
       customDarkSquareStyle: props.customDarkSquareStyle || {
-        backgroundColor: 'rgba(0, 163, 255, .4)',
+        backgroundColor: boardTheme.darkSquare,
       },
       customLightSquareStyle: props.customLightSquareStyle || {
-        backgroundColor: 'white',
+        backgroundColor: boardTheme.lightSquare,
       },
       customBoardStyle: props.customBoardStyle || { backgroundColor: 'white' },
     }),
@@ -82,14 +85,10 @@ export const ChessboardContainer = ({
   const customSquareStyles = useMemo(() => {
     const lastMoveStyle = lastMove && {
       [lastMove.from]: {
-        background: isDarkSquare(lastMove.from)
-          ? 'rgba(234, 183, 255, .6)'
-          : 'rgba(234, 183, 255, .3)',
+        background: boardTheme.lastMoveFromSquare,
       },
       [lastMove.to]: {
-        background: isDarkSquare(lastMove.to)
-          ? 'rgba(234, 183, 255, .6)'
-          : 'rgba(234, 183, 255, .3)',
+        background: boardTheme.lastMoveToSquare,
       },
     };
 
@@ -136,7 +135,7 @@ export const ChessboardContainer = ({
       );
 
     return deepmerge(lastMoveStyle, circledStyle, checkedStyle);
-  }, [lastMove, circlesMap, props.sizePx, inCheckSquares]);
+  }, [lastMove, circlesMap, props.sizePx, inCheckSquares, boardTheme]);
 
   const [promoMove, setPromoMove] = useState<ShortChessMove>();
   const [localBoardArrowsMap, setLocalBoardArrowsMap] = useState<ArrowsMap>({});

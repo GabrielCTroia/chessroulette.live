@@ -53,10 +53,15 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   // console.log('learn acivity', props.iceServers);
 
   const [nextUserId, setNextUserId] = useState(getRandomInt(0, 99999));
-  const inviteUrl = useMemo(
-    () => (url ? url.host + url.pathname + `?userId=${nextUserId}` : ''),
-    [url, nextUserId]
-  );
+  const inviteUrl = useMemo(() => {
+    if (!url) {
+      return '';
+    }
+
+    url.searchParams.set('userId', String(nextUserId));
+
+    return url.href;
+  }, [url, nextUserId]);
 
   // const ridAsStr = useMemo(
   //   () => toResourceIdentifierStr(props.rid),
