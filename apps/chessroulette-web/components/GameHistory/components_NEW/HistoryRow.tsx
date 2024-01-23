@@ -69,57 +69,93 @@ export const HistoryRow = React.forwardRef<
       }
     });
 
+    const shouldSplit = !!whiteMove.branchedHistories;
+
+    const blackMoveRender = blackMove ? (
+      <Text
+        className={`flex-1 cursor-pointer p-1 hover:bg-slate-500 ${
+          focus === 1 && 'font-black bg-slate-600'
+        }`}
+        onClick={() => {
+          if (!blackMove.isNonMove) {
+            onFocus(blackMoveIndex);
+          }
+        }}
+        onContextMenu={(event) => show({ event, props: { color: 'black' } })}
+      >
+        {blackMove.san}
+      </Text>
+    ) : (
+      <div className="flex-1" />
+    );
+
     return (
       <div className={containerClassName} ref={isNested ? undefined : ref}>
-        <div className={`flex ${className}`}>
-          <Text className="flex-0 p-1 pr-2 cursor-pointer">{moveCount}.</Text>
-          <Text
-            className={`flex-1 cursor-pointer p-1 sbg-slate-600 hover:bg-slate-500 ${
-              focus === 0 && 'font-black bg-slate-600'
-            }`}
-            onContextMenu={(event) =>
-              show({ event, props: { color: 'white' } })
-            }
-            onClick={() => {
-              if (!whiteMove.isNonMove) {
-                onFocus(whiteMoveIndex);
-              }
-            }}
-          >
-            {whiteMove.san}
-          </Text>
-
-          {blackMove ? (
+        <div className={`flex ${className} ${shouldSplit && 'flex-col'}`}>
+          <div id="header" className="flex flex-1">
+            <Text className="flex-0 p-1 pr-2 cursor-pointer">{moveCount}.</Text>
             <Text
-              className={`flex-1 cursor-pointer p-1 hover:bg-slate-500 ${
-                focus === 1 && 'font-black bg-slate-600'
+              className={`flex-1 cursor-pointer p-1 sbg-slate-600 hover:bg-slate-500 ${
+                focus === 0 && 'font-black bg-slate-600'
               }`}
+              onContextMenu={(event) =>
+                show({ event, props: { color: 'white' } })
+              }
               onClick={() => {
-                if (!blackMove.isNonMove) {
-                  onFocus(blackMoveIndex);
+                if (!whiteMove.isNonMove) {
+                  onFocus(whiteMoveIndex);
                 }
               }}
-              onContextMenu={(event) =>
-                show({ event, props: { color: 'black' } })
-              }
             >
-              {blackMove.san}
+              {whiteMove.san}
             </Text>
-          ) : (
-            <div className="flex-1" />
+
+            {shouldSplit ? (
+              <Text
+                className={`flex-1 cursor-pointer p-1 hover:bg-slate-500`}
+                onContextMenu={(event) =>
+                  show({ event, props: { color: 'white' } })
+                }
+              >
+                ...
+              </Text>
+            ) : (
+              blackMoveRender
+            )}
+          </div>
+          {whiteMove.branchedHistories && (
+            <div>
+              <>
+                <NestedHistories
+                  branchedHistories={whiteMove.branchedHistories}
+                  historyIndex={[historyTurnIndex, 0]}
+                  onFocus={onFocus}
+                  onDelete={onDelete}
+                  className="pl-2 mt-2 border-l border-slate-500 ml-1 sbg-red-500"
+                  rowClassName={containerClassName}
+                  focusedRecursiveIndexes={focusedNestedIndex}
+                />
+              </>
+            </div>
+          )}
+          {shouldSplit && (
+            <div className="flex flex-1">
+              <Text className="flex-0 p-1 pr-2 cursor-pointer">
+                {moveCount}.
+              </Text>
+              <Text
+                className="flex-1 cursor-pointer p-1 hover:bg-slate-500"
+                onContextMenu={(event) =>
+                  show({ event, props: { color: 'black' } })
+                }
+              >
+                ...
+              </Text>
+              {blackMoveRender}
+            </div>
           )}
         </div>
-        {whiteMove.branchedHistories && (
-          <NestedHistories
-            branchedHistories={whiteMove.branchedHistories}
-            historyIndex={[historyTurnIndex, 0]}
-            onFocus={onFocus}
-            onDelete={onDelete}
-            className="pl-2 mt-2 border-l border-slate-500 ml-1 sbg-red-500"
-            rowClassName={containerClassName}
-            focusedRecursiveIndexes={focusedNestedIndex}
-          />
-        )}
+
         {blackMove?.branchedHistories && (
           <NestedHistories
             branchedHistories={blackMove.branchedHistories}

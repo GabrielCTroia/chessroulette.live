@@ -13,7 +13,52 @@ import {
   ChessRecursiveHistoryFullTurn_NEW,
   ChessRecursiveHistoryHalfTurn_NEW,
 } from './types';
-import { addMoveToChessHistory, getHistoryNonMoveWhite } from './util';
+import {
+  addMoveToChessHistory,
+  decrementNestedHistoryIndex,
+  findMoveAtIndexRecursively,
+  getHistoryNonMoveWhite,
+  incrementHistoryIndex,
+  incrementNestedHistoryIndex,
+} from './util';
+
+describe('Nested indexes', () => {
+  test('increment one generation nested index', () => {
+    const index: ChessHistoryIndex_NEW = [0, 0, [[0, 1], 0]];
+    const actual = incrementNestedHistoryIndex(index);
+
+    expect(actual).toEqual([0, 0, [[1, 0], 0]]);
+  });
+
+  test('increment multi generatation nested index', () => {
+    const index: ChessHistoryIndex_NEW = [
+      0,
+      0,
+      [[0, 1, [[2, 0, [[5, 1], 0]], 2]], 0],
+    ];
+    const actual = incrementNestedHistoryIndex(index);
+
+    expect(actual).toEqual([0, 0, [[0, 1, [[2, 0, [[6, 0], 0]], 2]], 0]]);
+  });
+
+  test('decrement one generation nested index', () => {
+    const index: ChessHistoryIndex_NEW = [0, 0, [[0, 1], 0]];
+    const actual = decrementNestedHistoryIndex(index);
+
+    expect(actual).toEqual([0, 0, [[0, 0], 0]]);
+  });
+
+  test('decrement multi generatation nested index', () => {
+    const index: ChessHistoryIndex_NEW = [
+      0,
+      0,
+      [[0, 1, [[2, 0, [[5, 1], 0]], 2]], 0],
+    ];
+    const actual = decrementNestedHistoryIndex(index);
+
+    expect(actual).toEqual([0, 0, [[0, 1, [[2, 0, [[5, 0], 0]], 2]], 0]]);
+  });
+});
 
 describe('Add Nested Move', () => {
   test('adds a first branched history (Black Move) to a Half turn (White Move)', () => {
@@ -428,6 +473,73 @@ describe('Multi level nested histories', () => {
     // console.log('expected', JSON.stringify(expected, null, 2));
 
     expect(actual).toEqual(expected);
+  });
+});
+
+describe('Find Move At Index Recursively', () => {
+  test('finds the correct nested Move', () => {
+    const nestedHistory = [
+      [
+        {
+          from: 'd2',
+          to: 'd4',
+          san: 'd4',
+          color: 'w',
+          branchedHistories: [
+            [
+              [
+                {
+                  isNonMove: true,
+                  san: '...',
+                  color: 'w',
+                },
+                {
+                  from: 'b7',
+                  to: 'b5',
+                  color: 'b',
+                  san: 'b5',
+                  branchedHistories: [
+                    [
+                      [
+                        {
+                          from: 'b2',
+                          to: 'b4',
+                          color: 'w',
+                          san: 'b4',
+                        },
+                      ],
+                    ],
+                  ],
+                },
+              ],
+            ],
+          ],
+        },
+        {
+          from: 'd7',
+          to: 'd5',
+          san: 'd5',
+          color: 'b',
+        },
+      ],
+    ] as ChessHistory_NEW;
+
+    const actual = findMoveAtIndexRecursively(nestedHistory, [
+      0,
+      0,
+      [[0, 1, [[0, 0]]]], // should be b7
+    ]);
+
+    // [[0, 0]]
+
+    console.log('actual', JSON.stringify(actual, null, 2));
+
+    expect(actual).toEqual({
+      from: 'b2',
+      to: 'b4',
+      color: 'w',
+      san: 'b4',
+    });
   });
 });
 

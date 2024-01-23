@@ -11,6 +11,7 @@ import {
   ChessHistoryIndex_NEW,
   ChessHistoryMove_NEW,
   ChessHistoryRecursiveIndexes_NEW,
+  ChessHistoryTurn_NEW,
   ChessHistoryWhiteMove_NEW,
   ChessHistory_NEW,
   ChessRecursiveHistoryFullTurn_NEW,
@@ -90,6 +91,47 @@ export const areHistoryIndexesEqual = (
 export const incrementHistoryIndex = ([turn, move]: ChessHistoryIndex_NEW) =>
   (move === 1 ? [turn + 1, 0] : [turn, move + 1]) as ChessHistoryIndex_NEW;
 
+export const incrementNestedHistoryIndex = ([
+  turn,
+  move,
+  recursiveIndexes,
+]: ChessHistoryIndex_NEW): ChessHistoryIndex_NEW => {
+  if (recursiveIndexes) {
+    if (recursiveIndexes[0] === -1) {
+      throw new Error('This is not good. need to change it from -1');
+    }
+
+    return [
+      turn,
+      move,
+      [incrementNestedHistoryIndex(recursiveIndexes[0]), recursiveIndexes[1]],
+    ];
+  }
+
+  return incrementHistoryIndex([turn, move]);
+};
+
+// TODO: Rename to decrementHistoryIndexRecrsively
+export const decrementNestedHistoryIndex = ([
+  turn,
+  move,
+  recursiveIndexes,
+]: ChessHistoryIndex_NEW): ChessHistoryIndex_NEW => {
+  if (recursiveIndexes) {
+    if (recursiveIndexes[0] === -1) {
+      throw new Error('This is not good. need to change it from -1');
+    }
+
+    return [
+      turn,
+      move,
+      [decrementNestedHistoryIndex(recursiveIndexes[0]), recursiveIndexes[1]],
+    ];
+  }
+
+  return decrementHistoryIndex([turn, move]);
+};
+
 export const decrementHistoryIndex = ([turn, move]: ChessHistoryIndex_NEW) =>
   (move === 1 ? [turn, move - 1] : [turn - 1, 1]) as ChessHistoryIndex_NEW;
 
@@ -101,7 +143,44 @@ export const findMoveAtIndex = (
 export const findTurnAtIndex = (
   history: ChessHistory_NEW,
   [turn]: ChessHistoryIndex_NEW
-) => history[turn];
+) => {
+  return history[turn];
+};
+
+export const findTurnAtIndexRecursively = (
+  history: ChessHistory_NEW,
+  [turn, movePosition, recursiveHistoryIndex]: ChessHistoryIndex_NEW
+): ChessHistoryTurn_NEW | undefined => {
+  // console.log('findTurnAtIndexRecursively', history, [turn, movePosition]);
+  
+  if (recursiveHistoryIndex) {
+    // console.log('> recursiveHistoryIndex', recursiveHistoryIndex);
+    const [recursiveIndexes, paralelBranchIndex = 0] = recursiveHistoryIndex;
+
+    const nestedHistory =
+      history[turn][movePosition]?.branchedHistories?.[paralelBranchIndex];
+
+    if (!nestedHistory) {
+      return undefined;
+    }
+
+    // console.log('> recursiveIndexes', recursiveIndexes);
+
+    return findTurnAtIndexRecursively(
+      nestedHistory,
+      recursiveIndexes === -1
+        ? getHistoryLastIndex(nestedHistory) // -1 means last one
+        : recursiveIndexes
+    );
+  }
+
+  return history[turn];
+};
+
+export const findMoveAtIndexRecursively = (
+  history: ChessHistory_NEW,
+  atIndex: ChessHistoryIndex_NEW
+) => findTurnAtIndexRecursively(history, atIndex)?.[atIndex[1]];
 
 const getHistoryLastTurn = (
   history: ChessHistory_NEW
@@ -157,6 +236,10 @@ export const addMoveToChessHistory = (
     // This is where it becomes recursive
 
     const prevTurnAtIndex = findTurnAtIndex(history, atIndex);
+
+    if (!prevTurnAtIndex) {
+      throw new Error('This should not happen b/c findMoveAtIndex() exists');
+    }
 
     const { nextBranchedHistories, nextIndex } = invoke(
       (): {

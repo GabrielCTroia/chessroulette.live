@@ -28,6 +28,8 @@ import {
   findMoveAtIndex,
   getHistoryNonMove,
   isLastHistoryIndexInBranch,
+  incrementNestedHistoryIndex,
+  findMoveAtIndexRecursively,
 } from 'apps/chessroulette-web/components/GameHistory/history/util';
 import { Action } from 'movex-core-util';
 import { Square } from 'react-chessboard/dist/chessboard/types';
@@ -154,7 +156,7 @@ export default (
 
         // Add Use case to handle Invalid Moves on Learn Activity
 
-        const prevMove = findMoveAtIndex(
+        const prevMove = findMoveAtIndexRecursively(
           prev.activityState.history.moves,
           prev.activityState.history.focusedIndex
         );
@@ -164,27 +166,79 @@ export default (
 
         // If the moves are the same introduce a non move
         const [nextHistory, addedAtIndex] = invoke(() => {
+          
           const isFocusedIndexLastInBranch = isLastHistoryIndexInBranch(
             prevHistoryMoves,
             prevFocusedIndex
           );
 
+          console.log('isFocusedIndexLastInBranch', isFocusedIndexLastInBranch);
+          console.log('prevFocusedIndex', prevFocusedIndex);
+
+          // const isFocusIndexNested = !!prevFocusedIndex[2];
+          const [prevFocusTurnIndex, prevFocusMovePosition, prevFocusRecursiveIndexes] = prevFocusedIndex;
+
+          if (prevFocusRecursiveIndexes) {
+            console.log('prevFocusRecursiveIndexes', prevFocusRecursiveIndexes);
+
+            const addAt = incrementNestedHistoryIndex(prevFocusedIndex);
+
+            console.log('add at', addAt);
+            console.log('prevMove', prevMove);
+
+            if (prevMove?.color === nextMove.color) {
+              const [nextHistory, addedAtIndex] = addMoveToChessHistory(
+                prev.activityState.history.moves,
+                getHistoryNonMove(swapColor(nextMove.color)),
+                addAt
+              );
+
+              return addMoveToChessHistory(
+                nextHistory,
+                nextMove,
+                incrementNestedHistoryIndex(addedAtIndex),
+                // addAtIndex
+                // prev.activityState.history.focusedIndex
+              );
+            }
+
+            return addMoveToChessHistory(
+              prev.activityState.history.moves,
+              nextMove,
+              addAt,
+              // addAtIndex
+              // prev.activityState.history.focusedIndex
+            );
+          }
+
           // console.log('isFocusedIndexLastInBranch', isFocusedIndexLastInBranch);
 
           const addAtIndex = isFocusedIndexLastInBranch
-            ? incrementHistoryIndex(prev.activityState.history.focusedIndex)
+            ? incrementNestedHistoryIndex(prev.activityState.history.focusedIndex)
             : prev.activityState.history.focusedIndex;
 
-          prev.activityState.history.focusedIndex;
+          // prev.activityState.history.focusedIndex;
 
           // if 1st move is black add a non move
-          if (!prevMove && nextMove.color === 'b') {
+          if (prevHistoryMoves.length === 0 && nextMove.color === 'b') {
             const [nextHistory, addedAtIndex] = addMoveToChessHistory(
               prev.activityState.history.moves,
               getHistoryNonMove(swapColor(nextMove.color))
             );
 
             return addMoveToChessHistory(nextHistory, nextMove);
+          }
+
+
+          // If it's not the last branch
+          if (!isFocusedIndexLastInBranch) {
+            return addMoveToChessHistory(
+              prev.activityState.history.moves,
+              nextMove,
+              prevFocusedIndex,
+              // addAtIndex
+              // prev.activityState.history.focusedIndex
+            );
           }
 
           // Add nonMoves for skipping one
@@ -201,7 +255,7 @@ export default (
           return addMoveToChessHistory(
             prev.activityState.history.moves,
             nextMove,
-            addAtIndex
+            // addAtIndex
             // prev.activityState.history.focusedIndex
           );
         });
@@ -215,8 +269,8 @@ export default (
         //   // prev.activityState.history.focusedIndex
         // );
 
-        // console.log('next history', nextHistory, nextHistory.length);
-        // console.log('addedAtIndex', addedAtIndex);
+        console.log('next history', nextHistory, nextHistory.length);
+        console.log('addedAtIndex', addedAtIndex);
 
         return {
           ...prev,
@@ -268,10 +322,17 @@ export default (
         },
       };
     } else if (action.type === 'focusHistoryIndex') {
+      console.log('get history at index', action.payload.index);
+
       const historyAtFocusedIndex = getHistoryAtIndex(
         prev.activityState.history.moves,
         action.payload.index
+        // TODO: Add recursive 
       );
+
+      // TOOO// Need to create a history with the branched histories
+
+      console.log('historyAtFocusedIndex', historyAtFocusedIndex);
 
       const instance = new ChessFENBoard(
         prev.activityState.history.startingFen

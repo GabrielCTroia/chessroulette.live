@@ -108,7 +108,7 @@ describe('Find Move At Index', () => {
   });
 });
 
-describe('Get History To Index', () => {
+describe('Get History At Index', () => {
   test('Get Empty History', () => {
     const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [-1, 1]);
 
