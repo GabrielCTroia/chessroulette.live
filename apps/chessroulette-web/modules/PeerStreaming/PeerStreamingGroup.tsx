@@ -11,6 +11,7 @@ import {
   usePeerToPeerConnections,
 } from 'apps/chessroulette-web/providers/PeerToPeerProvider';
 import {
+  IceServerRecord,
   PeerUserId,
   PeerUserIdsMap,
   // PeerUser,
@@ -65,6 +66,7 @@ type Props = {
   clientUserId: UserId;
   peerUserIdsMap: PeerUserIdsMap; // This excludes the Local Client Peer (Me)
   p2pCommunicationType: P2PCommunicationType;
+  iceServers: IceServerRecord[];
   render: (p: { reel: Reel | undefined }) => React.ReactNode;
 };
 
@@ -117,6 +119,7 @@ export const PeerStreamingGroup: React.FC<Props> = React.memo((props) => {
     <PeerToPeerProvider
       // user={props.peerUser}
       clientUserId={props.clientUserId}
+      iceServers={props.iceServers}
       uniqId={props.groupId}
       onPeerConnectionChannelsUpdated={(payload) => {
         dispatch({ type: 'updatePeerConnection', payload });

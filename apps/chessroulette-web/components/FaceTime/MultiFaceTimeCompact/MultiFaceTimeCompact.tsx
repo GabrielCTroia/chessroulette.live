@@ -102,9 +102,9 @@ export const MultiFaceTimeCompact: React.FC<MultiFaceTimeCompactProps> = ({
   }, [avStreaminginstance]);
 
   const MicIcon =
-    myFaceTimeConstraints.audio === true ? SpeakerXMarkIcon : SpeakerWaveIcon;
+    myFaceTimeConstraints.audio === false ? SpeakerXMarkIcon : SpeakerWaveIcon;
   const CameraIcon =
-    myFaceTimeConstraints.video === true
+    myFaceTimeConstraints.video === false
       ? VideoCameraSlashIcon
       : VideoCameraIcon;
 

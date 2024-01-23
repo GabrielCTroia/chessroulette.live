@@ -94,7 +94,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
             ref={(r) => (rowElementRefs.current[historyTurnIndex] = r)}
             historyTurn={historyTurn}
             historyTurnIndex={historyTurnIndex}
-            moveCount={historyRootTurnIndex + historyTurnIndex}
+            moveCount={(historyRootTurnIndex + 1) + historyTurnIndex}
             onFocus={onRefocus}
             onDelete={onDelete}
             containerClassName={rowClassName}

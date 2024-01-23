@@ -24,6 +24,7 @@ import { User } from 'apps/chessroulette-web/modules/user/type';
 type Props = React.PropsWithChildren<{
   uniqId: string; // Make sure this changes each time is need (i.e. when the room changes)
   clientUserId: User['id'];
+  iceServers: IceServerRecord[];
 
   onOpen?: PeerConnectionsStateProps['onOpen'];
   onPeerConnected?: PeerConnectionsStateProps['onPeerConnected'];
@@ -51,7 +52,7 @@ export class PeerToPeerProvider extends React.Component<Props, State> {
     this.state = {
       peerConnectionsState: { status: 'init' },
       contextState: { ready: false },
-      iceServers: undefined,
+      iceServers: props.iceServers,
     };
 
     this.connectToPeers = this.connectToPeers.bind(this);
@@ -70,10 +71,11 @@ export class PeerToPeerProvider extends React.Component<Props, State> {
   }
 
   componentDidMount() {
+    console.log('Peer2PeerProvder Ice Servers:', this.props.iceServers);
     // TODO: This could be cached localy
-    getIceURLS().map((iceServers) => {
-      this.setState({ iceServers });
-    });
+    // getIceURLS().map((iceServers) => {
+    //   this.setState({ iceServers });
+    // });
   }
 
   componentDidUpdate(_: Props, prevState: State) {
@@ -180,12 +182,15 @@ export class PeerToPeerProvider extends React.Component<Props, State> {
   render() {
     return (
       <>
-        {/* <pre>{JSON.stringify(this.state.iceServers, null, 2)}</pre> */}
-        {this.state.iceServers && (
+        {/* <pre>
+          {this.props.iceServers?.length}{' '}
+          {JSON.stringify(this.props.iceServers, null, 2)}
+        </pre> */}
+        {this.props.iceServers && (
           <PeerConnectionsHandler
             // Reset this once the id changes
             key={this.props.uniqId}
-            iceServers={this.state.iceServers}
+            iceServers={this.props.iceServers}
             clientUserId={this.props.clientUserId}
             onPeerConnected={this.onPeerConnected}
             onClose={this.onClose}

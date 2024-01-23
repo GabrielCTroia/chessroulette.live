@@ -4,8 +4,19 @@ import {
   toResourceIdentifierObj,
 } from 'movex-core-util';
 import LearnActivity from 'apps/chessroulette-web/modules/room/Learn/LearnActivity';
+import Twilio from 'twilio';
+import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 
-export default function Page({ params }: { params: { slug: string } }) {
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID as string;
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN as string;
+
+const twilioClient = Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+
+export const twilio = {
+  getTokens: async () => twilioClient.tokens.create(),
+};
+
+export default async function Page({ params }: { params: { slug: string } }) {
   // console.log('params', decodeURIComponent(params.slug));
   // const { rid, slot } = searchParams;
 
@@ -15,6 +26,11 @@ export default function Page({ params }: { params: { slug: string } }) {
   // }
 
   // console.log('searchParams', searchParams);
+  // const twilioClient = Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
+
+  // const iceServersResponse = await fetch(`/api/ice-servers`, {
+  //   next: { revalidate: 3600 }, // Will revalidate every 1 hour
+  // });
 
   const slug = decodeURIComponent(params.slug);
 
@@ -26,70 +42,28 @@ export default function Page({ params }: { params: { slug: string } }) {
     toResourceIdentifierObj(slug).resourceId
   }`;
 
+
+  // TODO: make it better
+  const iceServers = (await twilio.getTokens()).iceServers as IceServerRecord[];
+
+  console.log('iceServers', iceServers);
+
   return (
-    // <MovexBoundResource
-    //   movexDefinition={movexConfig}
-    //   rid={'room:23'}
-    //   render={({ boundResource: { state, dispatch } }) => {
-    //     return (
-
-    //     );
-    //   }}
-    // If there is a given slot just show the ChatBox
-    // Otherwise allow the User to pick one
-
-    //   if (slot) {
-    //     return (
-    //       <ChatBoxContainer
-    //         userSlot={slot as UserSlot}
-    //         state={state}
-    //         dispatch={dispatch}
-    //       />
-    //     );
-    //   }
-
-    //   // Filter out the taken User Slots
-    //   const availableUserSlots = objectKeys(state.userSlots).reduce(
-    //     (accum, nextSlot) =>
-    //       state.userSlots[nextSlot] ? [...accum, nextSlot] : accum,
-    //     [] as UserSlot[]
-    //   );
-
-    //   return (
-    //     <ChatOnboarding
-    //       slots={availableUserSlots}
-    //       onSubmit={(slot) => {
-    //         // Redirect to the same page with the selected  userSlot
-    //         router.push({
-    //           pathname: router.asPath,
-    //           query: { slot },
-    //         });
-    //       }}
-    //     />
-    //   );
-    // }}
-    // />
-    // <Template
-    //   rightSideComponent={
-    //     <div className="flex space-between flex-col gap-6 h-full">
-    //       <div className="flex-1 flex flex-col">
-    //         <PlayerBox />
-    //         <div>
-
-    //         </div>
-    //       </div>
-    //     </div>
-    //   }
-    //   // mainContainerClass="flex items-center"
-    //   mainComponent={
-
-    //   }
-    //   // rightSideComponent={<RoomParticipants rid={rid} />}
-    // />
     <LearnActivity
       rid={rid}
       playingColor="black"
       fen="rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w KQkq - 0 1"
+      iceServers={
+        iceServers || [
+          // DEFAULT
+          {
+            url: 'stun:stun.ideasip.com',
+            urls: 'stun:stun.ideasip.com',
+            credential: undefined,
+            username: undefined,
+          },
+        ]
+      }
     />
   );
 }

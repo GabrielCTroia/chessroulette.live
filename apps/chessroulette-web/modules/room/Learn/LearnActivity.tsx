@@ -33,6 +33,7 @@ import {
 } from 'apps/chessroulette-web/components/GameHistory/lib';
 import { SquareMap } from '../activity/reducer';
 import { findMoveAtIndex } from 'apps/chessroulette-web/components/GameHistory/history/util';
+import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 // import { ChessHistoryBaseRealMove } from 'apps/chessroulette-web/components/GameHistory/types';
 
 type ChessColor = 'white' | 'black';
@@ -41,12 +42,15 @@ type Props = {
   rid: ResourceIdentifier<'room'>;
   fen?: ChessFEN;
   playingColor?: ChessColor;
+  iceServers: IceServerRecord[];
 };
 
 type Tabs = 'history' | 'import';
 
-export default ({ playingColor = 'white', ...props }: Props) => {
+export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   const url = useUrl();
+
+  // console.log('learn acivity', props.iceServers);
 
   const [nextUserId, setNextUserId] = useState(getRandomInt(0, 99999));
   const inviteUrl = useMemo(
@@ -113,12 +117,12 @@ export default ({ playingColor = 'white', ...props }: Props) => {
 
                 const { activityState } = state.activity;
 
-                console.group('Learn Activity');
-                console.log('Activity State', activityState);
-                console.log('History', activityState.history.moves);
-                console.log('Focused Index', activityState.history.focusedIndex);
-                console.groupEnd();
-                
+                // console.group('Learn Activity');
+                // console.log('Activity State', activityState);
+                // console.log('History', activityState.history.moves);
+                // console.log('Focused Index', activityState.history.focusedIndex);
+                // console.groupEnd();
+
                 const { history } = activityState;
 
                 // const lastMove =   history.moves.slice(-1)[0];
@@ -234,7 +238,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
       rightSideComponent={
         <div className="flex flex-1s flex-col space-between w-full h-full relative min-h-0 min-w-0">
           <div className="flex-1 flex flex-col min-h-0 min-w-0 gap-4">
-            <Streaming rid={props.rid} />
+            <Streaming rid={props.rid} iceServers={iceServers}/>
 
             <MovexBoundResource
               movexDefinition={movexConfig}
@@ -296,7 +300,7 @@ export default ({ playingColor = 'white', ...props }: Props) => {
                               p.isFocused ? 'bg-blue-500 hover:bg-red-700' : ''
                             }
                           >
-                            History
+                            Notation
                           </Button>
                         ),
                         renderContent: () => (

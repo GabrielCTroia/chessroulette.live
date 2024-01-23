@@ -11,7 +11,7 @@ import { useMemo, useState } from 'react';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { PeerStreamingGroup } from '../PeerStreaming';
 import { MultiFaceTimeCompact } from 'apps/chessroulette-web/components/FaceTime/MultiFaceTimeCompact';
-import { PeerUserIdsMap } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
+import { IceServerRecord, PeerUserIdsMap } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 import { config } from 'apps/chessroulette-web/config';
 import { CameraView } from 'apps/chessroulette-web/components/CameraView';
 import { AspectRatio } from 'apps/chessroulette-web/components/AspectRatio';
@@ -24,13 +24,14 @@ import { SpeakerWaveIcon, SpeakerXMarkIcon, VideoCameraIcon, VideoCameraSlashIco
 type Props = {
   rid: ResourceIdentifier<'room'>;
   aspectRatio?: FaceTimeProps['aspectRatio'];
+  iceServers: IceServerRecord[];
 };
 
 const hashDemoImgId = (id: string) => {
   return Number(id.match(/\d/)?.[0] || 0);
 };
 
-export default ({ rid, aspectRatio = 16 / 10 }: Props) => {
+export default ({ rid, aspectRatio = 16 / 10, iceServers }: Props) => {
   const userId = useUserId();
   const peerUser = useMemo(() => {
     if (userId) {
@@ -91,6 +92,7 @@ export default ({ rid, aspectRatio = 16 / 10 }: Props) => {
             clientUserId={peerUser.id}
             p2pCommunicationType="audioVideo"
             peerUserIdsMap={peerUserIdsMap}
+            iceServers={iceServers}
             render={({ reel }) => (
               <MultiFaceTimeCompact
                 reel={reel}
