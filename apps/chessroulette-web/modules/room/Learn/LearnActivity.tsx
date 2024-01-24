@@ -200,7 +200,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
       )}
       rightSideComponent={(p) => (
         <div
-          className="flex flex-col space-between sbg-red-100 w-full h-full relative"
+          className="flex flex-col space-between w-full relative"
           style={{
             height: p.center.height,
           }}
@@ -224,7 +224,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                   <Tabs
                     headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
                     containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 overflow-hidden rounded-lg"
-                    contentClassName="flex-1 flex min-h-"
+                    contentClassName="flex-1 flex min-h-0"
                     currentIndex={0}
                     renderContainerHeader={({ tabs, focus }) => (
                       <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">
@@ -268,7 +268,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                           </Button>
                         ),
                         renderContent: () => (
-                          <div className="flex flex-col flex-1 gap-2 bg-slate-700">
+                          <div className="flex flex-col flex-1 gap-2 bg-slate-700 min-h-0">
                             <GameHistory
                               history={activityState.history.moves}
                               // containerClassName="overflow-scroll bg-red-200 sh-full"
