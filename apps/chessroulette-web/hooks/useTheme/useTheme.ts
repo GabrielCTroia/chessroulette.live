@@ -1,3 +1,5 @@
+'use client';
+
 // import { getRandomInt } from 'chessterrain-react';
 // import { getRandomInt } from '@xmatter/util-kit';
 import { useSearchParams } from 'next/navigation';

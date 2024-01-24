@@ -1,7 +1,6 @@
 import { Metadata } from 'next';
 import '../styles.css';
 import MovexProvider from '../providers/MovexProvider';
-import Header from '../components/Header';
 
 export const metadata: Metadata = {
   title: 'Home',

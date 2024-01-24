@@ -1,13 +1,20 @@
 import React from 'react';
 import { PropsWithChildren } from 'react';
 
-export type ButtonProps = PropsWithChildren<{
-  type?: 'primary' | 'secondary' | 'clear' | 'custom';
-  onClick?: () => void;
-  className?: string;
-  disabled?: boolean;
-  size?: 'sm' | 'md' | 'lg';
-}>;
+export type ButtonProps = Omit<
+  React.DetailedHTMLProps<
+    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    HTMLButtonElement
+  >,
+  'type'
+> &
+  PropsWithChildren<{
+    type?: 'primary' | 'secondary' | 'clear' | 'custom';
+    onClick?: () => void;
+    className?: string;
+    disabled?: boolean;
+    size?: 'sm' | 'md' | 'lg';
+  }>;
 
 const classes = {
   md: 'p-3 px-5 rounded-xl',
@@ -27,6 +34,7 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
   className,
   size = 'md',
+  ...props
 }) => {
   return (
     <button
@@ -35,6 +43,7 @@ export const Button: React.FC<ButtonProps> = ({
       } ${className}`}
       onClick={onClick}
       disabled={disabled === true}
+      {...props}
     >
       {children}
     </button>

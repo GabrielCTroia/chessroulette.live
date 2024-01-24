@@ -1,4 +1,5 @@
 type Theme = {
+  name: string;
   board: {
     darkSquare: string;
     lightSquare: string;
@@ -9,6 +10,7 @@ type Theme = {
 };
 
 const chessrouletteTheme: Theme = {
+  name: 'chessroulette',
   board: {
     darkSquare: 'rgba(0, 163, 255, .4)',
     lightSquare: 'white',
@@ -19,6 +21,7 @@ const chessrouletteTheme: Theme = {
 };
 
 const outpostTheme: Theme = {
+  name: 'outpost',
   board: {
     darkSquare: '#C8A07D',
     lightSquare: 'white',

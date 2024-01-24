@@ -29,6 +29,7 @@ import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProv
 import {
   ArrowsUpDownIcon,
   DocumentDuplicateIcon,
+  CheckIcon,
 } from '@heroicons/react/16/solid';
 
 type ChessColor = 'white' | 'black';
@@ -206,8 +207,12 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
           }}
         >
           <div className="flex flex-col flex-1 min-h-0 gap-4">
-            <div className='overflow-hidden rounded-lg'>
-              <Streaming rid={props.rid} iceServers={iceServers} />
+            <div className="overflow-hidden rounded-lg">
+              <Streaming
+                rid={props.rid}
+                iceServers={iceServers}
+                aspectRatio={16 / 9}
+              />
             </div>
 
             <MovexBoundResource
@@ -223,31 +228,22 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                 return (
                   <Tabs
                     headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
-                    containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 overflow-hidden rounded-lg"
+                    containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg"
                     contentClassName="flex-1 flex min-h-0"
                     currentIndex={0}
                     renderContainerHeader={({ tabs, focus }) => (
                       <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">
                         {tabs.map((c) => c)}
                         <div className="flex-1" />
-                        <ClipboardCopyButton
-                          value={inviteUrl}
-                          copiedlLabel="Invitation Copied"
-                          className="bg-green-500 hover:bg-green-700"
-                          onCopied={() => {
-                            setNextUserId(getRandomInt(0, 9999));
-                          }}
-                          size="sm"
-                        >
-                          Invite Friend
-                        </ClipboardCopyButton>
+
                         <Button
-                          className="bg-red-500"
+                          className="bg-red-900 hover:bg-red-600 active:bg-red-800 font-bold"
                           onClick={() => {
                             dispatch({ type: 'importPgn', payload: '' });
 
                             focus(0);
                           }}
+                          type="custom"
                           size="sm"
                         >
                           Reset Board
@@ -292,11 +288,16 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                               </p>
                               <ClipboardCopyButton
                                 value={activityState.fen}
-                                type="secondary"
+                                type="custom"
                                 size="sm"
-                              >
-                                <DocumentDuplicateIcon className="w-5 h-5 text-slate-400 hover:text-slate-200" />
-                              </ClipboardCopyButton>
+                                render={(copied) =>
+                                  copied ? (
+                                    <CheckIcon className="w-5 h-5 text-slate-400 text-green-500" />
+                                  ) : (
+                                    <DocumentDuplicateIcon className="w-5 h-5 text-slate-400 hover:text-slate-200" />
+                                  )
+                                }
+                              />
                             </div>
                           </div>
                         ),

@@ -68,6 +68,6 @@ export const keyInObject = <X extends {}, Y extends PropertyKey>(
 type TupleToUnionType<T extends any[]> = T[number];
 
 export const isOneOf = <T extends string, List extends T[]>(
-  k: T,
+  k: T | undefined,
   listOfOptions: List
 ): k is TupleToUnionType<List> => listOfOptions.indexOf(k) > -1;

@@ -6,6 +6,7 @@ import {
 import LearnActivity from 'apps/chessroulette-web/modules/room/Learn/LearnActivity';
 import { Twilio } from 'twilio';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
+import RoomTemplate from 'apps/chessroulette-web/templates/RoomTemplate';
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID as string;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN as string;
@@ -16,7 +17,13 @@ const twilio = {
   getTokens: async () => twilioClient.tokens.create(),
 };
 
-export default async function Page({ params }: { params: { slug: string } }) {
+export default async function Page({
+  params,
+  searchParams,
+}: {
+  params: { slug: string };
+  searchParams: Partial<{ theme: string }>;
+}) {
   // console.log('params', decodeURIComponent(params.slug));
   // const { rid, slot } = searchParams;
 
@@ -42,28 +49,27 @@ export default async function Page({ params }: { params: { slug: string } }) {
     toResourceIdentifierObj(slug).resourceId
   }`;
 
-
   // TODO: make it better
   const iceServers = (await twilio.getTokens()).iceServers as IceServerRecord[];
 
-  console.log('iceServers', iceServers);
-
   return (
-    <LearnActivity
-      rid={rid}
-      playingColor="black"
-      fen="rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w KQkq - 0 1"
-      iceServers={
-        iceServers || [
-          // DEFAULT
-          {
-            url: 'stun:stun.ideasip.com',
-            urls: 'stun:stun.ideasip.com',
-            credential: undefined,
-            username: undefined,
-          },
-        ]
-      }
-    />
+    <RoomTemplate themeName={searchParams.theme}>
+      <LearnActivity
+        rid={rid}
+        playingColor="black"
+        fen="rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w KQkq - 0 1"
+        iceServers={
+          iceServers || [
+            // DEFAULT
+            {
+              url: 'stun:stun.ideasip.com',
+              urls: 'stun:stun.ideasip.com',
+              credential: undefined,
+              username: undefined,
+            },
+          ]
+        }
+      />
+    </RoomTemplate>
   );
 }

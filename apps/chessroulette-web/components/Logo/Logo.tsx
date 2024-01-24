@@ -1,6 +1,8 @@
-import React, { CSSProperties, useMemo } from 'react';
+import React, { CSSProperties } from 'react';
 // import { createUseStyles, CSSProperties } from 'src/lib/jss';
-import logoLight from './assets/Logo_light_full.svg';
+import logoLightFull from './assets/Logo_light_full.svg';
+// import ChessrouletteOutpostWhite from './assets/Chessroulette-Outpost-White.svg';
+import ChessrouletteOutpostWhite from './assets/chessroulette+outpost.svg';
 import logoDark from './assets/Logo_dark_full.svg';
 import logoDarkWithBeta from './assets/Logo_dark_full_w_beta.svg';
 import logoLightSingle from './assets/Logo_light_single.svg';
@@ -8,6 +10,8 @@ import logoDarkSingle from './assets/Logo_dark_single.svg';
 import logoLightWithBeta from './assets/light_with_beta.svg';
 import logoDarkSingleStroke from './assets/Logo_dark_single_stroke_variation.svg';
 import Image from 'next/image';
+import { useTheme } from 'apps/chessroulette-web/hooks/useTheme/useTheme';
+import { invoke, isOneOf } from '@xmatter/util-kit';
 // import { onlyMobile } from 'src/theme';
 // import cx from 'classnames';
 // import { Link } from 'react-router-dom';
@@ -23,7 +27,14 @@ type Props = {
   imgClassName?: string;
   width?: string;
   style?: CSSProperties;
+  themeName?: string;
 };
+
+// const S = () => {
+//   return (
+//     <ChessrouletteOutpostWhite />
+//   )
+// }
 
 export const Logo: React.FC<Props> = ({
   asLink = true,
@@ -33,6 +44,7 @@ export const Logo: React.FC<Props> = ({
   withOutline = false,
   className,
   imgClassName,
+  themeName,
   style,
 }) => {
   // const imgSrc = useMemo(() => {
@@ -64,14 +76,25 @@ export const Logo: React.FC<Props> = ({
   //   return darkBG ? logoLight : logoDark;
   // }, [mini, darkBG, withOutline, theme]);
 
+  const imageProps = (() => {
+    if (themeName === 'op' || themeName === 'outpost') {
+      return {
+        src: ChessrouletteOutpostWhite,
+        width: 190,
+        title: 'Chessroulette + Outpost = ♥️',
+      };
+    }
+
+    return {
+      src: logoLightFull,
+      width: 220,
+      title: 'Chessroulette',
+    };
+  })();
+
   return (
     <div className="" style={style}>
-      <Image
-        src={logoLight}
-        alt="Chessroulette Logo"
-        width={220}
-        // height={500}
-      />
+      <Image {...imageProps} alt={imageProps.title} />
     </div>
   );
 

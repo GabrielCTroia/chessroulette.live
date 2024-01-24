@@ -14,14 +14,16 @@ import { noop } from '@xmatter/util-kit';
 
 type Props = Omit<ButtonProps, 'onClick'> & {
   value: string;
-  copiedlLabel?: string;
+  // copiedlLabel?: string;
   onCopied?: () => void;
+  render: (copied: boolean) => React.ReactNode;
 };
 
 export const ClipboardCopyButton: React.FC<Props> = ({
   value,
-  copiedlLabel = 'Copied',
+  // copiedlLabel = 'Copied',
   onCopied = noop,
+  render = noop,
   ...buttonProps
 }) => {
   const [copied, setCopied] = useState(false);
@@ -43,6 +45,7 @@ export const ClipboardCopyButton: React.FC<Props> = ({
 
   return (
     <Button
+      title="Invite Friend"
       onClick={copy}
       // icon={() => (
       //   <FontAwesomeIcon
@@ -60,7 +63,8 @@ export const ClipboardCopyButton: React.FC<Props> = ({
       // )}
       {...buttonProps}
     >
-      {copied ? copiedlLabel : buttonProps.children}
+      {render(copied)}
+      {/* {copied ? copiedlLabel : buttonProps.children} */}
     </Button>
   );
 };
