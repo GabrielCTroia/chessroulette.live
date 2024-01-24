@@ -33,6 +33,7 @@
   ],
   "exclude": [
     ".next",
+    "dist",
     "node_modules",
     "jest.config.ts",
     "src/**/*.spec.ts",

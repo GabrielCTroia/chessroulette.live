@@ -1,5 +1,3 @@
-'use client';
-
 import React, { useState } from 'react';
 import { Button, ButtonProps } from '../Button';
 import { noop } from '@xmatter/util-kit';
@@ -23,7 +21,7 @@ export const ClipboardCopyButton: React.FC<Props> = ({
   value,
   // copiedlLabel = 'Copied',
   onCopied = noop,
-  render = noop,
+  render,
   ...buttonProps
 }) => {
   const [copied, setCopied] = useState(false);

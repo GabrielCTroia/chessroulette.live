@@ -23,20 +23,20 @@ export const flatten = <T>(a: T[]) =>
 
 export const invoke = <T>(fn: () => T): T => fn();
 
-export function toDictIndexedBy<
-  O,
-  KGetter extends (o: O) => string
->(list: O[], getKey: KGetter): { [k: string]: O };
-export function toDictIndexedBy<
-  O,
-  KGetter extends (o: O) => string,
-  V
->(list: O[], getKey: KGetter, getVal: (o: O) => V): { [k: string]: V };
-export function toDictIndexedBy<
-  O,
-  KGetter extends (o: O) => string,
-  V
->(list: O[], getKey: KGetter, getVal?: (o: O) => V) {
+export function toDictIndexedBy<O, KGetter extends (o: O) => string>(
+  list: O[],
+  getKey: KGetter
+): { [k: string]: O };
+export function toDictIndexedBy<O, KGetter extends (o: O) => string, V>(
+  list: O[],
+  getKey: KGetter,
+  getVal: (o: O) => V
+): { [k: string]: V };
+export function toDictIndexedBy<O, KGetter extends (o: O) => string, V>(
+  list: O[],
+  getKey: KGetter,
+  getVal?: (o: O) => V
+) {
   if (getVal) {
     return list.reduce(
       (prev, next) => ({
@@ -70,4 +70,4 @@ type TupleToUnionType<T extends any[]> = T[number];
 export const isOneOf = <T extends string, List extends T[]>(
   k: T | undefined,
   listOfOptions: List
-): k is TupleToUnionType<List> => listOfOptions.indexOf(k) > -1;
+): k is TupleToUnionType<List> => !!k && listOfOptions.indexOf(k) > -1;
