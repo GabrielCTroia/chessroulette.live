@@ -2,7 +2,6 @@
 
 import { ClipboardCopyButton } from 'apps/chessroulette-web/components/ClipboardCopyButton';
 import { PaperAirplaneIcon, CheckIcon } from '@heroicons/react/24/outline';
-import { Text } from 'apps/chessroulette-web/components/Text';
 import { useMemo, useState } from 'react';
 import { getRandomInt } from '@xmatter/util-kit';
 import { useUrl } from 'nextjs-current-url';
@@ -16,10 +15,10 @@ export const RoomSideMenu = () => {
     }
 
     url.searchParams.set('userId', String(nextUserId));
+    url.searchParams.set('flipped', '1');
 
     return url.href;
   }, [url, nextUserId]);
-
 
   return (
     <div className="flex flex-col items-center">

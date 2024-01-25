@@ -9,6 +9,12 @@ export const useUpdateableSearchParams = () => {
 
   return useMemo(
     () => ({
+      get: (key: string) => {
+        return currentSearchParams.get(key);
+      },
+      // getAll: () => {
+      //   return currentSearchParams.getAll
+      // },
       set: (
         nextSearchParams?:
           | SearchParamsRecord

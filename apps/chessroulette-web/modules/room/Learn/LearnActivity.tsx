@@ -12,6 +12,7 @@ import {
   getNewChessGame,
   getRandomInt,
   invoke,
+  swapColor,
   toDictIndexedBy,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
@@ -31,6 +32,7 @@ import {
   DocumentDuplicateIcon,
   CheckIcon,
 } from '@heroicons/react/16/solid';
+import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
 
 type ChessColor = 'white' | 'black';
 
@@ -44,20 +46,9 @@ type Props = {
 type Tabs = 'history' | 'import';
 
 export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
-  const url = useUrl();
-
-  const [nextUserId, setNextUserId] = useState(getRandomInt(0, 99999));
-  const inviteUrl = useMemo(() => {
-    if (!url) {
-      return '';
-    }
-
-    url.searchParams.set('userId', String(nextUserId));
-
-    return url.href;
-  }, [url, nextUserId]);
-
   const userId = useUserId();
+  const updateableSearchParams = useUpdateableSearchParams();
+  const flippedBoard = updateableSearchParams.get('flipped') === '1';
 
   return (
     <LearnTemplate
@@ -150,7 +141,11 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                 return (
                   <div className="bg-indigo-500s flex">
                     <Freeboard
-                      boardOrientation={activityState.boardOrientation}
+                      boardOrientation={
+                        flippedBoard
+                          ? swapColor(activityState.boardOrientation)
+                          : activityState.boardOrientation
+                      }
                       sizePx={p.center.width}
                       fen={activityState.fen}
                       lastMove={lastMove}
@@ -182,12 +177,14 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
                         title="Flip Board"
                         onClick={() => {
+                          const nextBoardOrientation =
+                            activityState.boardOrientation === 'black'
+                              ? 'white'
+                              : 'black';
+
                           dispatch({
                             type: 'changeBoardOrientation',
-                            payload:
-                              activityState.boardOrientation === 'black'
-                                ? 'white'
-                                : 'black',
+                            payload: nextBoardOrientation,
                           });
                         }}
                       />

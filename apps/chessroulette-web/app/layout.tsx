@@ -3,8 +3,8 @@ import '../styles.css';
 import MovexProvider from '../providers/MovexProvider';
 
 export const metadata: Metadata = {
-  title: 'Home',
-  description: 'Welcome to Next.js',
+  title: 'Chessroulette | Home',
+  description: 'Welcome to Chessroulette',
 };
 
 export default function RootLayout({
