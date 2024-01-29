@@ -14,7 +14,21 @@ const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN as string;
 const twilioClient: any = new Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 
 const twilio = {
-  getTokens: async () => twilioClient.tokens.create(),
+  getIceServers: async (): Promise<IceServerRecord[]> => {
+    try {
+      return (await twilioClient.tokens.create()).iceServers;
+    } catch {
+      // Return the defaults if no connection or other error
+      return [
+        {
+          url: 'stun:stun.ideasip.com',
+          urls: 'stun:stun.ideasip.com',
+          credential: undefined,
+          username: undefined,
+        },
+      ];
+    }
+  },
 };
 
 export default async function Page({
@@ -50,7 +64,7 @@ export default async function Page({
   }`;
 
   // TODO: make it better
-  const iceServers = (await twilio.getTokens()).iceServers as IceServerRecord[];
+  const iceServers = await twilio.getIceServers();
 
   return (
     <RoomTemplate themeName={searchParams.theme}>
