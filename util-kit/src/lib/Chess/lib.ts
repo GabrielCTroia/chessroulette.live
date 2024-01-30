@@ -92,3 +92,15 @@ export const isValidPgn = (s: string): s is ChessPGN => {
     return false;
   }
 };
+
+export const isValidFen = (s: string): s is ChessFEN => {
+  const instance = new Chess();
+
+  try {
+    instance.loadPgn(s);
+
+    return true;
+  } catch {
+    return false;
+  }
+};

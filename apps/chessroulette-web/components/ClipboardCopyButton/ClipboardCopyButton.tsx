@@ -43,7 +43,6 @@ export const ClipboardCopyButton: React.FC<Props> = ({
 
   return (
     <Button
-      title="Invite Friend"
       onClick={copy}
       // icon={() => (
       //   <FontAwesomeIcon

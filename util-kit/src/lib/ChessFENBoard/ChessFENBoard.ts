@@ -1,5 +1,5 @@
 import { deepmerge } from 'deepmerge-ts';
-import { getNewChessGame, isShortChessColor } from '../Chess/lib';
+import { getNewChessGame, isShortChessColor, toShortColor } from '../Chess/lib';
 import {
   ChessFEN,
   ChessFENStateNotation,
@@ -15,6 +15,7 @@ import {
   fenBoardPieceSymbolToPieceSymbol,
   getFileRank,
   matrixIndexToSquare,
+  swapColor,
 } from './chessUtils';
 import { SQUARES, type Color, type PieceSymbol, type Square } from 'chess.js';
 import { Err, Ok, Result } from 'ts-results';
@@ -174,7 +175,8 @@ export class ChessFENBoard {
     // Refresh the Fen State
     this.setFenNotation({
       fromState: {
-        turn: prevFenState.turn === 'b' ? 'w' : 'b',
+        // turn: prevFenState.turn === 'b' ? 'w' : 'b',
+        turn: toShortColor(swapColor(detailedPiece.color)),
 
         ...(castlingMove && {
           // Remove the castling rights if applied this move

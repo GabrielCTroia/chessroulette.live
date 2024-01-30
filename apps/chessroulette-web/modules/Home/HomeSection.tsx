@@ -88,12 +88,13 @@ export default () => {
                     updateableSearchParams.set((prev) => ({
                       ...prev,
                       userId: prev.userId || getRandomInt(0, 999),
+                      instructor: 1,
                     }))
                 );
               });
           }}
         >
-          Learn
+          Start Class As Instructor
         </Button>
       </main>
     </>

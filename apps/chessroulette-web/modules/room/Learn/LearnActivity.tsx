@@ -10,19 +10,17 @@ import {
   ChessFEN,
   ChessFENBoard,
   getNewChessGame,
-  getRandomInt,
   invoke,
   swapColor,
   toDictIndexedBy,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import Streaming from '../Streaming';
 import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
 import { Button } from 'apps/chessroulette-web/components/Button';
 import { Tabs } from 'apps/chessroulette-web/components/Tabs';
 import { ClipboardCopyButton } from 'apps/chessroulette-web/components/ClipboardCopyButton';
-import { useUrl } from 'nextjs-current-url';
 import { Square } from 'react-chessboard/dist/chessboard/types';
 import { SquareMap } from '../activity/reducer';
 import { findMoveAtIndex } from 'apps/chessroulette-web/components/GameHistory/history/util';
@@ -34,7 +32,9 @@ import {
   PencilSquareIcon,
 } from '@heroicons/react/16/solid';
 import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor/BoardEditor';
-import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
+import { useLearnActivitySettings } from './useLearnActivitySettings';
+import useInstance from '@use-it/instance';
+import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
 
 type ChessColor = 'white' | 'black';
 
@@ -48,24 +48,12 @@ type Props = {
 type Tabs = 'history' | 'import';
 
 export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
-  const url = useUrl();
-
-  const [isEditMode, seetIsEditMode] = useState(true);
-
-  const [nextUserId, setNextUserId] = useState(getRandomInt(0, 99999));
-  const inviteUrl = useMemo(() => {
-    if (!url) {
-      return '';
-    }
-
-    url.searchParams.set('userId', String(nextUserId));
-
-    return url.href;
-  }, [url, nextUserId]);
+  const [isEditMode, setIsEditMode] = useState(false);
 
   const userId = useUserId();
-  const updateableSearchParams = useUpdateableSearchParams();
-  const flippedBoard = updateableSearchParams.get('flipped') === '1';
+  const settings = useLearnActivitySettings();
+
+  const Board = settings.canMakeInvalidMoves ? Freeboard : Playboard;
 
   return (
     <LearnTemplate
@@ -155,13 +143,9 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                   ) as SquareMap;
                 });
 
-                // if (isEditMode) {
-                //   return (
-                //     <div>
-                //       edit
-                //     </div>
-                //   )
-                // }
+                const playingColor = settings.isBoardFlipped
+                  ? swapColor(activityState.boardOrientation)
+                  : activityState.boardOrientation;
 
                 return (
                   <div className="flex">
@@ -173,15 +157,15 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         }}
                       />
                     ) : (
-                      <Freeboard
-                        boardOrientation={activityState.boardOrientation}
+                      <Board
+                        boardOrientation={playingColor}
+                        playingColor={playingColor}
                         sizePx={p.center.width}
                         fen={activityState.fen}
                         lastMove={lastMove}
                         inCheckSquares={inCheckSquaresMap}
                         onMove={(payload) => {
                           dispatch({ type: 'dropPiece', payload });
-
                           return true;
                         }}
                         onArrowsChange={(payload) => {
@@ -203,37 +187,34 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                     )}
 
                     <div className="flex flex-col p-1 pt-0 pb-0">
-                      <div className="mb-2">
-                        <ArrowsUpDownIcon
-                          className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
-                          title="Flip Board"
-                          onClick={() => {
-                            dispatch({
-                              type: 'changeBoardOrientation',
-                              payload:
-                                activityState.boardOrientation === 'black'
-                                  ? 'white'
-                                  : 'black',
-                            });
-                          }}
-                        />
-                      </div>
-                      <div className="">
-                        <PencilSquareIcon
-                          className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
-                          title="Edit Board"
-                          onClick={() => {
-                            seetIsEditMode((prev) => !prev);
-                            // dispatch({
-                            //   type: 'changeBoardOrientation',
-                            //   payload:
-                            //     activityState.boardOrientation === 'black'
-                            //       ? 'white'
-                            //       : 'black',
-                            // });
-                          }}
-                        />
-                      </div>
+                      {settings.canFlipBoard && (
+                        <div className="mb-2">
+                          <ArrowsUpDownIcon
+                            className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
+                            title="Flip Board"
+                            onClick={() => {
+                              dispatch({
+                                type: 'changeBoardOrientation',
+                                payload:
+                                  activityState.boardOrientation === 'black'
+                                    ? 'white'
+                                    : 'black',
+                              });
+                            }}
+                          />
+                        </div>
+                      )}
+                      {settings.canEditBoard && (
+                        <div className="">
+                          <PencilSquareIcon
+                            className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
+                            title="Edit Board"
+                            onClick={() => {
+                              setIsEditMode((prev) => !prev);
+                            }}
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
@@ -245,9 +226,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
       rightSideComponent={(p) => (
         <div
           className="flex flex-col space-between w-full relative"
-          style={{
-            height: p.center.height,
-          }}
+          style={{ height: p.center.height }}
         >
           <div className="flex flex-col flex-1 min-h-0 gap-4">
             <div className="overflow-hidden rounded-lg">
