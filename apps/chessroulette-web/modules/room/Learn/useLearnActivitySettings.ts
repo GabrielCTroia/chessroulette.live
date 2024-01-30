@@ -6,11 +6,13 @@ export type LearnActivitySettings = {
   isBoardFlipped: boolean;
   canEditBoard: boolean;
   canMakeInvalidMoves: boolean;
+  canImport: boolean;
 };
 
 export const useLearnActivitySettings = (): LearnActivitySettings => {
   const updateableSearchParams = useUpdateableSearchParams();
   const isInstructor = updateableSearchParams.get('instructor') === '1';
+
   return {
     isInstructor,
     canFlipBoard:
@@ -21,5 +23,6 @@ export const useLearnActivitySettings = (): LearnActivitySettings => {
       isInstructor || updateableSearchParams.get('canEditBoard') === '1',
     canMakeInvalidMoves:
       isInstructor || updateableSearchParams.get('canMakeInvalidMoves') === '1',
+    canImport: isInstructor || updateableSearchParams.get('canImport') === '1',
   };
 };

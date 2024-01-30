@@ -15,7 +15,7 @@ import {
   toDictIndexedBy,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import Streaming from '../Streaming';
 import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
 import { Button } from 'apps/chessroulette-web/components/Button';
@@ -33,7 +33,6 @@ import {
 } from '@heroicons/react/16/solid';
 import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor/BoardEditor';
 import { useLearnActivitySettings } from './useLearnActivitySettings';
-import useInstance from '@use-it/instance';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
 
 type ChessColor = 'white' | 'black';
@@ -48,12 +47,22 @@ type Props = {
 type Tabs = 'history' | 'import';
 
 export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-
   const userId = useUserId();
   const settings = useLearnActivitySettings();
 
+  const [editMode, setEditMode] = useState({
+    isActive: false,
+    fen: ChessFENBoard.STARTING_FEN,
+  }); // TODO: Set it so it's coming from the state (url)
+
   const Board = settings.canMakeInvalidMoves ? Freeboard : Playboard;
+
+  const updateEditedFen = useCallback((nextFen: ChessFEN) => {
+    setEditMode((prev) => ({
+      ...prev,
+      fen: nextFen,
+    }));
+  }, []);
 
   return (
     <LearnTemplate
@@ -149,12 +158,11 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                 return (
                   <div className="flex">
-                    {isEditMode ? (
+                    {editMode.isActive ? (
                       <BoardEditor
+                        fen={editMode.fen}
                         sizePx={p.center.width}
-                        onUpdated={(nextFen) => {
-                          console.log('nexg fen', nextFen);
-                        }}
+                        onUpdated={updateEditedFen}
                       />
                     ) : (
                       <Board
@@ -210,7 +218,10 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                             className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
                             title="Edit Board"
                             onClick={() => {
-                              setIsEditMode((prev) => !prev);
+                              setEditMode((prev) => ({
+                                ...prev,
+                                isActive: !prev.isActive,
+                              }));
                             }}
                           />
                         </div>
@@ -247,10 +258,74 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                 const { activityState } = state.activity;
 
+                if (editMode.isActive) {
+                  return (
+                    <div className="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg">
+                      <div className="flex-1 flex min-h-0">
+                        <div className="flex flex-col flex-1 gap-2 bg-slate-700 min-h-0 jsutify-between">
+                          <div className="flex-1">
+                            <Button
+                              size="sm"
+                              onClick={() => {
+                                dispatch({
+                                  type: 'importFen',
+                                  payload: editMode.fen,
+                                });
+
+                                setEditMode({
+                                  isActive: false,
+                                  fen: ChessFENBoard.STARTING_FEN,
+                                });
+                              }}
+                            >
+                              Use Board
+                            </Button>
+                            {/* <Button
+                              size="sm"
+                              type="custom"
+                              className="bg-red-600"
+                              onClick={() => {
+                                dispatch({
+                                  type: 'importFen',
+                                  payload: editMode.fen,
+                                });
+
+                                setEditMode({
+                                  isActive: true,
+                                  fen: '',
+                                });
+                              }}
+                            >
+                              Clear Board
+                            </Button> */}
+                          </div>
+                          <div className="flex items-space-between p-1 pl-3 border border-slate-400 rounded-lg">
+                            <p className="flex-1 overflow-x-scroll text-wrap break-all text-slate-400">
+                              FEN: {editMode.fen}
+                            </p>
+                            <ClipboardCopyButton
+                              value={editMode.fen}
+                              type="custom"
+                              size="sm"
+                              render={(copied) =>
+                                copied ? (
+                                  <CheckIcon className="w-5 h-5 text-slate-400 text-green-500" />
+                                ) : (
+                                  <DocumentDuplicateIcon className="w-5 h-5 text-slate-400 hover:text-slate-200" />
+                                )
+                              }
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
                   <Tabs
-                    headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
                     containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg"
+                    headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
                     contentClassName="flex-1 flex min-h-0"
                     currentIndex={0}
                     renderContainerHeader={({ tabs, focus }) => (
@@ -258,18 +333,20 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         {tabs.map((c) => c)}
                         <div className="flex-1" />
 
-                        <Button
-                          className="bg-red-900 hover:bg-red-600 active:bg-red-800 font-bold"
-                          onClick={() => {
-                            dispatch({ type: 'importPgn', payload: '' });
+                        {settings.isInstructor && (
+                          <Button
+                            className="bg-red-900 hover:bg-red-600 active:bg-red-800 font-bold"
+                            onClick={() => {
+                              dispatch({ type: 'importPgn', payload: '' });
 
-                            focus(0);
-                          }}
-                          type="custom"
-                          size="sm"
-                        >
-                          Reset Board
-                        </Button>
+                              focus(0);
+                            }}
+                            type="custom"
+                            size="sm"
+                          >
+                            Reset Board
+                          </Button>
+                        )}
                       </div>
                     )}
                     tabs={[
@@ -324,40 +401,46 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                           </div>
                         ),
                       },
-                      {
-                        renderHeader: (p) => (
-                          <Button
-                            onClick={p.focus}
-                            size="sm"
-                            className={`bg-slate-600 font-bold hover:bg-slate-800 ${
-                              p.isFocused && 'bg-slate-800'
-                            }`}
-                          >
-                            Import
-                          </Button>
-                        ),
-                        renderContent: (p) => (
-                          <PgnInputBox
-                            containerClassName="flex-1 h-full"
-                            contentClassName="p-3 bg-slate-600 rounded-b-lg"
-                            onChange={(inputType, nextInput) => {
-                              if (inputType === 'FEN') {
-                                dispatch({
-                                  type: 'importFen',
-                                  payload: nextInput,
-                                });
-                              } else if (inputType === 'PGN') {
-                                dispatch({
-                                  type: 'importPgn',
-                                  payload: nextInput,
-                                });
-                              }
+                      settings.canImport
+                        ? {
+                            renderHeader: (p) => (
+                              <Button
+                                onClick={p.focus}
+                                size="sm"
+                                className={`bg-slate-600 font-bold hover:bg-slate-800 ${
+                                  p.isFocused && 'bg-slate-800'
+                                }`}
+                              >
+                                Import
+                              </Button>
+                            ),
+                            renderContent: (p) => (
+                              <PgnInputBox
+                                containerClassName="flex-1 h-full"
+                                contentClassName="p-3 bg-slate-600 rounded-b-lg"
+                                onChange={(inputType, nextInput) => {
+                                  if (inputType === 'FEN') {
+                                    dispatch({
+                                      type: 'importFen',
+                                      payload: nextInput,
+                                    });
+                                  } else if (inputType === 'PGN') {
+                                    dispatch({
+                                      type: 'importPgn',
+                                      payload: nextInput,
+                                    });
+                                  }
 
-                              p.focus(0);
-                            }}
-                          />
-                        ),
-                      },
+                                  setEditMode((prev) => ({
+                                    ...prev,
+                                    isActive: false,
+                                  }));
+                                  p.focus(0);
+                                }}
+                              />
+                            ),
+                          }
+                        : undefined,
                     ]}
                   />
                 );

@@ -17,6 +17,7 @@ import {
   ChessHistoryIndex_NEW,
   ChessHistoryMove_NEW,
   ChessHistory_NEW,
+  ChessRecursiveHistory_NEW,
 } from 'apps/chessroulette-web/components/GameHistory/history/types';
 import {
   addMoveToChessHistory,
@@ -305,24 +306,19 @@ export default (
         return prev;
       }
 
-      const instance = getNewChessGame({
-        fen: action.payload,
-      });
-
-      const nextHistoryMovex = pgnToHistory(action.payload);
+      const nextMoves: ChessRecursiveHistory_NEW = [];
 
       return {
         ...prev,
         activityState: {
           ...prev.activityState,
-          fen: instance.fen(),
+          fen: action.payload,
           circles: {},
           arrows: {},
           history: {
             startingFen: ChessFENBoard.STARTING_FEN,
-            moves: nextHistoryMovex,
-            // focusedIndex: nextHistoryMovex.length - 1,
-            focusedIndex: getHistoryLastIndex(nextHistoryMovex),
+            moves: nextMoves,
+            focusedIndex: getHistoryLastIndex(nextMoves),
           },
         },
       };

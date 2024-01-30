@@ -36,6 +36,7 @@ export type FenState = {
 export class ChessFENBoard {
   static STARTING_FEN: ChessFEN =
     'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+    // '8/8/8/8/8/8/8/8 w - - 0 1'; // TODO: Add ability to have an empty baord
 
   // This is a get because it's meant to be readonly
   static get STARTING_FEN_STATE(): FenState {
@@ -603,6 +604,8 @@ export class ChessFENBoard {
 
       return new Ok(str as ChessFEN);
     } catch (e) {
+      console.log('eeee', e);
+
       return new Err(e);
     }
   }

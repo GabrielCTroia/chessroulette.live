@@ -22,12 +22,12 @@ import { DropContainer } from './DropContainer';
 import { DraggablePiece } from './DraggablePiece';
 
 type Props = Pick<ChessboardContainerProps, 'sizePx'> & {
-  fen?: ChessFEN;
-  onUpdated?: (fen: ChessFEN) => void;
+  fen: ChessFEN;
+  onUpdated: (fen: ChessFEN) => void;
 };
 
-const whitePieces: PieceSan[] = ['wP', 'wB', 'wK', 'wN', 'wQ', 'wR'];
-const blackPieces: PieceSan[] = ['bP', 'bB', 'bK', 'bN', 'bQ', 'bR'];
+const whitePieces: PieceSan[] = ['wP', 'wB', 'wN', 'wQ', 'wR'];
+const blackPieces: PieceSan[] = ['bP', 'bB', 'bN', 'bQ', 'bR'];
 
 export const BoardEditor = ({
   fen = ChessFENBoard.STARTING_FEN,
@@ -36,7 +36,7 @@ export const BoardEditor = ({
   ...props
 }: Props) => {
   const fenBoard = useInstance<ChessFENBoard>(new ChessFENBoard(fen));
-  const [editedFen, setEditedFen] = useState(fenBoard.fen);
+  // const [editedFen, setEditedFen] = useState(fenBoard.fen);
   const [draggingPieces, setDraggingPieces] = useState<
     Partial<Record<PieceSan, boolean>>
   >({});
@@ -55,9 +55,9 @@ export const BoardEditor = ({
     };
   }, [sizePx]);
 
-  useEffect(() => {
-    onUpdated(editedFen);
-  }, [editedFen, onUpdated]);
+  // useEffect(() => {
+  //   onUpdated(editedFen);
+  // }, [editedFen, onUpdated]);
 
   const boardTheme = useBoardTheme();
   const [hoveredSquare, setHoveredSquare] = useState<Square>();
@@ -96,70 +96,120 @@ export const BoardEditor = ({
     />
   );
 
-  return (
-    <DndProvider backend={HTML5Backend}>
-      <div
-        className="flex flex-col justify-between items-center justify-center"
-        style={{
-          width: sizePx,
-          height: sizePx,
-        }}
-      >
-        <div className="flex flex-1s rounded-lg overflow-hidden bg-slate-100">
-          {blackPieces.map(renderPiece)}
-        </div>
-        <DropContainer
-          isActive={isDragging}
-          onHover={(_, square) => {
-            setHoveredSquare(square);
-          }}
-          onDrop={(pieceSan, square) => {
-            fenBoard.put(square, pieceSanToFenBoardPieceSymbol(pieceSan));
+  const [draggedPiece, setDraggedPiece] = useState<{
+    piece: PieceSan;
+    from: Square;
+    dropped: boolean;
+  }>();
 
-            setEditedFen(fenBoard.fen);
-            setHoveredSquare(undefined);
+  const cb = useCallback(() => {
+    console.log('dragged piece', draggedPiece);
+  }, [draggedPiece]);
+
+  return (
+    <div
+      className="flex flex-col sjustify-between items-center justify-center"
+      style={{ height: sizePx }}
+    >
+      <DndProvider backend={HTML5Backend}>
+        <div
+          className="flex flex-cosl justify-between items-center justify-center"
+          style={{
+            width: sizePx,
+            // height: sizePx,
           }}
         >
-          <ChessboardContainer
-            fen={editedFen}
-            id="board-editor"
-            // {...props}
-            onMove={(p) => {
-              fenBoard.move(p.from, p.to);
+          <div className="flex flex-col flex-1s rounded-lg overflow-hidden bg-slate-100">
+            {blackPieces.map(renderPiece)}
+          </div>
+          <DropContainer
+            isActive={isDragging}
+            onHover={(_, square) => {
+              setHoveredSquare(square);
+            }}
+            onDrop={(pieceSan, square) => {
+              fenBoard.put(square, pieceSanToFenBoardPieceSymbol(pieceSan));
 
-              setEditedFen(fenBoard.fen);
-
+              // setEditedFen(fenBoard.fen);
+              onUpdated(fenBoard.fen);
               setHoveredSquare(undefined);
+            }}
+          >
+            <ChessboardContainer
+              fen={fen}
+              id="board-editor"
+              {...props}
+              onMove={(p) => {
+                fenBoard.move(p.from, p.to);
 
-              return true;
-            }}
-            onPieceDrop={(...args) => {
-              console.log('on piece drop boar deditor', args);
-            }}
-            onPieceDragEnd={(p, from) => {
-              console.log('onPieceDragEnd', p, from)
-            }}
-            onDragOverSquare={(s) => {
-              console.log('s', s)
-            }}
-            // customNotationStyle
-            arePiecesDraggable
-            allowDragOutsideBoard
-            dropOffBoardAction="snapback"
-            sizePx={boardSize}
-            customSquareStyles={{
-              ...(hoveredSquare && {
-                [hoveredSquare]: {
-                  boxShadow: `inset 0 0 5px 5px ${boardTheme.hoveredSquare}`,
-                },
-              }),
-            }}
-          />
-        </DropContainer>
-        <div className="flex flex-1s rounded-lg overflow-hidden sbg-opacity-30 bg-slate-100">
-          {whitePieces.map(renderPiece)}
+                // setEditedFen(fenBoard.fen);
+                onUpdated(fenBoard.fen);
+
+                setHoveredSquare(undefined);
+
+                return true;
+              }}
+              onPieceDragBegin={(piece, from) => {
+                // console.log('onPieceDragStart', piece, from);
+                // console.log('onPieceDragStart', draggedPiece);
+
+                setDraggedPiece({ piece, dropped: false, from });
+              }}
+              onPieceDrop={(from, to, piece) => {
+                // console.log('on piece drop boar deditor', args);
+                // console.log('dropped', draggedPiece);
+
+                setDraggedPiece({ piece, dropped: true, from });
+                return true;
+              }}
+              onPieceDragEnd={(piece, from) => {
+                setDraggedPiece((prev) => {
+                  if (prev) {
+                    const {
+                      piece: draggedPiece,
+                      dropped,
+                      from: prevFrom,
+                    } = prev;
+
+                    console.log('on drag end', prev, from, prevFrom);
+
+                    // If the draggedPiece haven't dropped yet, it means it got dragged outside
+                    if (
+                      draggedPiece === piece &&
+                      // prevFrom !== from &&
+                      dropped === false
+                    ) {
+                      fenBoard.clear(from);
+
+                      onUpdated(fenBoard.fen);
+                    }
+                  }
+
+                  return undefined;
+                });
+              }}
+              arePiecesDraggable
+              allowDragOutsideBoard
+              dropOffBoardAction="trash"
+              sizePx={boardSize}
+              customSquareStyles={{
+                ...(hoveredSquare && {
+                  [hoveredSquare]: {
+                    boxShadow: `inset 0 0 5px 5px ${boardTheme.hoveredSquare}`,
+                  },
+                }),
+              }}
+            />
+          </DropContainer>
+          <div className="flex flex-col flex-1s rounded-lg overflow-hidden sbg-opacity-30 bg-slate-100">
+            {whitePieces.map(renderPiece)}
+          </div>
         </div>
-      </div>
-    </DndProvider>
+      </DndProvider>
+      {/* <div> */}
+      {/* {draggedPiece} */}
+      {/* <Text>{editedFen}</Text> */}
+      {/* </div> */}
+    </div>
   );
 };

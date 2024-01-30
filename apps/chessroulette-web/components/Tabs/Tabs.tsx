@@ -1,16 +1,18 @@
 import { useMemo, useState } from 'react';
 
+type Tab = {
+  renderHeader: (p: {
+    focus: () => void;
+    isFocused: boolean;
+  }) => React.ReactNode;
+  renderContent: (p: {
+    focus: (tabIndex: number) => void;
+    isFocused: boolean;
+  }) => React.ReactNode;
+};
+
 type Props = {
-  tabs: {
-    renderHeader: (p: {
-      focus: () => void;
-      isFocused: boolean;
-    }) => React.ReactNode;
-    renderContent: (p: {
-      focus: (tabIndex: number) => void;
-      isFocused: boolean;
-    }) => React.ReactNode;
-  }[];
+  tabs: (Tab | undefined)[];
   renderContainerHeader?: (p: {
     tabs: React.ReactNode[];
     focus: (tabIndex: number) => void;
@@ -27,14 +29,22 @@ export const Tabs = (props: Props) => {
   );
 
   const headerComponent = useMemo(() => {
-    const tabs = props.tabs.map((p, i) => (
-      <div key={i}>
-        {p.renderHeader({
-          focus: () => setCurrentTabIndex(i),
-          isFocused: i === currentTabIndex,
-        })}
-      </div>
-    ));
+    const tabs = props.tabs
+      // .filter((m) => !!m)
+      .map((p, i) => {
+        // if (!p) {
+        //   return null;
+        // }
+
+        return (
+          <div key={i}>
+            {p?.renderHeader({
+              focus: () => setCurrentTabIndex(i),
+              isFocused: i === currentTabIndex,
+            })}
+          </div>
+        );
+      });
 
     if (props.renderContainerHeader) {
       return props.renderContainerHeader({
@@ -54,7 +64,7 @@ export const Tabs = (props: Props) => {
     <div className={props.containerClassName}>
       {headerComponent}
       <div className={`flex-1 ${props.contentClassName}`}>
-        {props.tabs[currentTabIndex].renderContent({
+        {props.tabs[currentTabIndex]?.renderContent({
           focus: setCurrentTabIndex,
           isFocused: true,
         })}
