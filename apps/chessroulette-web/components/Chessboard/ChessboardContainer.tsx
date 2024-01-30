@@ -2,9 +2,8 @@ import {
   ChessColor,
   ChessFEN,
   GetComponentProps,
-  LongChessColor,
+  PieceSan,
   ShortChessMove,
-  isDarkSquare,
   objectKeys,
   toChessArrowFromId,
   toChessArrowId,
@@ -13,7 +12,13 @@ import {
   useCallbackIf,
 } from '@xmatter/util-kit';
 import { Square } from 'chess.js';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
 import { useArrowColor } from './useArrowColor';
@@ -35,7 +40,7 @@ type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
 export type ChessboardContainerProps = Omit<
   ChessBoardProps,
-  'position' | 'onArrowsChange' | 'boardOrientation'
+  'position' | 'onArrowsChange' | 'boardOrientation' | 'onPieceDrop'
 > & {
   fen: ChessFEN;
   sizePx: number;
@@ -43,6 +48,7 @@ export type ChessboardContainerProps = Omit<
   circlesMap?: CirclesMap;
   arrowColor?: string;
   onMove?: (m: ShortChessMove) => boolean;
+  onPieceDrop?: (from: Square, to: Square, piece: PieceSan) => void;
   lastMove?: ShortChessMove;
   onArrowsChange?: (arrows: ArrowsMap) => void;
   onCircleDraw?: (circleTuple: CircleDrawTuple) => void;
@@ -51,16 +57,17 @@ export type ChessboardContainerProps = Omit<
   boardOrientation?: ChessColor;
 };
 
-export const ChessboardContainer = ({
+export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
   fen,
   lastMove,
   circlesMap,
   onArrowsChange = noop,
   onCircleDraw = noop,
+  onPieceDrop = noop,
   inCheckSquares,
   boardOrientation = 'white',
   ...props
-}: ChessboardContainerProps) => {
+}) => {
   const boardTheme = useBoardTheme();
 
   const customStyles = useMemo(
@@ -212,6 +219,8 @@ export const ChessboardContainer = ({
     []
   );
 
+  const s = useRef<any>();
+
   return (
     <div className="relative overflow-hidden rounded-lg">
       <Chessboard
@@ -225,7 +234,9 @@ export const ChessboardContainer = ({
         customLightSquareStyle={customStyles.customLightSquareStyle}
         customDarkSquareStyle={customStyles.customDarkSquareStyle}
         customSquare={ChessboardSquare}
-        onPieceDrop={(from, to) => {
+        onPieceDrop={(from, to, p) => {
+          onPieceDrop(from, to, p);
+
           // As long as the on PromotionPieceSelect is present this doesn't get triggered with a pieceSelect
           return !!props.onMove?.({ from, to });
         }}
@@ -243,6 +254,8 @@ export const ChessboardContainer = ({
         customArrows={arrowsToRender}
         autoPromoteToQueen={false}
         onPromotionCheck={(from, to, piece) => {
+          // console.log('hererere', from, to, piece);
+
           const isPromoMove = isPromotableMove({ from, to }, piece);
 
           if (isPromoMove) {

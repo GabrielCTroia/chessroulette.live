@@ -31,7 +31,9 @@ import {
   ArrowsUpDownIcon,
   DocumentDuplicateIcon,
   CheckIcon,
+  PencilSquareIcon,
 } from '@heroicons/react/16/solid';
+import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor/BoardEditor';
 import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
 
 type ChessColor = 'white' | 'black';
@@ -46,6 +48,21 @@ type Props = {
 type Tabs = 'history' | 'import';
 
 export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
+  const url = useUrl();
+
+  const [isEditMode, seetIsEditMode] = useState(true);
+
+  const [nextUserId, setNextUserId] = useState(getRandomInt(0, 99999));
+  const inviteUrl = useMemo(() => {
+    if (!url) {
+      return '';
+    }
+
+    url.searchParams.set('userId', String(nextUserId));
+
+    return url.href;
+  }, [url, nextUserId]);
+
   const userId = useUserId();
   const updateableSearchParams = useUpdateableSearchParams();
   const flippedBoard = updateableSearchParams.get('flipped') === '1';
@@ -138,56 +155,85 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                   ) as SquareMap;
                 });
 
+                // if (isEditMode) {
+                //   return (
+                //     <div>
+                //       edit
+                //     </div>
+                //   )
+                // }
+
                 return (
-                  <div className="bg-indigo-500s flex">
-                    <Freeboard
-                      boardOrientation={
-                        flippedBoard
-                          ? swapColor(activityState.boardOrientation)
-                          : activityState.boardOrientation
-                      }
-                      sizePx={p.center.width}
-                      fen={activityState.fen}
-                      lastMove={lastMove}
-                      inCheckSquares={inCheckSquaresMap}
-                      onMove={(payload) => {
-                        dispatch({ type: 'dropPiece', payload });
-
-                        return true;
-                      }}
-                      onArrowsChange={(payload) => {
-                        // console.log('on arrow change?');
-                        dispatch({ type: 'arrowChange', payload });
-                      }}
-                      arrowsMap={activityState.arrows}
-                      onCircleDraw={(tuple) => {
-                        dispatch({
-                          type: 'drawCircle',
-                          payload: tuple,
-                        });
-                      }}
-                      onClearCircles={() => {
-                        dispatch({ type: 'clearCircles' });
-                      }}
-                      circlesMap={activityState.circles}
-                    />
-
-                    <div className="bg-resd-100 p-1 pt-0 pb-0">
-                      <ArrowsUpDownIcon
-                        className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
-                        title="Flip Board"
-                        onClick={() => {
-                          const nextBoardOrientation =
-                            activityState.boardOrientation === 'black'
-                              ? 'white'
-                              : 'black';
-
-                          dispatch({
-                            type: 'changeBoardOrientation',
-                            payload: nextBoardOrientation,
-                          });
+                  <div className="flex">
+                    {isEditMode ? (
+                      <BoardEditor
+                        sizePx={p.center.width}
+                        onUpdated={(nextFen) => {
+                          console.log('nexg fen', nextFen);
                         }}
                       />
+                    ) : (
+                      <Freeboard
+                        boardOrientation={activityState.boardOrientation}
+                        sizePx={p.center.width}
+                        fen={activityState.fen}
+                        lastMove={lastMove}
+                        inCheckSquares={inCheckSquaresMap}
+                        onMove={(payload) => {
+                          dispatch({ type: 'dropPiece', payload });
+
+                          return true;
+                        }}
+                        onArrowsChange={(payload) => {
+                          // console.log('on arrow change?');
+                          dispatch({ type: 'arrowChange', payload });
+                        }}
+                        arrowsMap={activityState.arrows}
+                        onCircleDraw={(tuple) => {
+                          dispatch({
+                            type: 'drawCircle',
+                            payload: tuple,
+                          });
+                        }}
+                        onClearCircles={() => {
+                          dispatch({ type: 'clearCircles' });
+                        }}
+                        circlesMap={activityState.circles}
+                      />
+                    )}
+
+                    <div className="flex flex-col p-1 pt-0 pb-0">
+                      <div className="mb-2">
+                        <ArrowsUpDownIcon
+                          className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
+                          title="Flip Board"
+                          onClick={() => {
+                            dispatch({
+                              type: 'changeBoardOrientation',
+                              payload:
+                                activityState.boardOrientation === 'black'
+                                  ? 'white'
+                                  : 'black',
+                            });
+                          }}
+                        />
+                      </div>
+                      <div className="">
+                        <PencilSquareIcon
+                          className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
+                          title="Edit Board"
+                          onClick={() => {
+                            seetIsEditMode((prev) => !prev);
+                            // dispatch({
+                            //   type: 'changeBoardOrientation',
+                            //   payload:
+                            //     activityState.boardOrientation === 'black'
+                            //       ? 'white'
+                            //       : 'black',
+                            // });
+                          }}
+                        />
+                      </div>
                     </div>
                   </div>
                 );

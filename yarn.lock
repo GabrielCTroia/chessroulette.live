@@ -13337,10 +13337,10 @@ rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-chessboard@^4.3.2:
-  version "4.3.2"
-  resolved "https://registry.yarnpkg.com/react-chessboard/-/react-chessboard-4.3.2.tgz#bdec9383c564eeca92cc821b46f02fc48196a9d0"
-  integrity sha512-w6V6q2XsByrUypsAzVEUV+MfhCjeD6iaGbNWdy3D1xo/AcNl4fFgbNV549G6YFJv83OP1ys1chajNcO8Rw7LlQ==
+react-chessboard@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/react-chessboard/-/react-chessboard-4.4.0.tgz#15b7bef9e61236f07625994120b933e455833134"
+  integrity sha512-UJuFVju9pEcPJvH76HQyccm4uHyU755/Uf/3e1QfMHGWLFCBeEMSUkbzhlvxSL8Mutj/4wRxBVyJMyjhtnX0xg==
   dependencies:
     react-dnd "^16.0.1"
     react-dnd-html5-backend "^16.0.1"

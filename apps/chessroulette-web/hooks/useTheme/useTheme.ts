@@ -21,6 +21,7 @@ export const useTheme = () => {
 
   const darkSquare = params.get('darkSquare') || undefined;
   const lightSquare = params.get('lightSquare') || undefined;
+  const hoveredSquare = params.get('hoveredSquare') || undefined;
 
   // TODO: Validate colors
 
@@ -30,6 +31,7 @@ export const useTheme = () => {
       ...baseTheme.board,
       ...(darkSquare && { darkSquare }),
       ...(lightSquare && { lightSquare }),
+      ...(hoveredSquare && { hoveredSquare }),
     },
   };
 };

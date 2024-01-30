@@ -6,6 +6,7 @@ type Theme = {
     arrowColors: [string, string, string];
     lastMoveToSquare: string;
     lastMoveFromSquare: string;
+    hoveredSquare: string;
   };
 };
 
@@ -17,6 +18,7 @@ const chessrouletteTheme: Theme = {
     arrowColors: ['#11c6d1', '#f2358d', '#6f7381'],
     lastMoveToSquare: 'rgba(234, 183, 255, .5)',
     lastMoveFromSquare: 'rgba(234, 183, 255, .5)',
+    hoveredSquare: 'rgba(204, 183, 255, .9)',
   },
 };
 
@@ -28,6 +30,7 @@ const outpostTheme: Theme = {
     arrowColors: ['#11c6d1', '#f2358d', '#6f7381'],
     lastMoveToSquare: 'rgba(95, 15, 15, .6)',
     lastMoveFromSquare: 'rgba(95, 15, 15, .6)',
+    hoveredSquare: 'rgba(134, 583, 255, .5)',
   },
 };
 

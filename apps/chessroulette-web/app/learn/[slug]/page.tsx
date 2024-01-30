@@ -7,6 +7,7 @@ import LearnActivity from 'apps/chessroulette-web/modules/room/Learn/LearnActivi
 import { Twilio } from 'twilio';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 import RoomTemplate from 'apps/chessroulette-web/templates/RoomTemplate';
+import { config } from 'apps/chessroulette-web/config';
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID as string;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN as string;
@@ -16,6 +17,10 @@ const twilioClient: any = new Twilio(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN);
 const twilio = {
   getIceServers: async (): Promise<IceServerRecord[]> => {
     try {
+      if (!config.CAMERA_ON) {
+        throw 'camera off - meant to catch!';
+      }
+
       return (await twilioClient.tokens.create()).iceServers;
     } catch {
       // Return the defaults if no connection or other error

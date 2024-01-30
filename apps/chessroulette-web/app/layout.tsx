@@ -3,7 +3,7 @@ import '../styles.css';
 import MovexProvider from '../providers/MovexProvider';
 
 export const metadata: Metadata = {
-  title: 'Chessroulette | Home',
+  title: 'Home | Chessroulette',
   description: 'Welcome to Chessroulette',
 };
 

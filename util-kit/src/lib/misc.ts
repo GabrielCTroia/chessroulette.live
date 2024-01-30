@@ -71,3 +71,6 @@ export const isOneOf = <T extends string, List extends T[]>(
   k: T | undefined,
   listOfOptions: List
 ): k is TupleToUnionType<List> => !!k && listOfOptions.indexOf(k) > -1;
+
+export const isObject = (m: unknown): m is object =>
+  m !== null && typeof m === 'object';
