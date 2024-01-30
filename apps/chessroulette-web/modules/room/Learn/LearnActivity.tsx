@@ -34,6 +34,7 @@ import {
 import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor/BoardEditor';
 import { useLearnActivitySettings } from './useLearnActivitySettings';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
+import { toShortColor } from 'chessterrain-react';
 
 type ChessColor = 'white' | 'black';
 
@@ -259,11 +260,17 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                 const { activityState } = state.activity;
 
                 if (editMode.isActive) {
+                  const editFenInstance = new ChessFENBoard(
+                    editMode.fen
+                  );
+
+                  const changeTo = swapColor(editFenInstance.getFenState().turn);
+
                   return (
                     <div className="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg">
                       <div className="flex-1 flex min-h-0">
                         <div className="flex flex-col flex-1 gap-2 bg-slate-700 min-h-0 jsutify-between">
-                          <div className="flex-1">
+                          <div className="flex flex-1 flex-col gap-2">
                             <Button
                               size="sm"
                               onClick={() => {
@@ -279,6 +286,25 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                               }}
                             >
                               Use Board
+                            </Button>
+                            <Button
+                              size="sm"
+                              type="custom"
+                              className="bg-blue-600 hover:bg-blue-400 capitalize"
+                              onClick={() => {
+                                editFenInstance.setFenNotation({
+                                  fromState: {
+                                    turn: toShortColor(changeTo),
+                                  }
+                                })
+
+                                setEditMode((prev) => ({
+                                  ...prev,
+                                  fen: editFenInstance.fen,
+                                }))
+                              }}
+                            >
+                              Change Turn to <span className='font-bold'>{changeTo}</span>
                             </Button>
                             {/* <Button
                               size="sm"
