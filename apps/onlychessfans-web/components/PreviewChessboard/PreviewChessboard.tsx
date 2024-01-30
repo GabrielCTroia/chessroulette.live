@@ -6,8 +6,12 @@ import {
 } from 'apps/onlychessfans-web/lib/util';
 import { AspectRatio } from '../AspectRatio';
 import React, { useMemo } from 'react';
-import { ChessFENBoard, matrixMap } from '@xmatter/util-kit';
-import { fenBoardPieceSymbolToDetailed } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
+import {
+  ChessFENBoard,
+  fenBoardPieceSymbolToDetailedChessPiece,
+  matrixMap,
+} from '@xmatter/util-kit';
+// import { fenBoardPieceSymbolToDetailed } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
 import './styles.css';
 import { pieces } from './assets/pieces';
 import { BackgroundLayer } from './BackgroundLayer';
@@ -43,10 +47,10 @@ export const PreviewChessboard = React.memo(
               return;
             }
 
-            const { color, type } = fenBoardPieceSymbolToDetailed(p);
+            const { color, piece } = fenBoardPieceSymbolToDetailedChessPiece(p);
 
             const img =
-              pieces[`${color}${type.toUpperCase()}` as keyof typeof pieces];
+              pieces[`${color}${piece.toUpperCase()}` as keyof typeof pieces];
             const imgSrc =
               isObject(img) && keyInObject(img, 'src') ? img.src : img;
 
