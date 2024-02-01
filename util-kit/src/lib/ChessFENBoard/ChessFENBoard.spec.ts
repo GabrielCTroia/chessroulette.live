@@ -467,7 +467,7 @@ describe('move', () => {
     chessFenBoard.move('e2', 'e4');
 
     expect(chessFenBoard.fen).toBe(
-      'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq - 0 1'
+      'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1'
     );
 
     chessFenBoard.move('d7', 'd6');
@@ -609,6 +609,108 @@ describe('Castling Move', () => {
     expect(actualFen).toBe(
       '2kr3r/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/R3K2R w KQ - 11 7'
     );
+  });
+
+  describe('en passant', () => {
+    test('fen adds the en passant notation when pawn moves 2 squares | white', () => {
+      const chessFenBoard = new ChessFENBoard(
+        'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1'
+      );
+
+      chessFenBoard.move('e2', 'e4');
+
+      const actualFen = chessFenBoard.fen;
+
+      expect(actualFen).toBe(
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1'
+      );
+    });
+
+    test('fen adds the en passant notation when pawn moves 2 squares | black', () => {
+      const chessFenBoard = new ChessFENBoard(
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1'
+      );
+
+      chessFenBoard.move('d7', 'd5');
+
+      const actualFen = chessFenBoard.fen;
+
+      expect(actualFen).toBe(
+        'rnbqkbnr/ppp1pppp/8/3p4/4P3/8/PPPP1PPP/RNBQKBNR w KQkq d6 0 2'
+      );
+    });
+
+    test('fen removes the en passant notation when any other move', () => {
+      const chessFenBoard = new ChessFENBoard(
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1'
+      );
+
+      chessFenBoard.move('d2', 'd3');
+
+      const actualFen = chessFenBoard.fen;
+
+      expect(actualFen).toBe(
+        'rnbqkbnr/pppppppp/8/8/4P3/3P4/PPP2PPP/RNBQKBNR b KQkq - 0 1'
+      );
+    });
+
+    test('does not add en passant when pawn moves on different ranks', () => {
+      const chessFenBoard = new ChessFENBoard(
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 1'
+      );
+
+      chessFenBoard.move('d2', 'e4');
+
+      const actualFen = chessFenBoard.fen;
+
+      expect(actualFen).toBe(
+        'rnbqkbnr/pppppppp/8/8/4P3/8/PPP2PPP/RNBQKBNR b KQkq - 0 1'
+      );
+    });
+
+    describe('En Passant capturers', () => {
+      test('takes the moved white pawn on e6', () => {
+        const chessFenBoard = new ChessFENBoard(
+          'rnbqkbnr/pppp1ppp/8/4pP2/8/8/PPPPP1PP/RNBQKBNR w KQkq e6 0 2'
+        );
+
+        const actualMove = chessFenBoard.move('f5', 'e6');
+        const actualFen = chessFenBoard.fen;
+
+        expect(actualMove).toEqual({
+          captured: 'bP',
+          color: 'w',
+          from: 'f5',
+          piece: 'p',
+          san: 'fxe6',
+          to: 'e6',
+        });
+        expect(actualFen).toBe(
+          'rnbqkbnr/pppp1ppp/4P3/8/8/8/PPPPP1PP/RNBQKBNR b KQkq - 0 2'
+        );
+      });
+
+      test('takes the moved white pawn on e3', () => {
+        const chessFenBoard = new ChessFENBoard(
+          'rnbqkbnr/ppp1pppp/8/8/3pP3/8/PPPP1PPP/RNBQKBNR b KQkq e3 0 2'
+        );
+
+        const actualMove = chessFenBoard.move('d4', 'e3');
+        const actualFen = chessFenBoard.fen;
+
+        expect(actualMove).toEqual({
+          captured: 'wP',
+          color: 'b',
+          from: 'd4',
+          piece: 'p',
+          san: 'dxe3',
+          to: 'e3',
+        });
+        expect(actualFen).toBe(
+          'rnbqkbnr/ppp1pppp/8/8/8/4p3/PPPP1PPP/RNBQKBNR w KQkq - 0 3'
+        );
+      });
+    });
   });
 });
 

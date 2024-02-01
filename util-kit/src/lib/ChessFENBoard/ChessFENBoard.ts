@@ -133,12 +133,24 @@ export class ChessFENBoard {
       throw new Error(`Move Error: the from square (${from}) was empty!`);
     }
 
-    const toPiece = this.piece(to);
-    const captured: PieceSymbol | undefined = toPiece
-      ? fenBoardPieceSymbolToPieceSymbol(toPiece)
-      : undefined;
+    const castlingMove = this.isCastlingMove({ from, to, piece });
+    const enPassant = this.isEnPassantMove({ from, to, piece });
 
-    const castlingMove = this.isCastlingMove(from, to);
+    const capturedPieceViaEnPassant = this.getCapturedPieceViaEnPassant({
+      from,
+      to,
+      piece,
+    });
+
+    if (capturedPieceViaEnPassant) {
+      // Remove the captured pawn
+      this.clear(capturedPieceViaEnPassant.square);
+    }
+
+    const targetPiece = this.piece(to) || capturedPieceViaEnPassant?.piece;
+    const captured: PieceSymbol | undefined = targetPiece
+      ? fenBoardPieceSymbolToPieceSymbol(targetPiece)
+      : undefined;
 
     // TODO: here the fen gets recalculate 2 times (one for put one for clear)
     this.put(to, piece);
@@ -195,6 +207,8 @@ export class ChessFENBoard {
           },
         }),
 
+        enPassant,
+
         /**
          * Half Moves reset when there is a capture or a pawn advance otherwise they increment
          *
@@ -225,16 +239,15 @@ export class ChessFENBoard {
     };
   }
 
-  private isCastlingMove(
-    from: Square,
-    to: Square
-  ): null | { rookFrom: Square; rookTo: Square; side: 'q' | 'k' } {
-    const piece = this.piece(from);
-
-    if (!piece) {
-      throw new Error(`Move Error: the from square (${from}) was empty!`);
-    }
-
+  private isCastlingMove({
+    from,
+    to,
+    piece,
+  }: {
+    from: Square;
+    to: Square;
+    piece: FenBoardPieceSymbol;
+  }): null | { rookFrom: Square; rookTo: Square; side: 'q' | 'k' } {
     if (!isOneOf(piece, ['K', 'k'])) {
       return null;
     }
@@ -324,6 +337,66 @@ export class ChessFENBoard {
     }
 
     return null;
+  }
+
+  private isEnPassantMove({
+    from,
+    to,
+    piece,
+  }: {
+    from: Square;
+    to: Square;
+    piece: FenBoardPieceSymbol;
+  }): Square | undefined {
+    if (isOneOf(piece, ['P', 'p'])) {
+      const [fileFrom, rankFrom] = from;
+      const [fileTo, rankTo] = to;
+
+      if (fileFrom === fileTo) {
+        // White
+        if (rankFrom === '2' && rankTo === '4') {
+          return `${fileFrom}3` as Square;
+        }
+
+        // Black
+        if (rankFrom === '7' && rankTo === '5') {
+          return `${fileFrom}6` as Square;
+        }
+      }
+    }
+
+    return undefined;
+  }
+
+  private getCapturedPieceViaEnPassant({
+    from,
+    to,
+    piece,
+  }: {
+    from: Square;
+    to: Square;
+    piece: FenBoardPieceSymbol;
+  }): { piece: FenBoardPieceSymbol; square: Square } | undefined {
+    if (
+      this._state.fenState.enPassant &&
+      to === this._state.fenState.enPassant && // the fen State enPassant is exactly the to square
+      isOneOf(piece, ['p', 'P']) && // the captureer is a pawn
+      isOneOf(from[1], ['4', '5']) // the capturer is on the same rank as the captured
+    ) {
+      const targetRank = to[1] === '3' ? Number(to[1]) + 1 : Number(to[1]) - 1;
+
+      const targetSquare = `${to[0]}${targetRank}` as Square;
+      const targetPiece = this.piece(targetSquare);
+
+      if (targetPiece) {
+        return {
+          piece: targetPiece,
+          square: targetSquare,
+        };
+      }
+    }
+
+    return undefined;
   }
 
   /**

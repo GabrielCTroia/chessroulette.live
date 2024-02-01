@@ -116,11 +116,11 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                   const fenBoardInstance = new ChessFENBoard(activityState.fen);
 
-                  fenBoardInstance.setFenNotation({ fromState: { turn: 'w' } });
+                  fenBoardInstance.setFenNotation({ fromState: { turn: 'w', enPassant: undefined } });
 
                   const fenAsWhiteTurn = fenBoardInstance.fen;
 
-                  fenBoardInstance.setFenNotation({ fromState: { turn: 'b' } });
+                  fenBoardInstance.setFenNotation({ fromState: { turn: 'b', enPassant: undefined } });
 
                   const fenAsBlackTurn = fenBoardInstance.fen;
 
