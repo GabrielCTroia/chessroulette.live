@@ -11,11 +11,12 @@ import {
   ChessFENBoard,
   getNewChessGame,
   invoke,
+  objectKeys,
   swapColor,
   toDictIndexedBy,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import Streaming from '../Streaming';
 import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
 import { Button } from 'apps/chessroulette-web/components/Button';
@@ -35,6 +36,7 @@ import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardE
 import { useLearnActivitySettings } from './useLearnActivitySettings';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
 import { toShortColor } from 'chessterrain-react';
+import { useBoardTheme } from 'apps/chessroulette-web/components/Chessboard/useBoardTheme';
 
 type ChessColor = 'white' | 'black';
 
@@ -50,6 +52,7 @@ type Tabs = 'history' | 'import';
 export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   const userId = useUserId();
   const settings = useLearnActivitySettings();
+  const boardTheme = useBoardTheme();
 
   const [editMode, setEditMode] = useState({
     isActive: false,
@@ -158,7 +161,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                   : activityState.boardOrientation;
 
                 return (
-                  <div className="flex">
+                  <div className="flex border-slate-900">
                     {editMode.isActive ? (
                       <BoardEditor
                         fen={editMode.fen}
@@ -167,6 +170,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                       />
                     ) : (
                       <Board
+                        containerClassName="shadow-2xl"
                         boardOrientation={playingColor}
                         playingColor={playingColor}
                         sizePx={p.center.width}
@@ -192,6 +196,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                           dispatch({ type: 'clearCircles' });
                         }}
                         circlesMap={activityState.circles}
+                        customPieces={boardTheme.customPieces}
                       />
                     )}
 
@@ -199,7 +204,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                       {settings.canFlipBoard && (
                         <div className="mb-2">
                           <ArrowsUpDownIcon
-                            className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
+                            className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black hover:rounded-lg"
                             title="Flip Board"
                             onClick={() => {
                               dispatch({
@@ -216,7 +221,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                       {settings.canEditBoard && (
                         <div className="">
                           <PencilSquareIcon
-                            className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer text-slate-400 hover:text-black hover:rounded-lg"
+                            className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black hover:rounded-lg"
                             title="Edit Board"
                             onClick={() => {
                               setEditMode((prev) => ({
@@ -241,7 +246,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
           style={{ height: p.center.height }}
         >
           <div className="flex flex-col flex-1 min-h-0 gap-4">
-            <div className="overflow-hidden rounded-lg">
+            <div className="overflow-hidden rounded-lg shadow-2xl">
               <Streaming
                 rid={props.rid}
                 iceServers={iceServers}
@@ -260,14 +265,14 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                 const { activityState } = state.activity;
 
                 if (editMode.isActive) {
-                  const editFenInstance = new ChessFENBoard(
-                    editMode.fen
+                  const editFenInstance = new ChessFENBoard(editMode.fen);
+
+                  const changeTo = swapColor(
+                    editFenInstance.getFenState().turn
                   );
 
-                  const changeTo = swapColor(editFenInstance.getFenState().turn);
-
                   return (
-                    <div className="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg">
+                    <div className="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl">
                       <div className="flex-1 flex min-h-0">
                         <div className="flex flex-col flex-1 gap-2 bg-slate-700 min-h-0 jsutify-between">
                           <div className="flex flex-1 flex-col gap-2">
@@ -295,16 +300,17 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                 editFenInstance.setFenNotation({
                                   fromState: {
                                     turn: toShortColor(changeTo),
-                                  }
-                                })
+                                  },
+                                });
 
                                 setEditMode((prev) => ({
                                   ...prev,
                                   fen: editFenInstance.fen,
-                                }))
+                                }));
                               }}
                             >
-                              Change Turn to <span className='font-bold'>{changeTo}</span>
+                              Change Turn to{' '}
+                              <span className="font-bold">{changeTo}</span>
                             </Button>
                             {/* <Button
                               size="sm"
@@ -350,7 +356,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                 return (
                   <Tabs
-                    containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg"
+                    containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
                     headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
                     contentClassName="flex-1 flex min-h-0"
                     currentIndex={0}

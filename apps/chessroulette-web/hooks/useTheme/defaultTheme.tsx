@@ -1,3 +1,14 @@
+import {
+  GetComponentProps,
+  objectKeys,
+  toDictIndexedBy,
+} from '@xmatter/util-kit';
+import { Chessboard } from 'react-chessboard';
+import { Piece } from 'apps/chessroulette-web/components/Chessboard/Piece';
+import { pieces as MahaPieces } from 'apps/chessroulette-web/components/Chessboard/assets/mahaPieces';
+
+export type ChessBoardProps = GetComponentProps<typeof Chessboard>;
+
 type Theme = {
   name: string;
   board: {
@@ -7,6 +18,7 @@ type Theme = {
     lastMoveToSquare: string;
     lastMoveFromSquare: string;
     hoveredSquare: string;
+    customPieces?: ChessBoardProps['customPieces'];
   };
 };
 
@@ -34,6 +46,29 @@ const outpostTheme: Theme = {
   },
 };
 
+const kidsTheme: Theme = {
+  name: 'kids',
+  board: {
+    ...chessrouletteTheme.board,
+    customPieces: toDictIndexedBy(
+      objectKeys(MahaPieces),
+      (pieceSan) => pieceSan,
+      (pieceSan) => (p: { squareWidth: number }) =>
+        (
+          <Piece
+            registry={MahaPieces}
+            squareSize={p.squareWidth * 1}
+            pieceSan={pieceSan}
+            className="mb-4"
+            style={{
+              marginTop: '-1%',
+            }}
+          />
+        )
+    ),
+  },
+};
+
 export const defaultTheme = chessrouletteTheme;
 
 export const themes = {
@@ -41,4 +76,5 @@ export const themes = {
   cr: chessrouletteTheme,
   outpost: outpostTheme,
   op: outpostTheme,
+  kids: kidsTheme,
 };

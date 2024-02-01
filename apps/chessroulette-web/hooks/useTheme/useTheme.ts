@@ -23,15 +23,19 @@ export const useTheme = () => {
   const lightSquare = params.get('lightSquare') || undefined;
   const hoveredSquare = params.get('hoveredSquare') || undefined;
 
+  const kidsMode = themeParam.indexOf('kids') > -1;
+
   // TODO: Validate colors
 
   return {
     ...baseTheme,
+    kidsMode,
     board: {
       ...baseTheme.board,
       ...(darkSquare && { darkSquare }),
       ...(lightSquare && { lightSquare }),
       ...(hoveredSquare && { hoveredSquare }),
+      kidsMode,
     },
   };
 };

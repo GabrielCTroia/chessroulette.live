@@ -12,13 +12,7 @@ import {
   useCallbackIf,
 } from '@xmatter/util-kit';
 import { Square } from 'chess.js';
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
 import { useArrowColor } from './useArrowColor';
@@ -36,7 +30,8 @@ import { deepmerge } from 'deepmerge-ts';
 import { ChessboardSquare } from './ChessboardSquare';
 import { useBoardTheme } from './useBoardTheme';
 
-type ChessBoardProps = GetComponentProps<typeof Chessboard>;
+
+export type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
 export type ChessboardContainerProps = Omit<
   ChessBoardProps,
@@ -55,6 +50,7 @@ export type ChessboardContainerProps = Omit<
   onClearCircles?: () => void;
   inCheckSquares?: SquareMap;
   boardOrientation?: ChessColor;
+  containerClassName?: string;
 };
 
 export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
@@ -66,6 +62,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
   onPieceDrop = noop,
   inCheckSquares,
   boardOrientation = 'white',
+  containerClassName,
   ...props
 }) => {
   const boardTheme = useBoardTheme();
@@ -219,10 +216,11 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
     []
   );
 
-  const s = useRef<any>();
-
+  // const s = useRef<any>();
   return (
-    <div className="relative overflow-hidden rounded-lg">
+    <div
+      className={`relative overflow-hidden rounded-lg ${containerClassName}`}
+    >
       <Chessboard
         position={fen}
         boardWidth={props.sizePx}

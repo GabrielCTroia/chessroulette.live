@@ -1,6 +1,6 @@
 import React from 'react';
 import { PieceSan, isObject, keyInObject } from '@xmatter/util-kit';
-import { pieces as pieceGraphics } from '../assets/pieces';
+import { pieces as pieceGraphics } from '../assets/mahaPieces';
 import { DraggableItem, DraggablePieceProps } from './DraggableItem';
 
 type Props = DraggablePieceProps & {
