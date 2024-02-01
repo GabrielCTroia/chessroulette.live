@@ -530,10 +530,6 @@ describe('Find Move At Index Recursively', () => {
       [[0, 1, [[0, 0]]]], // should be b7
     ]);
 
-    // [[0, 0]]
-
-    console.log('actual', JSON.stringify(actual, null, 2));
-
     expect(actual).toEqual({
       from: 'b2',
       to: 'b4',

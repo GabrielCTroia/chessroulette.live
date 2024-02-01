@@ -36,7 +36,7 @@ export type FenState = {
 export class ChessFENBoard {
   static STARTING_FEN: ChessFEN =
     'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-    // '8/8/8/8/8/8/8/8 w - - 0 1'; // TODO: Add ability to have an empty baord
+  // '8/8/8/8/8/8/8/8 w - - 0 1'; // TODO: Add ability to have an empty baord
 
   // This is a get because it's meant to be readonly
   static get STARTING_FEN_STATE(): FenState {
@@ -170,7 +170,13 @@ export class ChessFENBoard {
       return 'x';
     });
 
-    const san = `${sanPiece}${sanCaptured}${to}`;
+    const san = invoke(() => {
+      if (castlingMove) {
+        return castlingMove.side === 'k' ? '0-0' : '0-0-0';
+      }
+
+      return `${sanPiece}${sanCaptured}${to}`;
+    });
     const prevFenState = this._state.fenState;
 
     // Refresh the Fen State
@@ -222,7 +228,7 @@ export class ChessFENBoard {
   private isCastlingMove(
     from: Square,
     to: Square
-  ): null | { rookFrom: Square; rookTo: Square } {
+  ): null | { rookFrom: Square; rookTo: Square; side: 'q' | 'k' } {
     const piece = this.piece(from);
 
     if (!piece) {
@@ -254,7 +260,7 @@ export class ChessFENBoard {
           return null;
         }
 
-        return { rookFrom: 'h1', rookTo: 'f1' };
+        return { rookFrom: 'h1', rookTo: 'f1', side: 'k' };
       }
 
       // If Queen side
@@ -271,7 +277,7 @@ export class ChessFENBoard {
           return null;
         }
 
-        return { rookFrom: 'a1', rookTo: 'd1' };
+        return { rookFrom: 'a1', rookTo: 'd1', side: 'q' };
       }
     }
 
@@ -296,7 +302,7 @@ export class ChessFENBoard {
           return null;
         }
 
-        return { rookFrom: 'h8', rookTo: 'f8' };
+        return { rookFrom: 'h8', rookTo: 'f8', side: 'k' };
       }
 
       // If Queen side
@@ -313,7 +319,7 @@ export class ChessFENBoard {
           return null;
         }
 
-        return { rookFrom: 'a8', rookTo: 'c8' };
+        return { rookFrom: 'a8', rookTo: 'd8', side: 'q' };
       }
     }
 

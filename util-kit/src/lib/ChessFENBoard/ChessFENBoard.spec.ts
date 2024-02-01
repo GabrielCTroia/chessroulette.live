@@ -457,20 +457,6 @@ describe('move', () => {
     );
   });
 
-  test('moves with castling', () => {
-    const chessFenBoard = new ChessFENBoard(
-      'rnbqkb1r/5ppp/p2ppn2/1p6/3NP3/1BN5/PPP2PPP/R1BQK2R w KQkq - 0 1'
-    );
-
-    chessFenBoard.move('e1', 'g1');
-
-    const actual = chessFenBoard.fen;
-
-    expect(actual).toBe(
-      'rnbqkb1r/5ppp/p2ppn2/1p6/3NP3/1BN5/PPP2PPP/R1BQ1RK1 b kq - 1 1'
-    );
-  });
-
   test('full moves get counted correctly', () => {
     const chessFenBoard = new ChessFENBoard();
 
@@ -533,6 +519,95 @@ describe('move', () => {
     chessFenBoard.move('e1', 'g1');
     expect(chessFenBoard.fen).toBe(
       'r3kb1r/pppqpppp/2np1n2/8/2B1P1b1/P4N2/1PPP1PPP/RNB2RK1 b kq - 5 6'
+    );
+  });
+});
+
+describe('Castling Move', () => {
+  test('castling for white on king side', () => {
+    const chessFenBoard = new ChessFENBoard(
+      'rnbqkb1r/5ppp/p2ppn2/1p6/3NP3/1BN5/PPP2PPP/R1BQK2R w KQkq - 0 1'
+    );
+
+    const actualMove = chessFenBoard.move('e1', 'g1');
+    const actualFen = chessFenBoard.fen;
+
+    expect(actualMove).toEqual({
+      captured: undefined,
+      color: 'w',
+      from: 'e1',
+      to: 'g1',
+      piece: 'k',
+      san: '0-0',
+    });
+    expect(actualFen).toBe(
+      'rnbqkb1r/5ppp/p2ppn2/1p6/3NP3/1BN5/PPP2PPP/R1BQ1RK1 b kq - 1 1'
+    );
+  });
+
+  test('castling for white on queen side', () => {
+    const chessFenBoard = new ChessFENBoard(
+      'r3k2r/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/R3K2R w KQkq - 10 6'
+    );
+
+    const actualMove = chessFenBoard.move('e1', 'c1');
+
+    expect(actualMove).toEqual({
+      captured: undefined,
+      color: 'w',
+      from: 'e1',
+      to: 'c1',
+      piece: 'k',
+      san: '0-0-0',
+    });
+
+    const actualFen = chessFenBoard.fen;
+    expect(actualFen).toBe(
+      'r3k2r/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/2KR3R b kq - 11 6'
+    );
+  });
+
+  test('castling for black on king side', () => {
+    const chessFenBoard = new ChessFENBoard(
+      'r3k2r/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/R3K2R b KQkq - 10 6'
+    );
+
+    const actualMove = chessFenBoard.move('e8', 'g8');
+
+    expect(actualMove).toEqual({
+      captured: undefined,
+      color: 'b',
+      from: 'e8',
+      to: 'g8',
+      piece: 'k',
+      san: '0-0',
+    });
+
+    const actualFen = chessFenBoard.fen;
+    expect(actualFen).toBe(
+      'r4rk1/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/R3K2R w KQ - 11 7'
+    );
+  });
+
+  test('castling for black on queen side', () => {
+    const chessFenBoard = new ChessFENBoard(
+      'r3k2r/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/R3K2R b KQkq - 10 6'
+    );
+
+    const actualMove = chessFenBoard.move('e8', 'c8');
+
+    expect(actualMove).toEqual({
+      captured: undefined,
+      color: 'b',
+      from: 'e8',
+      to: 'c8',
+      piece: 'k',
+      san: '0-0-0',
+    });
+
+    const actualFen = chessFenBoard.fen;
+    expect(actualFen).toBe(
+      '2kr3r/pppppppp/1nbq1bn1/8/8/1NBQ1BN1/PPPPPPPP/R3K2R w KQ - 11 7'
     );
   });
 });
