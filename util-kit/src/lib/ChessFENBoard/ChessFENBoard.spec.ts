@@ -406,7 +406,7 @@ describe('move', () => {
     chessFenBoard.move('e8', 'd1');
 
     expect(chessFenBoard.fen).toBe(
-      'rnbq1bnr/pppppppp/8/P7/2R5/8/1PPPPPPP/RNBkKBN1 b KQkq - 0 2'
+      'rnbq1bnr/pppppppp/8/P7/2R5/8/1PPPPPPP/RNBkKBN1 w KQkq - 0 2'
     );
 
     expect(chessFenBoard.board).toEqual([
