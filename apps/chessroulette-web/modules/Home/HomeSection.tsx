@@ -88,15 +88,15 @@ export default () => {
                     updateableSearchParams.set((prev) => ({
                       ...prev,
                       userId: prev.userId || getRandomInt(0, 999),
+                      theme: 'outpost',
                       instructor: 1,
                     }))
                 );
               });
           }}
         >
-          Start Class As Instructor
+          Start Class As Outpost Instructor
         </Button>
-
         <Button
           onClick={() => {
             // console.log('works', roomResource);
@@ -120,10 +120,10 @@ export default () => {
                 );
               });
           }}
-          type='custom'
-          className='bg-green-600 font-bold hover:bg-green-500'
+          type="custom"
+          className="bg-green-600 font-bold hover:bg-green-500"
         >
-          Start Class As Instructor For Kids
+          Start Class as Kids Instructor
         </Button>
       </main>
     </>
