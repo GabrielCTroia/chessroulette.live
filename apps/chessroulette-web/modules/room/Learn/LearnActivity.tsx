@@ -3,7 +3,6 @@
 import movexConfig from 'apps/chessroulette-web/movex.config';
 import { ResourceIdentifier } from 'movex-core-util';
 import { MovexBoundResource } from 'movex-react';
-import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { LearnTemplate } from './LearnTemplate';
 import { GameHistory } from 'apps/chessroulette-web/components/GameHistory';
 import {
@@ -11,12 +10,11 @@ import {
   ChessFENBoard,
   getNewChessGame,
   invoke,
-  objectKeys,
   swapColor,
   toDictIndexedBy,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import Streaming from '../Streaming';
 import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
 import { Button } from 'apps/chessroulette-web/components/Button';
@@ -34,6 +32,7 @@ import {
 } from '@heroicons/react/16/solid';
 import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor/BoardEditor';
 import { useLearnActivitySettings } from './useLearnActivitySettings';
+import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
 import { toShortColor } from 'chessterrain-react';
 import { useBoardTheme } from 'apps/chessroulette-web/components/Chessboard/useBoardTheme';

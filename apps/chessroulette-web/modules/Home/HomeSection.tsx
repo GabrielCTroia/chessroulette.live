@@ -96,6 +96,35 @@ export default () => {
         >
           Start Class As Instructor
         </Button>
+
+        <Button
+          onClick={() => {
+            // console.log('works', roomResource);
+
+            roomResource
+              ?.create({
+                ...initialRoomState,
+                activity: initialLearnActivityState,
+              })
+              .map((s) => {
+                const pathname = `learn/${toRidAsStr(s.rid)}`;
+
+                router.push(
+                  `${pathname}?` +
+                    updateableSearchParams.set((prev) => ({
+                      ...prev,
+                      userId: prev.userId || getRandomInt(0, 999),
+                      instructor: 1,
+                      theme: 'kids',
+                    }))
+                );
+              });
+          }}
+          type='custom'
+          className='bg-green-600 font-bold hover:bg-green-500'
+        >
+          Start Class As Instructor For Kids
+        </Button>
       </main>
     </>
   );
