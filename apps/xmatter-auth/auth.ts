@@ -1,11 +1,11 @@
-import NextAuth from 'next-auth';
+import NextAuth, { AuthOptions } from 'next-auth';
 
 import GitHub from 'next-auth/providers/github';
 import Google from 'next-auth/providers/google';
 import EmailProvider from 'next-auth/providers/email';
 import Credentials from 'next-auth/providers/credentials';
 
-import type { NextAuthConfig } from 'next-auth';
+// import type { NextAuthConfig } from 'next-auth';
 import { appConfig } from './appConfig';
 
 import { PrismaAdapter } from '@auth/prisma-adapter';
@@ -13,7 +13,15 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export const config = {
+const emailConfig = {
+  EMAIL_SERVER_HOST: 'smtp.mailgun.org',
+  EMAIL_SERVER_USER: 'test@mail.chessroulette.org', // 'postmaster@mail.chessroulette.org',
+  EMAIL_SERVER_PASSWORD: 'e5e8308dcc5fa5df1ffec46ba1fd10b2-8c90f339-2af7f09c', //'d10b08f23216bd6da36498250433d61d-8c90f339-e79028a8', // Mailgun key 45aa235ba167635c8d72ee2ea1e83458-8c90f339-6a7c2895
+  EMAIL_SERVER_PORT: 587,
+  EMAIL_FROM: 'gabriel@chessroulette.org',
+};
+
+export const authOptions = {
   theme: {
     // logo: 'https://next-auth.js.org/img/logo/logo-sm.png',
     logo: 'https://raw.githubusercontent.com/movesthatmatter/chessroulette-web/72553f4cdecb07e467d5b972a563192e5c8027ac/src/components/Logo/assets/Logo_light_full.svg',
@@ -41,7 +49,23 @@ export const config = {
     //     }
     //   },
     // }),
-    EmailProvider,
+    EmailProvider({
+      server: {
+        host: emailConfig.EMAIL_SERVER_HOST,
+        port: emailConfig.EMAIL_SERVER_PORT,
+        auth: {
+          user: emailConfig.EMAIL_SERVER_USER,
+          pass: emailConfig.EMAIL_SERVER_PASSWORD,
+        },
+      },
+      from: process.env.EMAIL_FROM,
+    }),
+    // {
+    //   id: 'mailgun',
+    //   type: 'email',
+    //   async sendVerificationRequest({identifier: email, url}) {
+    //   }
+    // },
     {
       id: 'Lichess',
       name: 'Lichess',
@@ -70,8 +94,12 @@ export const config = {
         token_endpoint_auth_method: 'none',
       },
     },
-    GitHub,
+    // GitHub({
+    //   clientId: '',
+    //   clientSecret: '',
+    // }),
   ],
-} satisfies NextAuthConfig;
+  debug: true,
+} as AuthOptions;
 
-export const { handlers, auth, signIn, signOut } = NextAuth(config);
+// export const { handlers, auth, signIn, signOut } = NextAuth(config);
