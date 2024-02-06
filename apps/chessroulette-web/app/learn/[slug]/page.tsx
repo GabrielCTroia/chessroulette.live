@@ -8,6 +8,8 @@ import { Twilio } from 'twilio';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 import RoomTemplate from 'apps/chessroulette-web/templates/RoomTemplate';
 import { config } from 'apps/chessroulette-web/config';
+import { getServerSession } from 'next-auth';
+import { authOptions } from 'apps/xmatter-auth/auth';
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID as string;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN as string;
@@ -43,6 +45,7 @@ export default async function Page({
   params: { slug: string };
   searchParams: Partial<{ theme: string }>;
 }) {
+  const session = (await getServerSession(authOptions)) || undefined;
   // console.log('params', decodeURIComponent(params.slug));
   // const { rid, slot } = searchParams;
 
@@ -72,7 +75,7 @@ export default async function Page({
   const iceServers = await twilio.getIceServers();
 
   return (
-    <RoomTemplate themeName={searchParams.theme}>
+    <RoomTemplate themeName={searchParams.theme} session={session}>
       <LearnActivity
         rid={rid}
         playingColor="black"

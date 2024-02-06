@@ -2,7 +2,7 @@ const SIGNALING_SERVER_CONFIG = {
   // host: 'chessroulette-rtc-signaling.fly.dev',
   // port: 443,
   // secure: true,
-  host: process.env.NEXT_PUBLIC_SIGNALING_SERVER_HOST,
+  host: process.env.NEXT_PUBLIC_SIGNALING_SERVER_HOST as string,
   port: Number(process.env.NEXT_PUBLIC_SIGNALING_SERVER_PORT),
   secure: Number(process.env.NEXT_PUBLIC_SIGNALING_SERVER_SECURE) === 1,
   // pingInterval: 30 * 1000,

@@ -4,10 +4,13 @@ import { RoomSideMenu } from '../modules/room/Learn/RoomSideMenu';
 import { toImgPath } from '../lib/misc';
 import bkg_2 from 'apps/chessroulette-web/templates/bkg_2.svg';
 import { CSSProperties } from 'react';
+import { Session } from 'next-auth';
+import { OnboardingWidget } from '../modules/Onboarding';
 
 type Props = React.PropsWithChildren & {
   contentClassname?: string;
   themeName?: string;
+  session?: Session;
 };
 
 export default function RoomTemplate(props: Props) {
@@ -30,9 +33,9 @@ export default function RoomTemplate(props: Props) {
         </div>
       </div>
       <menu className="bg-slate-700 flex-0 flex flex-col p-2">
-        <Avatar />
+        <OnboardingWidget session={props.session} />
         <div className="pb-6 border-b border-slate-500 mb-4" />
-        <RoomSideMenu />
+        <RoomSideMenu  />
       </menu>
     </div>
   );
