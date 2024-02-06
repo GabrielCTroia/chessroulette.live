@@ -6917,11 +6917,6 @@ chess.js@^1.0.0-beta.6:
   resolved "https://registry.yarnpkg.com/chess.js/-/chess.js-1.0.0-beta.6.tgz#c8bd5d26890421472fba2bbb0819820accd084a9"
   integrity sha512-sqBfX1VL3csSyqVM5ogbKA+aRlZyWDh276ruWXphwI0lDUMs7iYjZs29BOi49f7mXeunJE7cdfnIZhihsyLnsA==
 
-chessterrain-react@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/chessterrain-react/-/chessterrain-react-0.0.1.tgz#8ca73f82521ee5b62f47dbefd10aad5ec7f723b0"
-  integrity sha512-n62v9tsfQJOg1GtSbiM57xPn+hYVOWzkacxrLsncYXAfidNCvp5qlnJCkG5Q9xfStQJpKxnx2dLuN90BGp0rYg==
-
 chokidar@^3.5.3:
   version "3.5.3"
   resolved "https://registry.yarnpkg.com/chokidar/-/chokidar-3.5.3.tgz#1cf37c8707b932bd1af1ae22c0432e2acd1903bd"

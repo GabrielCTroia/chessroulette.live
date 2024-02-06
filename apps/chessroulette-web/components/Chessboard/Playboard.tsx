@@ -1,12 +1,11 @@
 import { useEffect } from 'react';
 import useInstance from '@use-it/instance';
 import { Chess } from 'chess.js';
-import { ChessColor, ChessFENBoard, getNewChessGame } from '@xmatter/util-kit';
+import { ChessColor, ChessFENBoard, getNewChessGame, toShortColor } from '@xmatter/util-kit';
 import {
   ChessboardContainer,
   ChessboardContainerProps,
 } from './ChessboardContainer';
-import { toShortColor } from 'chessterrain-react';
 
 type Props = ChessboardContainerProps & {
   playingColor?: ChessColor;

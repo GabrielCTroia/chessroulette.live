@@ -1,5 +1,5 @@
 import { Square } from 'chess.js';
-import { AbsoluteCoord, Coord } from 'chessterrain-react';
+import { AbsoluteCoord, RelativeCoord } from './types';
 
 export const getBoardCoordsFromAbsoluteCoords = ({
   absoluteCoords,
@@ -7,7 +7,7 @@ export const getBoardCoordsFromAbsoluteCoords = ({
 }: {
   absoluteCoords: AbsoluteCoord;
   squareSize: number;
-}): Coord => {
+}): RelativeCoord => {
   // console.log('absolute', absoluteCoords);
 
   return {
@@ -21,7 +21,10 @@ export const getSquareSize = (sizePx: number) => sizePx / 8;
 export const indexedFiles = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'] as const;
 export const indexedRanks = ['8', '7', '6', '5', '4', '3', '2', '1'] as const;
 
-export const boardCoordsToSquare = ({ row, col }: Coord): Square | null => {
+export const boardCoordsToSquare = ({
+  row,
+  col,
+}: RelativeCoord): Square | null => {
   const rank = indexedRanks[row];
   const file = indexedFiles[col];
 

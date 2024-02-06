@@ -12,6 +12,7 @@ import {
   invoke,
   swapColor,
   toDictIndexedBy,
+  toShortColor,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { useCallback, useState } from 'react';
@@ -34,7 +35,6 @@ import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardE
 import { useLearnActivitySettings } from './useLearnActivitySettings';
 import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
-import { toShortColor } from 'chessterrain-react';
 import { useBoardTheme } from 'apps/chessroulette-web/components/Chessboard/useBoardTheme';
 
 type ChessColor = 'white' | 'black';
