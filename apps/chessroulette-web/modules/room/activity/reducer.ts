@@ -31,6 +31,8 @@ import {
   incrementNestedHistoryIndex,
   findMoveAtIndexRecursively,
   renderHistoryIndex,
+  decrementNestedHistoryIndex,
+  getLinearChessHistoryAtRecursiveIndex_2,
 } from 'apps/chessroulette-web/components/GameHistory/history/util';
 import { Action } from 'movex-core-util';
 import { Square } from 'react-chessboard/dist/chessboard/types';
@@ -118,6 +120,8 @@ export default (
     // TODO: Should this be split?
 
     if (action.type === 'dropPiece') {
+      // TODO: the logic for this should be in GameHistory class/stati  so it can be tested
+
       try {
         const { from, to, promoteTo } = action.payload;
 
@@ -184,18 +188,21 @@ export default (
           ] = prevFocusedIndex;
 
           if (prevFocusRecursiveIndexes) {
-            console.log('prevFocusRecursiveIndexes', prevFocusRecursiveIndexes);
+            console.log(
+              'prevFocusRecursiveIndexes',
+              prevFocusRecursiveIndexes[0]
+            );
 
-            const addAt = incrementNestedHistoryIndex(prevFocusedIndex);
+            const addAtIndex = incrementNestedHistoryIndex(prevFocusedIndex);
 
-            console.log('add at', addAt);
+            console.log('add at ', renderHistoryIndex(addAtIndex));
             console.log('prevMove', prevMove);
 
             if (prevMove?.color === nextMove.color) {
               const [nextHistory, addedAtIndex] = addMoveToChessHistory(
                 prev.activityState.history.moves,
                 getHistoryNonMove(swapColor(nextMove.color)),
-                addAt
+                addAtIndex
               );
 
               return addMoveToChessHistory(
@@ -210,7 +217,7 @@ export default (
             return addMoveToChessHistory(
               prev.activityState.history.moves,
               nextMove,
-              addAt
+              addAtIndex
               // addAtIndex
               // prev.activityState.history.focusedIndex
             );
@@ -275,8 +282,8 @@ export default (
         //   // prev.activityState.history.focusedIndex
         // );
 
-        console.log('next history', nextHistory, nextHistory.length);
-        console.log('addedAtIndex', addedAtIndex);
+        // console.log('next history', nextHistory, nextHistory.length);
+        console.log('addedAtIndex', renderHistoryIndex(addedAtIndex));
 
         return {
           ...prev,
@@ -351,7 +358,7 @@ export default (
     } else if (action.type === 'focusHistoryIndex') {
       // console.log('get history at index', action.payload.index);
 
-      const historyAtFocusedIndex = getHistoryAtIndex(
+      const historyAtFocusedIndex = getLinearChessHistoryAtRecursiveIndex_2(
         prev.activityState.history.moves,
         action.payload.index
         // TODO: Add recursive
@@ -365,23 +372,29 @@ export default (
         prev.activityState.history.startingFen
       );
 
-      historyAtFocusedIndex.forEach((turn, i) => {
-        // if (m.isNonMove) {
-        //   return;
-        // }
-
-        try {
-          turn.forEach((m) => {
-            if (m.isNonMove) {
-              return;
-            }
-            instance.move(m.from, m.to);
-          });
-        } catch (e) {
-          // console.log('failed at m', m, 'i', i);
-          throw e;
+      historyAtFocusedIndex.forEach((m) => {
+        if (!m.isNonMove) {
+          instance.move(m.from, m.to);
         }
       });
+
+      // historyAtFocusedIndex.forEach((turn, i) => {
+      //   // if (m.isNonMove) {
+      //   //   return;
+      //   // }
+
+      //   try {
+      //     turn.forEach((m) => {
+      //       if (m.isNonMove) {
+      //         return;
+      //       }
+      //       instance.move(m.from, m.to);
+      //     });
+      //   } catch (e) {
+      //     // console.log('failed at m', m, 'i', i);
+      //     throw e;
+      //   }
+      // });
 
       const nextFen = instance.fen;
 
@@ -401,7 +414,7 @@ export default (
     }
 
     if (action.type === 'deleteHistoryMove') {
-      const nextIndex = decrementHistoryIndex(action.payload.atIndex);
+      const nextIndex = decrementNestedHistoryIndex(action.payload.atIndex);
       const nextHistory = getHistoryAtIndex(
         prev.activityState.history.moves,
         nextIndex

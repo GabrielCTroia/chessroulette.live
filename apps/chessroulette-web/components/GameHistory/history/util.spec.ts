@@ -7,6 +7,7 @@ import {
   ChessHistoryBlackMove_NEW,
   ChessHistoryIndex_NEW,
   ChessHistoryMove_NEW,
+  ChessHistory_NEW,
 } from './types';
 import {
   addMoveToChessHistory,
@@ -17,6 +18,9 @@ import {
   getHistoryLastIndex,
   getHistoryAtIndex,
   areHistoryIndexesEqual,
+  // getLinearChessHistoryAtRecursiveIndex,
+  getLinearChessHistoryAtRecursiveIndex_2,
+  findMoveAtIndexRecursively,
 } from './util';
 
 describe('History Index', () => {
@@ -219,6 +223,84 @@ describe('Get History At Index', () => {
     const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [19, 1]);
 
     expect(actual).toEqual(LONG_HISTORY_WITH_HALF_LAST_TURN);
+  });
+
+  describe('Recursively', () => {
+    test('Get Hstory from first nested branch', () => {
+      const nestedHistory = [
+        [
+          {
+            from: 'd2',
+            to: 'd4',
+            san: 'd4',
+            color: 'w',
+            branchedHistories: [
+              [
+                [
+                  {
+                    isNonMove: true,
+                    san: '...',
+                    color: 'w',
+                    // this: 'yess'
+                  },
+                  {
+                    from: 'b7',
+                    to: 'b5',
+                    color: 'b',
+                    san: 'b5',
+                    branchedHistories: [
+                      [
+                        [
+                          {
+                            from: 'b2',
+                            to: 'b4',
+                            color: 'w',
+                            san: 'b4',
+                          },
+                        ],
+                      ],
+                    ],
+                  },
+                ],
+              ],
+            ],
+          },
+          {
+            from: 'd7',
+            to: 'd5',
+            san: 'd5',
+            color: 'b',
+          },
+        ],
+      ] satisfies ChessHistory_NEW;
+
+      const actual = getLinearChessHistoryAtRecursiveIndex_2(nestedHistory, [
+        0,
+        0,
+        [[0, 1, [[0, 0]]]],
+      ]);
+
+      expect(actual).toEqual([
+        {
+          from: 'd2',
+          to: 'd4',
+          san: 'd4',
+          color: 'w',
+        },
+        {
+          from: 'b7',
+          to: 'b5',
+          color: 'b',
+          san: 'b5',
+        },
+        {
+          from: 'b2',
+          to: 'b4',
+          color: 'w',
+          san: 'b4',
+        },
+      ]);
+    });
   });
 });
 

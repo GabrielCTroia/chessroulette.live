@@ -23,7 +23,7 @@ import { Tabs } from 'apps/chessroulette-web/components/Tabs';
 import { ClipboardCopyButton } from 'apps/chessroulette-web/components/ClipboardCopyButton';
 import { Square } from 'react-chessboard/dist/chessboard/types';
 import { SquareMap } from '../activity/reducer';
-import { findMoveAtIndex } from 'apps/chessroulette-web/components/GameHistory/history/util';
+import { findMoveAtIndex, findMoveAtIndexRecursively, renderHistoryIndex } from 'apps/chessroulette-web/components/GameHistory/history/util';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 import {
   ArrowsUpDownIcon,
@@ -101,13 +101,13 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                 console.log('History', activityState.history.moves);
                 console.log(
                   'Focused Index',
-                  activityState.history.focusedIndex
+                  renderHistoryIndex(activityState.history.focusedIndex)
                 );
                 console.groupEnd();
 
                 const { history } = activityState;
 
-                const lm = findMoveAtIndex(history.moves, history.focusedIndex);
+                const lm = findMoveAtIndexRecursively(history.moves, history.focusedIndex);
                 const lastMove = lm?.isNonMove ? undefined : lm;
 
                 // Don't leave this here as it's not optimal
@@ -116,11 +116,15 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                   const fenBoardInstance = new ChessFENBoard(activityState.fen);
 
-                  fenBoardInstance.setFenNotation({ fromState: { turn: 'w', enPassant: undefined } });
+                  fenBoardInstance.setFenNotation({
+                    fromState: { turn: 'w', enPassant: undefined },
+                  });
 
                   const fenAsWhiteTurn = fenBoardInstance.fen;
 
-                  fenBoardInstance.setFenNotation({ fromState: { turn: 'b', enPassant: undefined } });
+                  fenBoardInstance.setFenNotation({
+                    fromState: { turn: 'b', enPassant: undefined },
+                  });
 
                   const fenAsBlackTurn = fenBoardInstance.fen;
 
