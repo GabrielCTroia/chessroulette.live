@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { GameHistory } from './GameHistory';
-import { pgnToHistory } from './history/util';
+import { pgnToHistory, renderHistoryIndex } from './history/util';
 import {
   BRANCHED_HISTORY_1,
   LONG_HISTORY_WITH_FULL_LAST_TURN,
@@ -108,13 +108,16 @@ export const NestedHistory: Story = {
               action('OnDelete')(p);
             }}
             onRefocus={(p) => {
+              console.log('on focus', renderHistoryIndex(p));
+
               setCurrentIndex(p);
               action('OnRefocus')(p);
             }}
             focusedIndex={currentIndex}
           />
         </div>
-        {currentIndex.join(' ')}
+        {renderHistoryIndex(currentIndex)}
+        {/* {currentIndex.join(' ')} */}
       </>
     );
   },

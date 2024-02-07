@@ -86,7 +86,7 @@ export type ChessHistoryIndexMovePosition_NEW = 0 | 1; // 0 = white, 1 = black
 
 export type ChessHistoryRecursiveIndexes_NEW = [
   recursiveHistoryIndex: -1 | ChessRecursiveHistoryIndex_NEW, // '-1' = end of history
-  paralelBranchesIndex?: number // Defaults to 0 (root), '-1' = apends?
+  paralelBranchesIndex?: number// Defaults to 0 (root), '-1' = apends?
 ];
 
 export type ChessRecursiveHistoryIndex_NEW =

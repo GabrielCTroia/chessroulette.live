@@ -24,13 +24,13 @@ import {
   decrementHistoryIndex,
   getHistoryLastIndex,
   getHistoryAtIndex,
-  incrementHistoryIndex,
   pgnToHistory,
   findMoveAtIndex,
   getHistoryNonMove,
   isLastHistoryIndexInBranch,
   incrementNestedHistoryIndex,
   findMoveAtIndexRecursively,
+  renderHistoryIndex,
 } from 'apps/chessroulette-web/components/GameHistory/history/util';
 import { Action } from 'movex-core-util';
 import { Square } from 'react-chessboard/dist/chessboard/types';
@@ -173,8 +173,8 @@ export default (
             prevFocusedIndex
           );
 
-          console.log('isFocusedIndexLastInBranch', isFocusedIndexLastInBranch);
-          console.log('prevFocusedIndex', prevFocusedIndex);
+          // console.log('isFocusedIndexLastInBranch', isFocusedIndexLastInBranch);
+          // console.log('prevFocusedIndex', prevFocusedIndex);
 
           // const isFocusIndexNested = !!prevFocusedIndex[2];
           const [
@@ -349,7 +349,7 @@ export default (
         },
       };
     } else if (action.type === 'focusHistoryIndex') {
-      console.log('get history at index', action.payload.index);
+      // console.log('get history at index', action.payload.index);
 
       const historyAtFocusedIndex = getHistoryAtIndex(
         prev.activityState.history.moves,
@@ -359,7 +359,7 @@ export default (
 
       // TOOO// Need to create a history with the branched histories
 
-      console.log('historyAtFocusedIndex', historyAtFocusedIndex);
+      // console.log('historyAtFocusedIndex', historyAtFocusedIndex ? renderHistoryIndex(historyAtFocusedIndex) : '');
 
       const instance = new ChessFENBoard(
         prev.activityState.history.startingFen

@@ -22,6 +22,7 @@ import {
   ChessRecursiveHistory_NEW,
 } from './types';
 import { ChessLinearHistory } from '../types';
+import { getMoveAtIndex } from '../lib';
 
 export const getHistoryNonMoveWhite = (): ChessHistoryWhiteMove_NEW => ({
   color: 'w',
@@ -122,6 +123,13 @@ export const decrementNestedHistoryIndex = ([
       throw new Error('This is not good. need to change it from -1');
     }
 
+    const nestedIndex = decrementNestedHistoryIndex(recursiveIndexes[0]);
+
+    // If went down, remove it and go to the upper generation
+    if (nestedIndex[0] === -1) {
+      return [turn, move];
+    }
+
     return [
       turn,
       move,
@@ -152,7 +160,7 @@ export const findTurnAtIndexRecursively = (
   [turn, movePosition, recursiveHistoryIndex]: ChessHistoryIndex_NEW
 ): ChessHistoryTurn_NEW | undefined => {
   // console.log('findTurnAtIndexRecursively', history, [turn, movePosition]);
-  
+
   if (recursiveHistoryIndex) {
     // console.log('> recursiveHistoryIndex', recursiveHistoryIndex);
     const [recursiveIndexes, paralelBranchIndex = 0] = recursiveHistoryIndex;
@@ -391,6 +399,69 @@ export const getHistoryAtIndex = (
   ] as ChessHistory_NEW;
 };
 
+export const getChessHistoryAtIndexRecursively = (
+  history: ChessHistory_NEW,
+  index: ChessHistoryIndex_NEW
+): ChessHistory_NEW => {
+  // if (typeof index === 'number') {
+  //   return history.slice(0, index + 1);
+  // }
+  const [turnIndex, movePosition, recursiveIndexes] = index;
+
+  // Don't return last items as it's the default for array.slice() with negative numbers
+  if (turnIndex < 0) {
+    return [];
+  }
+
+  // const [moveIndex, branchIndex, nestedBranchedHistoryOrMoveIndex] = index;
+
+  // const move = history[moveIndex];
+  const move = findMoveAtIndex(history, [turnIndex, movePosition]);
+
+  if (!move) {
+    return []; // return an empty history if index is out of bounderies
+  }
+
+  const rootSlice = invoke(() => {
+    const turnsToIndex = history.slice(0, turnIndex) as ChessHistory_NEW;
+    const turnAtIndex = history[turnIndex];
+
+    if (!turnAtIndex) {
+      return turnsToIndex;
+    }
+
+    return [
+      ...turnsToIndex,
+      movePosition === 0 ? [turnAtIndex[0]] : turnAtIndex,
+    ] as ChessHistory_NEW;
+  });
+
+  // if (!move.branchedHistories) {
+  //   return rootSlice;
+  // }
+
+  if (recursiveIndexes) {
+    const [nestedIndex, branchIndex = 0] = recursiveIndexes;
+
+    // If the given branch doesn't exist just slice it up to the move index
+    if (!move.branchedHistories?.[branchIndex]) {
+      return rootSlice;
+    }
+
+    return [
+      ...rootSlice,
+      ...getChessHistoryAtIndexRecursively(
+        move.branchedHistories[branchIndex],
+        nestedIndex === -1
+          ? getHistoryLastIndex(move.branchedHistories[branchIndex])
+          : nestedIndex
+      ),
+    ] as ChessHistory_NEW;
+  }
+
+  return rootSlice;
+};
+
 export const updateOrInsertMoveInTurn = <
   T extends ChessRecursiveHistoryTurn_NEW
 >(
@@ -459,4 +530,31 @@ export const linearToTurnHistory = (
   );
 
   return cached ? ([...turns, [cached]] as ChessHistory_NEW) : turns;
+};
+
+export const renderHistoryIndex = ([
+  turn,
+  move,
+  nestedIndex,
+]: ChessHistoryIndex_NEW): string => {
+  const nested = invoke(() => {
+    if (!nestedIndex) {
+      return '';
+    }
+
+    if (nestedIndex[0] === -1) {
+      return ' -1';
+    }
+
+    return (
+      ', ' +
+      renderHistoryIndex(nestedIndex[0]) +
+      (nestedIndex[1] && nestedIndex[1] > 0 ? `:${nestedIndex[1]}` : '')
+      // + ']'
+    );
+  });
+
+  // TODO: This doesn't take care of the branches
+
+  return `[${turn}, ${move}${nested}]`;
 };

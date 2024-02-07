@@ -17,11 +17,13 @@ export type HistoryListProps = {
 } & (
   | {
       isNested: true;
-      historyRootTurnIndex: number;
+      // historyRootTurnIndex: number;
+      rootHistoryIndex: ChessHistoryIndex_NEW;
     }
   | {
-      isNested?: boolean;
-      historyRootTurnIndex?: undefined;
+      isNested?: false;
+      // historyRootTurnIndex?: undefined;
+      rootHistoryIndex?: undefined;
     }
 );
 
@@ -36,11 +38,15 @@ export const HistoryList: React.FC<HistoryListProps> = ({
   onDelete,
   className,
   rowClassName,
-  historyRootTurnIndex = 0,
+  // historyRootTurnIndex = 0,
+
+  rootHistoryIndex,
   isNested = false,
 }) => {
   const rowElementRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const containerElementRef = useRef<HTMLDivElement | null>();
+
+  // const [historyTurnIndex] = rootHistoryIndex;
 
   useDebouncedEffect(
     () => {
@@ -64,7 +70,7 @@ export const HistoryList: React.FC<HistoryListProps> = ({
 
       const elm = rowElementRefs.current[focusedTurnIndex];
 
-      console.log('focus into view?', elm);
+      // console.log('focus into view?', elm);
 
       if (elm) {
         scrollIntoView(elm);
@@ -82,10 +88,15 @@ export const HistoryList: React.FC<HistoryListProps> = ({
     }, 100);
   }, []);
 
+  const [focusedTurnIndex, focusedMovePosition, recusriveFocusedIndexes] =
+    focusedIndex || [];
+
   return (
     <div className={className} ref={(e) => (containerElementRef.current = e)}>
       {history.map((historyTurn, historyTurnIndex) => {
-        const rowId = `${historyRootTurnIndex + historyTurnIndex}.${
+        const rootHistoryTurnIndex = rootHistoryIndex?.[0] || 0;
+
+        const rowId = `${rootHistoryTurnIndex + historyTurnIndex}.${
           historyTurn[0].san
         }-${historyTurn[1]?.san || ''}`;
 
@@ -96,12 +107,29 @@ export const HistoryList: React.FC<HistoryListProps> = ({
             ref={(r) => (rowElementRefs.current[historyTurnIndex] = r)}
             historyTurn={historyTurn}
             historyTurnIndex={historyTurnIndex}
-            moveCount={historyRootTurnIndex + 1 + historyTurnIndex}
+            moveCount={rootHistoryTurnIndex + 1 + historyTurnIndex}
             onFocus={onRefocus}
             onDelete={onDelete}
+            focusedOnMovePosition={
+              historyTurnIndex === focusedTurnIndex
+                ? focusedMovePosition
+                : undefined
+            }
+            focusedOnRecursiveIndexes={
+              historyTurnIndex === focusedTurnIndex
+                ? recusriveFocusedIndexes
+                : undefined
+            }
+            // focusedIndex={focusedIndex}
             containerClassName={rowClassName}
-            isNested={isNested}
-            focusedIndex={focusedIndex}
+            {...(isNested
+              ? {
+                  isNested: true,
+                  rootHistoryIndex,
+                }
+              : {
+                  isNested: false,
+                })}
           />
         );
       })}

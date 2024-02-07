@@ -20,6 +20,7 @@ import {
   getHistoryNonMoveWhite,
   incrementHistoryIndex,
   incrementNestedHistoryIndex,
+  renderHistoryIndex,
 } from './util';
 
 describe('Nested indexes', () => {
@@ -57,6 +58,25 @@ describe('Nested indexes', () => {
     const actual = decrementNestedHistoryIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 1, [[2, 0, [[5, 0], 0]], 2]], 0]]);
+  });
+
+  test('when decrementing hits -1 jump to the root history', () => {
+    const index: ChessHistoryIndex_NEW = [
+      0,
+      0,
+      [[0, 1, [[2, 0, [[0, 0], 0]], 2]], 0],
+    ];
+    const actual = decrementNestedHistoryIndex(index);
+
+    expect(actual).toEqual([0, 0, [[0, 1, [[2, 0], 2]], 0]]);
+  });
+
+  test('when all generations hit -1 jump to the each root history', () => {
+    const index: ChessHistoryIndex_NEW = [0, 1, [[0, 0, [[0, 0, [[0, 0]]]]]]];
+    const actual = decrementNestedHistoryIndex(index);
+    const expected = [0, 1, [[0, 0, [[0, 0]]]]] satisfies ChessHistoryIndex_NEW;
+
+    expect(actual).toEqual(expected);
   });
 });
 

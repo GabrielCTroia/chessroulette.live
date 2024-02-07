@@ -2,7 +2,7 @@ import React from 'react';
 import { HistoryList, HistoryListProps } from './components_NEW/HistoryList';
 import { useKeysToRefocusHistory } from './hooks';
 import { ChessRecursiveHistory_NEW } from './history/types';
-import { getStartingHistoryIndex } from './history/util';
+import { getStartingHistoryIndex, renderHistoryIndex } from './history/util';
 
 export type GameHistoryProps = {
   history: ChessRecursiveHistory_NEW;
@@ -41,6 +41,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
           {emptyContent}
         </div>
       )}
+      {renderHistoryIndex(focusedIndex)}
     </div>
   );
 };

@@ -6,10 +6,12 @@ import {
 } from './history/types';
 import {
   areHistoryIndexesEqual,
-  decrementHistoryIndex,
+  decrementNestedHistoryIndex,
   findMoveAtIndex,
+  findMoveAtIndexRecursively,
   getStartingHistoryIndex,
-  incrementHistoryIndex,
+  incrementNestedHistoryIndex,
+  renderHistoryIndex,
 } from './history/util';
 
 export const useKeysToRefocusHistory = (
@@ -56,12 +58,18 @@ const findNextValidMoveIndex = (
   index: ChessHistoryIndex_NEW,
   dir: 'right' | 'left'
 ): ChessHistoryIndex_NEW => {
+  console.log('inc/dev >', renderHistoryIndex(index));
+
   const nextIndex =
     dir === 'right'
-      ? incrementHistoryIndex(index)
-      : decrementHistoryIndex(index);
+      ? incrementNestedHistoryIndex(index)
+      : decrementNestedHistoryIndex(index);
 
-  const nextMove = findMoveAtIndex(history, nextIndex);
+  // console.log('next inc/dev >', renderHistoryIndex(nextIndex));
+
+  const nextMove = findMoveAtIndexRecursively(history, nextIndex);
+
+  console.log('nextMove', nextMove, !!nextMove?.isNonMove ? 'nonMove' : '', renderHistoryIndex(nextIndex));
 
   if (nextMove?.isNonMove) {
     return findNextValidMoveIndex(history, nextIndex, dir);
