@@ -27,9 +27,9 @@ export const useKeysToRefocusHistory = (
       event.key === 'ArrowRight' ? 'right' : 'left'
     );
 
-    const isStartingIndex = FreeBoardHistory.areHistoryIndexesEqual(
+    const isStartingIndex = FreeBoardHistory.areIndexesEqual(
       nextIndex,
-      FreeBoardHistory.getStartingHistoryIndex()
+      FreeBoardHistory.getStartingIndex()
     );
 
     if (

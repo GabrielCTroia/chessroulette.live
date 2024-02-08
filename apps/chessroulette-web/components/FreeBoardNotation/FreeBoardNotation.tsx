@@ -22,7 +22,7 @@ export type GameHistoryProps = {
 export const FreeBoardNotation: React.FC<GameHistoryProps> = ({
   history = [],
   emptyContent = 'Wow, so empty!',
-  focusedIndex = FreeBoardHistory.getStartingHistoryIndex(),
+  focusedIndex = FreeBoardHistory.getStartingIndex(),
   onRefocus,
   onDelete,
   containerClassName = '',

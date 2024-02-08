@@ -131,7 +131,7 @@ export default (
         // If the moves are the same introduce a non move
         const [nextHistory, addedAtIndex] = invoke(() => {
           const isFocusedIndexLastInBranch =
-            FreeBoardHistory.isLastHistoryIndexInBranch(
+            FreeBoardHistory.isLastIndexInHistoryBranch(
               prevHistoryMoves,
               prevFocusedIndex
             );
@@ -144,20 +144,20 @@ export default (
 
             if (prevMove?.color === nextMove.color) {
               const [nextHistory, addedAtIndex] =
-                FreeBoardHistory.addMoveToChessHistory(
+                FreeBoardHistory.addMove(
                   prev.activityState.history.moves,
-                  FreeBoardHistory.getHistoryNonMove(swapColor(nextMove.color)),
+                  FreeBoardHistory.getNonMove(swapColor(nextMove.color)),
                   addAtIndex
                 );
 
-              return FreeBoardHistory.addMoveToChessHistory(
+              return FreeBoardHistory.addMove(
                 nextHistory,
                 nextMove,
                 FreeBoardHistory.incrementIndex(addedAtIndex)
               );
             }
 
-            return FreeBoardHistory.addMoveToChessHistory(
+            return FreeBoardHistory.addMove(
               prev.activityState.history.moves,
               nextMove,
               addAtIndex
@@ -172,12 +172,12 @@ export default (
 
           // if 1st move is black add a non move
           if (prevHistoryMoves.length === 0 && nextMove.color === 'b') {
-            const [nextHistory] = FreeBoardHistory.addMoveToChessHistory(
+            const [nextHistory] = FreeBoardHistory.addMove(
               prev.activityState.history.moves,
-              FreeBoardHistory.getHistoryNonMove(swapColor(nextMove.color))
+              FreeBoardHistory.getNonMove(swapColor(nextMove.color))
             );
 
-            return FreeBoardHistory.addMoveToChessHistory(
+            return FreeBoardHistory.addMove(
               nextHistory,
               nextMove
             );
@@ -185,7 +185,7 @@ export default (
 
           // If it's not the last branch
           if (!isFocusedIndexLastInBranch) {
-            return FreeBoardHistory.addMoveToChessHistory(
+            return FreeBoardHistory.addMove(
               prev.activityState.history.moves,
               nextMove,
               prevFocusedIndex
@@ -194,19 +194,19 @@ export default (
 
           // Add nonMoves for skipping one
           if (prevMove?.color === nextMove.color) {
-            const [nextHistory] = FreeBoardHistory.addMoveToChessHistory(
+            const [nextHistory] = FreeBoardHistory.addMove(
               prev.activityState.history.moves,
-              FreeBoardHistory.getHistoryNonMove(swapColor(nextMove.color)),
+              FreeBoardHistory.getNonMove(swapColor(nextMove.color)),
               addAtIndex
             );
 
-            return FreeBoardHistory.addMoveToChessHistory(
+            return FreeBoardHistory.addMove(
               nextHistory,
               nextMove
             );
           }
 
-          return FreeBoardHistory.addMoveToChessHistory(
+          return FreeBoardHistory.addMove(
             prev.activityState.history.moves,
             nextMove
           );
@@ -250,7 +250,7 @@ export default (
           history: {
             startingFen: ChessFENBoard.STARTING_FEN,
             moves: nextMoves,
-            focusedIndex: FreeBoardHistory.getHistoryLastIndex(nextMoves),
+            focusedIndex: FreeBoardHistory.getLastIndexInHistory(nextMoves),
           },
         },
       };
@@ -276,7 +276,7 @@ export default (
             startingFen: ChessFENBoard.STARTING_FEN,
             moves: nextHistoryMovex,
             focusedIndex:
-              FreeBoardHistory.getHistoryLastIndex(nextHistoryMovex),
+              FreeBoardHistory.getLastIndexInHistory(nextHistoryMovex),
           },
         },
       };
@@ -314,7 +314,7 @@ export default (
       // TODO: Fix this!
 
       const nextIndex = FreeBoardHistory.decrementIndex(action.payload.atIndex);
-      const nextHistory = FreeBoardHistory.getHistoryAtIndex(
+      const nextHistory = FreeBoardHistory.slice(
         prev.activityState.history.moves,
         nextIndex
       );
