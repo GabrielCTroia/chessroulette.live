@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
-import { HistoryList } from './HistoryList';
-import { HistoryRowProps } from './HistoryRow';
+import { List } from './List';
+import { RowProps } from './Row';
 import { FBHHistory, FBHIndex, FBHRecursiveIndexes } from '@xmatter/util-kit';
 
 type Props = {
@@ -9,11 +9,11 @@ type Props = {
   onFocus: (i: FBHIndex) => void;
   onDelete: (i: FBHIndex) => void;
   focusedRecursiveIndexes?: FBHRecursiveIndexes;
-  rowClassName?: HistoryRowProps['className'];
+  rowClassName?: RowProps['className'];
   className?: string;
 };
 
-export const NestedHistories = ({
+export const NestedLists = ({
   branchedHistories,
   rootHistoryIndex,
   focusedRecursiveIndexes,
@@ -56,7 +56,7 @@ export const NestedHistories = ({
       </span> */}
       {branchedHistories.map((branchedHistory, branchIndex) => {
         return (
-          <HistoryList
+          <List
             key={`${rootTurnIndex}-${rootMovePosition}--${branchIndex}`}
             history={branchedHistory}
             onRefocus={(nestedIndex) => {

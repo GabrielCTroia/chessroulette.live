@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
 import debounce from 'debounce';
 import useDebouncedEffect from 'use-debounced-effect';
-import { HistoryRow } from './HistoryRow';
+import { HistoryRow } from './Row';
 import { FBHHistory, FBHIndex } from '@xmatter/util-kit';
 
-export type HistoryListProps = {
+export type ListProps = {
   history: FBHHistory;
   onRefocus: (atIndex: FBHIndex) => void;
   onDelete: (atIndex: FBHIndex) => void;
@@ -26,7 +26,7 @@ const scrollIntoView = debounce((elm: HTMLDivElement) => {
   elm.scrollIntoView({ block: 'end', behavior: 'auto' });
 }, 5);
 
-export const HistoryList: React.FC<HistoryListProps> = ({
+export const List: React.FC<ListProps> = ({
   history,
   focusedIndex,
   onRefocus,

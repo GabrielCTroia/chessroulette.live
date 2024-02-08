@@ -1,22 +1,28 @@
 import React from 'react';
-import { HistoryList, HistoryListProps } from './components_NEW/HistoryList';
+import { List, ListProps } from './components/List';
 import { useKeysToRefocusHistory } from './hooks';
-import { FBHHistory, FreeBoardHistory } from '@xmatter/util-kit';
+import { FBHHistory, FreeBoardHistory as FBH } from '@xmatter/util-kit';
 
 export type GameHistoryProps = {
   history: FBHHistory;
-  focusedIndex: HistoryListProps['focusedIndex'];
-  onRefocus: HistoryListProps['onRefocus'];
-  onDelete: HistoryListProps['onDelete'];
+  focusedIndex: ListProps['focusedIndex'];
+  onRefocus: ListProps['onRefocus'];
+  onDelete: ListProps['onDelete'];
   emptyContent?: string | React.ReactNode;
   className?: string;
   containerClassName?: string;
 };
 
-export const GameHistory: React.FC<GameHistoryProps> = ({
+/**
+ * A component that works with FreeBoardHistory library (util-kit), and is able to render free moves
+ *
+ * @param param0
+ * @returns
+ */
+export const FreeBoardHistory: React.FC<GameHistoryProps> = ({
   history = [],
   emptyContent = 'Wow, so empty!',
-  focusedIndex = FreeBoardHistory.getStartingHistoryIndex(),
+  focusedIndex = FBH.getStartingHistoryIndex(),
   onRefocus,
   onDelete,
   containerClassName = '',
@@ -27,7 +33,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
   return (
     <div className={`flex flex-1 min-h-0 min-w-0 ${containerClassName} `}>
       {history.length > 0 ? (
-        <HistoryList
+        <List
           history={history}
           focusedIndex={focusedIndex}
           onRefocus={onRefocus}
@@ -40,7 +46,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
           {emptyContent}
         </div>
       )}
-      {FreeBoardHistory.renderIndex(focusedIndex)}
+      {FBH.renderIndex(focusedIndex)}
     </div>
   );
 };

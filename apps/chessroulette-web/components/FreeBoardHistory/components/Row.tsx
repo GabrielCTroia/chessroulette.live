@@ -3,9 +3,9 @@ import { Menu, Item, useContextMenu, ItemParams } from 'react-contexify';
 import 'react-contexify/dist/ReactContexify.css';
 import { FBHIndex, FBHRecursiveIndexes, FBHTurn } from '@xmatter/util-kit';
 import { Text } from '../../Text';
-import { NestedHistories } from './NestedHistories';
+import { NestedLists } from './NestedLists';
 
-export type HistoryRowProps = {
+export type RowProps = {
   rowId: string;
   historyTurn: FBHTurn;
   historyTurnIndex: number;
@@ -27,10 +27,7 @@ export type HistoryRowProps = {
     }
 );
 
-export const HistoryRow = React.forwardRef<
-  HTMLDivElement | null,
-  HistoryRowProps
->(
+export const HistoryRow = React.forwardRef<HTMLDivElement | null, RowProps>(
   (
     {
       rowId,
@@ -138,7 +135,7 @@ export const HistoryRow = React.forwardRef<
             )}
           </div>
           {whiteMove.branchedHistories && (
-            <NestedHistories
+            <NestedLists
               branchedHistories={whiteMove.branchedHistories}
               rootHistoryIndex={[historyTurnIndex, 0]}
               onFocus={onFocus}
@@ -168,7 +165,7 @@ export const HistoryRow = React.forwardRef<
         </div>
 
         {blackMove?.branchedHistories && (
-          <NestedHistories
+          <NestedLists
             branchedHistories={blackMove.branchedHistories}
             rootHistoryIndex={[historyTurnIndex, 1]}
             onFocus={onFocus}

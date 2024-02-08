@@ -4,11 +4,10 @@ import movexConfig from 'apps/chessroulette-web/movex.config';
 import { ResourceIdentifier } from 'movex-core-util';
 import { MovexBoundResource } from 'movex-react';
 import { LearnTemplate } from './LearnTemplate';
-import { GameHistory } from 'apps/chessroulette-web/components/GameHistory';
 import {
   ChessFEN,
   ChessFENBoard,
-  FreeBoardHistory,
+  FreeBoardHistory as FBH,
   getNewChessGame,
   invoke,
   swapColor,
@@ -31,7 +30,8 @@ import {
   CheckIcon,
   PencilSquareIcon,
 } from '@heroicons/react/16/solid';
-import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor/BoardEditor';
+import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor';
+import { FreeBoardHistory } from 'apps/chessroulette-web/components/FreeBoardHistory';
 import { useLearnActivitySettings } from './useLearnActivitySettings';
 import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
@@ -101,15 +101,13 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                 console.log('History', activityState.history.moves);
                 console.log(
                   'Focused Index',
-                  FreeBoardHistory.renderIndex(
-                    activityState.history.focusedIndex
-                  )
+                  FBH.renderIndex(activityState.history.focusedIndex)
                 );
                 console.groupEnd();
 
                 const { history } = activityState;
 
-                const lm = FreeBoardHistory.findMoveAtIndexRecursively(
+                const lm = FBH.findMoveAtIndexRecursively(
                   history.moves,
                   history.focusedIndex
                 );
@@ -404,7 +402,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         ),
                         renderContent: () => (
                           <div className="flex flex-col flex-1 gap-2 bg-slate-700 min-h-0">
-                            <GameHistory
+                            <FreeBoardHistory
                               history={activityState.history.moves}
                               // containerClassName="overflow-scroll bg-red-200 sh-full"
                               focusedIndex={activityState.history.focusedIndex}
