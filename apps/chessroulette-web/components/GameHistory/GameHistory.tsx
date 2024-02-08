@@ -1,11 +1,10 @@
 import React from 'react';
 import { HistoryList, HistoryListProps } from './components_NEW/HistoryList';
 import { useKeysToRefocusHistory } from './hooks';
-import { ChessRecursiveHistory_NEW } from './history/types';
-import { getStartingHistoryIndex, renderHistoryIndex } from './history/util';
+import { FBHHistory, FreeBoardHistory } from '@xmatter/util-kit';
 
 export type GameHistoryProps = {
-  history: ChessRecursiveHistory_NEW;
+  history: FBHHistory;
   focusedIndex: HistoryListProps['focusedIndex'];
   onRefocus: HistoryListProps['onRefocus'];
   onDelete: HistoryListProps['onDelete'];
@@ -17,7 +16,7 @@ export type GameHistoryProps = {
 export const GameHistory: React.FC<GameHistoryProps> = ({
   history = [],
   emptyContent = 'Wow, so empty!',
-  focusedIndex = getStartingHistoryIndex(),
+  focusedIndex = FreeBoardHistory.getStartingHistoryIndex(),
   onRefocus,
   onDelete,
   containerClassName = '',
@@ -41,7 +40,7 @@ export const GameHistory: React.FC<GameHistoryProps> = ({
           {emptyContent}
         </div>
       )}
-      {renderHistoryIndex(focusedIndex)}
+      {FreeBoardHistory.renderIndex(focusedIndex)}
     </div>
   );
 };

@@ -1,14 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
 import { GameHistory } from './GameHistory';
-import { pgnToHistory, renderHistoryIndex } from './history/util';
-import {
-  BRANCHED_HISTORY_1,
-  LONG_HISTORY_WITH_FULL_LAST_TURN,
-  LONG_HISTORY_WITH_PARALEL_HISTORIES,
-} from './history/specUtils';
-import { ChessHistoryIndex_NEW, ChessHistory_NEW } from './history/types';
 import { useState } from 'react';
+import { FBHHistory, FBHIndex, FreeBoardHistory } from '@xmatter/util-kit';
 
 const meta: Meta<typeof GameHistory> = {
   component: GameHistory,
@@ -18,7 +12,7 @@ const meta: Meta<typeof GameHistory> = {
 export default meta;
 type Story = StoryObj<typeof GameHistory>;
 
-const x = pgnToHistory(
+const x = FreeBoardHistory.pgnToHistory(
   '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6'
 );
 
@@ -33,7 +27,7 @@ const x = pgnToHistory(
 //   },
 // };
 
-const BASIC_HISTORY = pgnToHistory(
+const BASIC_HISTORY = FreeBoardHistory.pgnToHistory(
   '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6 7. h3'
 );
 
@@ -70,7 +64,7 @@ const historyWithOneGenBranch = [
               color: 'b',
             },
           ],
-        ] as ChessHistory_NEW,
+        ] as FBHHistory,
       ],
     },
     {
@@ -83,19 +77,17 @@ const historyWithOneGenBranch = [
     {
       ...BASIC_HISTORY[4][1],
       branchedHistories: [
-        pgnToHistory('1. e3 c5 2. Nf3 e6 3. d4 d6'),
-        pgnToHistory('1. e4 c5 2. Nf3 e5 3. d3'),
+        FreeBoardHistory.pgnToHistory('1. e3 c5 2. Nf3 e6 3. d4 d6'),
+        FreeBoardHistory.pgnToHistory('1. e4 c5 2. Nf3 e5 3. d3'),
       ],
     },
   ],
   ...BASIC_HISTORY.slice(5),
-] as ChessHistory_NEW;
+] as FBHHistory;
 
 export const NestedHistory: Story = {
   render: () => {
-    const [currentIndex, setCurrentIndex] = useState<ChessHistoryIndex_NEW>([
-      0, 1,
-    ]);
+    const [currentIndex, setCurrentIndex] = useState<FBHIndex>([0, 1]);
 
     return (
       <>
@@ -108,7 +100,7 @@ export const NestedHistory: Story = {
               action('OnDelete')(p);
             }}
             onRefocus={(p) => {
-              console.log('on focus', renderHistoryIndex(p));
+              console.log('on focus', FreeBoardHistory.renderIndex(p));
 
               setCurrentIndex(p);
               action('OnRefocus')(p);
@@ -116,7 +108,7 @@ export const NestedHistory: Story = {
             focusedIndex={currentIndex}
           />
         </div>
-        {renderHistoryIndex(currentIndex)}
+        {FreeBoardHistory.renderIndex(currentIndex)}
         {/* {currentIndex.join(' ')} */}
       </>
     );

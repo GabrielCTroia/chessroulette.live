@@ -11,7 +11,6 @@ import {
   PartialMove,
   PartialWhiteMove,
 } from './types';
-import { ChessHistoryIndex_NEW } from './history/types';
 
 export const isPartialMove = (pm: PairedMove): pm is PartialMove =>
   isPartialWhiteMove(pm) || isPartialBlackMove(pm);

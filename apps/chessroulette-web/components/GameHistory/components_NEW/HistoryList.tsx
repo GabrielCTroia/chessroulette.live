@@ -1,28 +1,23 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import debounce from 'debounce';
 import useDebouncedEffect from 'use-debounced-effect';
 import { HistoryRow } from './HistoryRow';
-import {
-  ChessHistoryIndex_NEW,
-  ChessRecursiveHistory_NEW,
-} from '../history/types';
+import { FBHHistory, FBHIndex } from '@xmatter/util-kit';
 
 export type HistoryListProps = {
-  history: ChessRecursiveHistory_NEW;
-  onRefocus: (atIndex: ChessHistoryIndex_NEW) => void;
-  onDelete: (atIndex: ChessHistoryIndex_NEW) => void;
-  focusedIndex?: ChessHistoryIndex_NEW;
+  history: FBHHistory;
+  onRefocus: (atIndex: FBHIndex) => void;
+  onDelete: (atIndex: FBHIndex) => void;
+  focusedIndex?: FBHIndex;
   className?: string;
   rowClassName?: string;
 } & (
   | {
       isNested: true;
-      // historyRootTurnIndex: number;
-      rootHistoryIndex: ChessHistoryIndex_NEW;
+      rootHistoryIndex: FBHIndex;
     }
   | {
       isNested?: false;
-      // historyRootTurnIndex?: undefined;
       rootHistoryIndex?: undefined;
     }
 );
@@ -38,15 +33,11 @@ export const HistoryList: React.FC<HistoryListProps> = ({
   onDelete,
   className,
   rowClassName,
-  // historyRootTurnIndex = 0,
-
   rootHistoryIndex,
   isNested = false,
 }) => {
   const rowElementRefs = useRef<Record<number, HTMLDivElement | null>>({});
   const containerElementRef = useRef<HTMLDivElement | null>();
-
-  // const [historyTurnIndex] = rootHistoryIndex;
 
   useDebouncedEffect(
     () => {
@@ -69,8 +60,6 @@ export const HistoryList: React.FC<HistoryListProps> = ({
       }
 
       const elm = rowElementRefs.current[focusedTurnIndex];
-
-      // console.log('focus into view?', elm);
 
       if (elm) {
         scrollIntoView(elm);
@@ -120,7 +109,6 @@ export const HistoryList: React.FC<HistoryListProps> = ({
                 ? recusriveFocusedIndexes
                 : undefined
             }
-            // focusedIndex={focusedIndex}
             containerClassName={rowClassName}
             {...(isNested
               ? {

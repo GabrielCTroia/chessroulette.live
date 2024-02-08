@@ -1,20 +1,14 @@
-import { HistoryList } from './HistoryList';
-import {
-  ChessHistoryIndex_NEW,
-  ChessHistoryRecursiveIndexes_NEW,
-  ChessHistory_NEW,
-} from '../history/types';
-import { HistoryRowProps } from './HistoryRow';
-import { invoke } from '@xmatter/util-kit';
-import { renderHistoryIndex } from '../history/util';
 import { useMemo } from 'react';
+import { HistoryList } from './HistoryList';
+import { HistoryRowProps } from './HistoryRow';
+import { FBHHistory, FBHIndex, FBHRecursiveIndexes } from '@xmatter/util-kit';
 
 type Props = {
-  branchedHistories: ChessHistory_NEW[];
-  rootHistoryIndex: ChessHistoryIndex_NEW;
-  onFocus: (i: ChessHistoryIndex_NEW) => void;
-  onDelete: (i: ChessHistoryIndex_NEW) => void;
-  focusedRecursiveIndexes?: ChessHistoryRecursiveIndexes_NEW;
+  branchedHistories: FBHHistory[];
+  rootHistoryIndex: FBHIndex;
+  onFocus: (i: FBHIndex) => void;
+  onDelete: (i: FBHIndex) => void;
+  focusedRecursiveIndexes?: FBHRecursiveIndexes;
   rowClassName?: HistoryRowProps['className'];
   className?: string;
 };
@@ -29,19 +23,15 @@ export const NestedHistories = ({
   onDelete,
 }: Props) => {
   const rootHistoryIndexWithoutNested = useMemo(
-    () =>
-      [
-        rootHistoryIndex[0],
-        rootHistoryIndex[1],
-      ] satisfies ChessHistoryIndex_NEW,
+    () => [rootHistoryIndex[0], rootHistoryIndex[1]] satisfies FBHIndex,
     [rootHistoryIndex]
   );
   const [rootTurnIndex, rootMovePosition] = rootHistoryIndexWithoutNested;
 
   const constructNestedIndex = (
-    [nestedHistoryTurnIndex, nestedHistoryMovePosition]: ChessHistoryIndex_NEW,
+    [nestedHistoryTurnIndex, nestedHistoryMovePosition]: FBHIndex,
     paralelBranchIndex: number
-  ): ChessHistoryIndex_NEW => {
+  ): FBHIndex => {
     return [
       rootTurnIndex,
       rootMovePosition,
@@ -56,14 +46,14 @@ export const NestedHistories = ({
 
   return (
     <>
-      <span
+      {/* <span
         className=""
         style={{
           fontSize: 9,
         }}
       >
         NHI: {renderHistoryIndex(rootHistoryIndex)}
-      </span>
+      </span> */}
       {branchedHistories.map((branchedHistory, branchIndex) => {
         return (
           <HistoryList

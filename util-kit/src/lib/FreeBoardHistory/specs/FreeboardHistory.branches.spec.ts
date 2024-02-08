@@ -7,74 +7,54 @@ import {
   PARALEL_BRANCHED_HISTORIES,
 } from './specUtils';
 import {
-  ChessHistoryIndex_NEW,
-  ChessHistoryMove_NEW,
-  ChessHistory_NEW,
-  ChessRecursiveHistoryFullTurn_NEW,
-  ChessRecursiveHistoryHalfTurn_NEW,
-} from './types';
-import {
-  addMoveToChessHistory,
-  decrementNestedHistoryIndex,
-  findMoveAtIndexRecursively,
-  getHistoryNonMoveWhite,
-  incrementHistoryIndex,
-  incrementNestedHistoryIndex,
-  renderHistoryIndex,
-} from './util';
+  FBHIndex,
+  FBHMove,
+  FBHHistory,
+  FBHRecursiveFullTurn,
+  FBHRecursiveHalfTurn,
+} from '../types';
+import { FreeBoardHistory as FBH } from '../FreeBoardHistory';
 
 describe('Nested indexes', () => {
   test('increment one generation nested index', () => {
-    const index: ChessHistoryIndex_NEW = [0, 0, [[0, 1], 0]];
-    const actual = incrementNestedHistoryIndex(index);
+    const index: FBHIndex = [0, 0, [[0, 1], 0]];
+    const actual = FBH.incrementNestedHistoryIndex(index);
 
     expect(actual).toEqual([0, 0, [[1, 0], 0]]);
   });
 
   test('increment multi generatation nested index', () => {
-    const index: ChessHistoryIndex_NEW = [
-      0,
-      0,
-      [[0, 1, [[2, 0, [[5, 1], 0]], 2]], 0],
-    ];
-    const actual = incrementNestedHistoryIndex(index);
+    const index: FBHIndex = [0, 0, [[0, 1, [[2, 0, [[5, 1], 0]], 2]], 0]];
+    const actual = FBH.incrementNestedHistoryIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 1, [[2, 0, [[6, 0], 0]], 2]], 0]]);
   });
 
   test('decrement one generation nested index', () => {
-    const index: ChessHistoryIndex_NEW = [0, 0, [[0, 1], 0]];
-    const actual = decrementNestedHistoryIndex(index);
+    const index: FBHIndex = [0, 0, [[0, 1], 0]];
+    const actual = FBH.decrementNestedHistoryIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 0], 0]]);
   });
 
   test('decrement multi generatation nested index', () => {
-    const index: ChessHistoryIndex_NEW = [
-      0,
-      0,
-      [[0, 1, [[2, 0, [[5, 1], 0]], 2]], 0],
-    ];
-    const actual = decrementNestedHistoryIndex(index);
+    const index: FBHIndex = [0, 0, [[0, 1, [[2, 0, [[5, 1], 0]], 2]], 0]];
+    const actual = FBH.decrementNestedHistoryIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 1, [[2, 0, [[5, 0], 0]], 2]], 0]]);
   });
 
   test('when decrementing hits -1 jump to the root history', () => {
-    const index: ChessHistoryIndex_NEW = [
-      0,
-      0,
-      [[0, 1, [[2, 0, [[0, 0], 0]], 2]], 0],
-    ];
-    const actual = decrementNestedHistoryIndex(index);
+    const index: FBHIndex = [0, 0, [[0, 1, [[2, 0, [[0, 0], 0]], 2]], 0]];
+    const actual = FBH.decrementNestedHistoryIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 1, [[2, 0], 2]], 0]]);
   });
 
   test('when all generations hit -1 jump to the each root history', () => {
-    const index: ChessHistoryIndex_NEW = [0, 1, [[0, 0, [[0, 0, [[0, 0]]]]]]];
-    const actual = decrementNestedHistoryIndex(index);
-    const expected = [0, 1, [[0, 0, [[0, 0]]]]] satisfies ChessHistoryIndex_NEW;
+    const index: FBHIndex = [0, 1, [[0, 0, [[0, 0, [[0, 0]]]]]]];
+    const actual = FBH.decrementNestedHistoryIndex(index);
+    const expected = [0, 1, [[0, 0, [[0, 0]]]]] as FBHIndex;
 
     expect(actual).toEqual(expected);
   });
@@ -82,23 +62,21 @@ describe('Nested indexes', () => {
 
 describe('Add Nested Move', () => {
   test('adds a first branched history (Black Move) to a Half turn (White Move)', () => {
-    const move: ChessHistoryMove_NEW = {
+    const move: FBHMove = {
       from: 'f7',
       to: 'f6',
       color: 'b',
       san: 'f6',
     };
 
-    const actual = addMoveToChessHistory(
+    const actual = FBH.addMoveToChessHistory(
       LONG_HISTORY_WITH_FULL_LAST_TURN,
       move,
       [1, 0]
     );
 
-    // console.log('actual', JSON.stringify(actual[1], null, 2));
-
-    const expectedTurn: ChessRecursiveHistoryFullTurn_NEW = [
-      getHistoryNonMoveWhite(),
+    const expectedTurn: FBHRecursiveFullTurn = [
+      FBH.getHistoryNonMoveWhite(),
       move,
     ];
     const expectedHistory = [
@@ -119,32 +97,28 @@ describe('Add Nested Move', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
-    const expectedIndex: ChessHistoryIndex_NEW = [1, 0, [[0, 1], 0]];
+    ] as FBHHistory;
+    const expectedIndex: FBHIndex = [1, 0, [[0, 1], 0]];
     const expected = [expectedHistory, expectedIndex];
-
-    // console.log('expected', JSON.stringify(expected, null, 2));
 
     expect(actual).toEqual(expected);
   });
 
   test('adds a first branched history (white move) to a Full turn (black move)', () => {
-    const move: ChessHistoryMove_NEW = {
+    const move: FBHMove = {
       from: 'f2',
       to: 'f3',
       color: 'w',
       san: 'f3',
     };
 
-    const actual = addMoveToChessHistory(
+    const actual = FBH.addMoveToChessHistory(
       LONG_HISTORY_WITH_FULL_LAST_TURN,
       move,
       [1, 1]
     );
 
-    // console.log('actual', JSON.stringify(actual, null, 2));
-
-    const expectedTurn: ChessRecursiveHistoryHalfTurn_NEW = [move];
+    const expectedTurn: FBHRecursiveHalfTurn = [move];
     const expectedHistory = [
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(0, 1),
       [
@@ -163,17 +137,15 @@ describe('Add Nested Move', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
-    const expectedIndex: ChessHistoryIndex_NEW = [1, 1, [[0, 0], 0]];
+    ] as FBHHistory;
+    const expectedIndex: FBHIndex = [1, 1, [[0, 0], 0]];
     const expected = [expectedHistory, expectedIndex];
-
-    // console.log('expected', JSON.stringify(expected, null, 2));
 
     expect(actual).toEqual(expected);
   });
 
   test('adds a continous move to an existent first branched history with FULL TURN', () => {
-    const branchedHistory: ChessHistory_NEW = BRANCHED_HISTORY_2;
+    const branchedHistory: FBHHistory = BRANCHED_HISTORY_2;
     const historyWithBranches = [
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(0, 1),
       [
@@ -192,24 +164,22 @@ describe('Add Nested Move', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
+    ] as FBHHistory;
 
-    const move: ChessHistoryMove_NEW = {
+    const move: FBHMove = {
       color: 'w',
       from: 'h2',
       to: 'h3',
       san: 'h2',
     };
 
-    const actual = addMoveToChessHistory(historyWithBranches, move, [
+    const actual = FBH.addMoveToChessHistory(historyWithBranches, move, [
       1,
       1,
       [-1], // [-1] is same as [-1, 0], meaning: -1 = append to the end of the history branch, 0 = implicit first history branch
     ]);
 
-    // console.log('actual', JSON.stringify(actual, null, 2));
-
-    const expectedTurn: ChessRecursiveHistoryHalfTurn_NEW = [move];
+    const expectedTurn: FBHRecursiveHalfTurn = [move];
     const expectedHistory = [
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(0, 1),
       [
@@ -228,24 +198,22 @@ describe('Add Nested Move', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
-    const expectedIndex: ChessHistoryIndex_NEW = [1, 1, [[1, 0], 0]];
+    ] as FBHHistory;
+    const expectedIndex: FBHIndex = [1, 1, [[1, 0], 0]];
     const expected = [expectedHistory, expectedIndex];
-
-    // console.log('expected', JSON.stringify(expected, null, 2));
 
     expect(actual).toEqual(expected);
   });
 
   test('adds a continous white move to an existent branch in between paralel histories', () => {
-    const move: ChessHistoryMove_NEW = {
+    const move: FBHMove = {
       color: 'w',
       from: 'h2',
       to: 'h3',
       san: 'h2',
     };
 
-    const actual = addMoveToChessHistory(
+    const actual = FBH.addMoveToChessHistory(
       LONG_HISTORY_WITH_PARALEL_HISTORIES,
       move,
       [
@@ -255,7 +223,7 @@ describe('Add Nested Move', () => {
       ]
     );
 
-    const expectedTurn: ChessRecursiveHistoryHalfTurn_NEW = [move];
+    const expectedTurn: FBHRecursiveHalfTurn = [move];
     const expectedHistory = [
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(0, 1),
       [
@@ -278,22 +246,22 @@ describe('Add Nested Move', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
-    const expectedIndex: ChessHistoryIndex_NEW = [1, 1, [[1, 0], 1]];
+    ] as FBHHistory;
+    const expectedIndex: FBHIndex = [1, 1, [[1, 0], 1]];
     const expected = [expectedHistory, expectedIndex];
 
     expect(actual).toEqual(expected);
   });
 
   test('adds a continous black move to an existent branch in a list of paralel histories', () => {
-    const move: ChessHistoryMove_NEW = {
+    const move: FBHMove = {
       color: 'b',
       from: 'h7',
       san: 'h7',
       to: 'h5',
     };
 
-    const actual = addMoveToChessHistory(
+    const actual = FBH.addMoveToChessHistory(
       LONG_HISTORY_WITH_PARALEL_HISTORIES,
       move,
       [
@@ -303,7 +271,7 @@ describe('Add Nested Move', () => {
       ]
     );
 
-    const expectedTurn: ChessRecursiveHistoryFullTurn_NEW = [
+    const expectedTurn: FBHRecursiveFullTurn = [
       PARALEL_BRANCHED_HISTORIES[0][1][0],
       move,
     ];
@@ -329,15 +297,15 @@ describe('Add Nested Move', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
-    const expectedIndex: ChessHistoryIndex_NEW = [1, 1, [[1, 1], 0]];
+    ] as FBHHistory;
+    const expectedIndex: FBHIndex = [1, 1, [[1, 1], 0]];
     const expected = [expectedHistory, expectedIndex];
 
     expect(actual).toEqual(expected);
   });
 
   test('starts a parallel branched history', () => {
-    const branchedHistory: ChessHistory_NEW = BRANCHED_HISTORY_1;
+    const branchedHistory: FBHHistory = BRANCHED_HISTORY_1;
     const historyWithBranches = [
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(0, 1),
       [
@@ -356,19 +324,19 @@ describe('Add Nested Move', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
+    ] as FBHHistory;
 
-    const move: ChessHistoryMove_NEW = {
+    const move: FBHMove = {
       color: 'w',
       from: 'f2',
       san: 'f2',
       to: 'f4',
     };
 
-    const actual = addMoveToChessHistory(historyWithBranches, move, [1, 1]);
+    const actual = FBH.addMoveToChessHistory(historyWithBranches, move, [1, 1]);
 
-    const expectedTurn: ChessRecursiveHistoryHalfTurn_NEW = [move];
-    const expectedNewBranchedHistory: ChessHistory_NEW = [expectedTurn];
+    const expectedTurn: FBHRecursiveHalfTurn = [move];
+    const expectedNewBranchedHistory: FBHHistory = [expectedTurn];
     const expectedHistory = [
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(0, 1),
       [
@@ -387,8 +355,8 @@ describe('Add Nested Move', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
-    const expectedIndex: ChessHistoryIndex_NEW = [1, 1, [[0, 0], 1]];
+    ] as FBHHistory;
+    const expectedIndex: FBHIndex = [1, 1, [[0, 0], 1]];
     const expected = [expectedHistory, expectedIndex];
 
     expect(actual).toEqual(expected);
@@ -397,7 +365,7 @@ describe('Add Nested Move', () => {
 
 describe('Multi level nested histories', () => {
   test('Adds multiple moves to nested branches ', () => {
-    const move1: ChessHistoryMove_NEW = {
+    const move1: FBHMove = {
       color: 'b',
       from: 'h7',
       to: 'h5',
@@ -405,7 +373,7 @@ describe('Multi level nested histories', () => {
     };
 
     // Added black move to branched history
-    const afterMove1 = addMoveToChessHistory(
+    const afterMove1 = FBH.addMoveToChessHistory(
       LONG_HISTORY_WITH_PARALEL_HISTORIES,
       move1,
       [
@@ -419,28 +387,19 @@ describe('Multi level nested histories', () => {
 
     const [addedMove1History, addedMove1AtIndex] = afterMove1;
 
-    const move2: ChessHistoryMove_NEW = {
+    const move2: FBHMove = {
       color: 'w',
       from: 'h2',
       to: 'h4',
       san: 'h4',
     };
 
-    const actual = addMoveToChessHistory(
+    const actual = FBH.addMoveToChessHistory(
       addedMove1History,
       move2,
       addedMove1AtIndex
     );
 
-    // console.log('actual', JSON.stringify(actual, null, 2));
-
-    // const expectedTurn: ChessRecursiveHistoryFullTurn_NEW = [
-    //   BRANCHED_HISTORY_2[0],
-    //   {
-    //     ...move1,
-    //     branchedHistories: [[[move2]]],
-    //   },
-    // ];
     const expectedHistory = [
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(0, 1),
       [
@@ -466,7 +425,7 @@ describe('Multi level nested histories', () => {
                   branchedHistories: [
                     [
                       [
-                        getHistoryNonMoveWhite(),
+                        FBH.getHistoryNonMoveWhite(),
                         {
                           ...move1,
                           branchedHistories: [[[move2]]],
@@ -482,15 +441,14 @@ describe('Multi level nested histories', () => {
         },
       ],
       ...LONG_HISTORY_WITH_FULL_LAST_TURN.slice(2),
-    ] as ChessHistory_NEW;
-    const expectedIndex: ChessHistoryIndex_NEW = [
+    ] as FBHHistory;
+
+    const expectedIndex: FBHIndex = [
       1,
       1,
       [[0, 1, [[0, 1, [[0, 0], 0]], 0]], 1],
     ];
     const expected = [expectedHistory, expectedIndex];
-
-    // console.log('expected', JSON.stringify(expected, null, 2));
 
     expect(actual).toEqual(expected);
   });
@@ -542,9 +500,9 @@ describe('Find Move At Index Recursively', () => {
           color: 'b',
         },
       ],
-    ] as ChessHistory_NEW;
+    ] as FBHHistory;
 
-    const actual = findMoveAtIndexRecursively(nestedHistory, [
+    const actual = FBH.findMoveAtIndexRecursively(nestedHistory, [
       0,
       0,
       [[0, 1, [[0, 0]]]], // should be b7

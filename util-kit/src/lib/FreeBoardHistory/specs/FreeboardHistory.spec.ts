@@ -3,91 +3,76 @@ import {
   HISTORY_WITH_HALF_LAST_TURN,
   LONG_HISTORY_WITH_HALF_LAST_TURN,
 } from './specUtils';
-import {
-  ChessHistoryBlackMove_NEW,
-  ChessHistoryIndex_NEW,
-  ChessHistoryMove_NEW,
-  ChessHistory_NEW,
-} from './types';
-import {
-  addMoveToChessHistory,
-  getStartingHistoryIndex,
-  incrementHistoryIndex,
-  decrementHistoryIndex,
-  findMoveAtIndex,
-  getHistoryLastIndex,
-  getHistoryAtIndex,
-  areHistoryIndexesEqual,
-  // getLinearChessHistoryAtRecursiveIndex,
-  getLinearChessHistoryAtRecursiveIndex_2,
-  findMoveAtIndexRecursively,
-} from './util';
+import { FBHBlackMove, FBHIndex, FBHMove, FBHHistory } from '../types';
+import { FreeBoardHistory as FBH } from '../FreeBoardHistory';
 
 describe('History Index', () => {
   test('starting index', () => {
-    expect(getStartingHistoryIndex()).toEqual([-1, 1]);
+    expect(FBH.getStartingHistoryIndex()).toEqual([-1, 1]);
   });
 
   test('increment index at turn level', () => {
-    const starting: ChessHistoryIndex_NEW = [0, 0];
-    const actual = incrementHistoryIndex(incrementHistoryIndex(starting));
+    const starting: FBHIndex = [0, 0];
+    const actual = FBH.incrementHistoryIndex(
+      FBH.incrementHistoryIndex(starting)
+    );
 
     expect(actual).toEqual([1, 0]);
   });
 
   test('increment index at move level', () => {
-    const starting: ChessHistoryIndex_NEW = [0, 0];
-    const actual = incrementHistoryIndex(starting);
+    const starting: FBHIndex = [0, 0];
+    const actual = FBH.incrementHistoryIndex(starting);
 
     expect(actual).toEqual([0, 1]);
   });
 
   test('decrement index at turn level', () => {
-    const starting: ChessHistoryIndex_NEW = [2, 0];
-    const actual = decrementHistoryIndex(starting);
+    const starting: FBHIndex = [2, 0];
+    const actual = FBH.decrementHistoryIndex(starting);
 
     expect(actual).toEqual([1, 1]);
   });
 
   test('decrement index at move level', () => {
-    const starting: ChessHistoryIndex_NEW = [2, 1];
-    const actual = decrementHistoryIndex(starting);
+    const starting: FBHIndex = [2, 1];
+    const actual = FBH.decrementHistoryIndex(starting);
 
     expect(actual).toEqual([2, 0]);
   });
 
   test('get last index from last half index', () => {
-    const actual = getHistoryLastIndex(HISTORY_WITH_HALF_LAST_TURN);
+    const actual = FBH.getHistoryLastIndex(HISTORY_WITH_HALF_LAST_TURN);
     expect(actual).toEqual([1, 0]);
   });
 
   test('get last index from last full index', () => {
-    const actual = getHistoryLastIndex(HISTORY_WITH_FULL_LAST_TURN);
+    const actual = FBH.getHistoryLastIndex(HISTORY_WITH_FULL_LAST_TURN);
     expect(actual).toEqual([0, 1]);
   });
 
   describe('areHistoryIndexesEqual', () => {
     test('true when equal non recursive', () => {
-      expect(areHistoryIndexesEqual([0, 1], [0, 1])).toBe(true);
+      expect(FBH.areHistoryIndexesEqual([0, 1], [0, 1])).toBe(true);
     });
 
     test('true when equal recursive', () => {
       expect(
-        areHistoryIndexesEqual([0, 1, [[0, 1], 0]], [0, 1, [[0, 1], 0]])
+        FBH.areHistoryIndexesEqual([0, 1, [[0, 1], 0]], [0, 1, [[0, 1], 0]])
       ).toBe(true);
     });
 
     test('false when not equal non recursive', () => {
-      expect(areHistoryIndexesEqual([0, 1], [0, 0])).toBe(false);
-      expect(areHistoryIndexesEqual([0, 0], [1, 0])).toBe(false);
+      expect(FBH.areHistoryIndexesEqual([0, 1], [0, 0])).toBe(false);
+      expect(FBH.areHistoryIndexesEqual([0, 0], [1, 0])).toBe(false);
     });
 
     test('false when not equal recusive', () => {
       expect(
-        areHistoryIndexesEqual([0, 1, [[0, 0], 0]], [0, 1, [[0, 1], 0]])
+        FBH.areHistoryIndexesEqual([0, 1, [[0, 0], 0]], [0, 1, [[0, 1], 0]])
       ).toBe(false);
       expect(
-        areHistoryIndexesEqual([0, 1, [[0, 1], 1]], [0, 1, [[0, 1], 0]])
+        FBH.areHistoryIndexesEqual([0, 1, [[0, 1], 1]], [0, 1, [[0, 1], 0]])
       ).toBe(false);
     });
   });
@@ -95,7 +80,7 @@ describe('History Index', () => {
 
 describe('Find Move At Index', () => {
   test('Gets an existent move', () => {
-    const actual = findMoveAtIndex(HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
+    const actual = FBH.findMoveAtIndex(HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
 
     expect(actual).toEqual({
       from: 'e7',
@@ -106,7 +91,7 @@ describe('Find Move At Index', () => {
   });
 
   test('Returns "undefined" when no move', () => {
-    const actual = findMoveAtIndex(HISTORY_WITH_HALF_LAST_TURN, [4, 0]);
+    const actual = FBH.findMoveAtIndex(HISTORY_WITH_HALF_LAST_TURN, [4, 0]);
 
     expect(actual).toBe(undefined);
   });
@@ -114,13 +99,19 @@ describe('Find Move At Index', () => {
 
 describe('Get History At Index', () => {
   test('Get Empty History', () => {
-    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [-1, 1]);
+    const actual = FBH.getHistoryAtIndex(
+      LONG_HISTORY_WITH_HALF_LAST_TURN,
+      [-1, 1]
+    );
 
     expect(actual).toEqual([]);
   });
 
   test('Get History At Starting Index', () => {
-    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 0]);
+    const actual = FBH.getHistoryAtIndex(
+      LONG_HISTORY_WITH_HALF_LAST_TURN,
+      [0, 0]
+    );
 
     expect(actual).toEqual([
       [
@@ -135,7 +126,10 @@ describe('Get History At Index', () => {
   });
 
   test('Get History At 1st Full Turn Index ', () => {
-    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
+    const actual = FBH.getHistoryAtIndex(
+      LONG_HISTORY_WITH_HALF_LAST_TURN,
+      [0, 1]
+    );
 
     expect(actual).toEqual([
       [
@@ -156,7 +150,10 @@ describe('Get History At Index', () => {
   });
 
   test('Get History At Half Turn Index ', () => {
-    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 0]);
+    const actual = FBH.getHistoryAtIndex(
+      LONG_HISTORY_WITH_HALF_LAST_TURN,
+      [1, 0]
+    );
 
     expect(actual).toEqual([
       [
@@ -185,7 +182,10 @@ describe('Get History At Index', () => {
   });
 
   test('Get History At Full Turn Index ', () => {
-    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 1]);
+    const actual = FBH.getHistoryAtIndex(
+      LONG_HISTORY_WITH_HALF_LAST_TURN,
+      [1, 1]
+    );
 
     expect(actual).toEqual([
       [
@@ -220,7 +220,10 @@ describe('Get History At Index', () => {
   });
 
   test('Get History At Longer than length Index', () => {
-    const actual = getHistoryAtIndex(LONG_HISTORY_WITH_HALF_LAST_TURN, [19, 1]);
+    const actual = FBH.getHistoryAtIndex(
+      LONG_HISTORY_WITH_HALF_LAST_TURN,
+      [19, 1]
+    );
 
     expect(actual).toEqual(LONG_HISTORY_WITH_HALF_LAST_TURN);
   });
@@ -272,9 +275,9 @@ describe('Get History At Index', () => {
             color: 'b',
           },
         ],
-      ] satisfies ChessHistory_NEW;
+      ] satisfies FBHHistory;
 
-      const actual = getLinearChessHistoryAtRecursiveIndex_2(nestedHistory, [
+      const actual = FBH.getLinearChessHistoryAtRecursiveIndex(nestedHistory, [
         0,
         0,
         [[0, 1, [[0, 0]]]],
@@ -308,14 +311,14 @@ describe('Add Move', () => {
   test('adds a white move at the end of history', () => {
     const history = HISTORY_WITH_FULL_LAST_TURN;
 
-    const newMove: ChessHistoryMove_NEW = {
+    const newMove: FBHMove = {
       from: 'a2',
       to: 'a3',
       color: 'w',
       san: 'a3',
     };
 
-    const actual = addMoveToChessHistory(history, newMove);
+    const actual = FBH.addMoveToChessHistory(history, newMove);
 
     const expectedHistory = [...history, [newMove]];
     const expectedIndex = [1, 0];
@@ -325,14 +328,17 @@ describe('Add Move', () => {
   });
 
   test('adds a black move at the end of history', () => {
-    const newMove: ChessHistoryBlackMove_NEW = {
+    const newMove: FBHBlackMove = {
       from: 'a7',
       to: 'a6',
       color: 'b',
       san: 'a6',
     };
 
-    const actual = addMoveToChessHistory(HISTORY_WITH_HALF_LAST_TURN, newMove);
+    const actual = FBH.addMoveToChessHistory(
+      HISTORY_WITH_HALF_LAST_TURN,
+      newMove
+    );
 
     const expectedHistory = [
       HISTORY_WITH_HALF_LAST_TURN[0],
