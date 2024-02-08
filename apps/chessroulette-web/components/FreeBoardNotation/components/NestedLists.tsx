@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { List } from './List';
 import { RowProps } from './Row';
-import { FBHHistory, FBHIndex, FBHRecursiveIndexes } from '@xmatter/util-kit';
+import { FBHHistory, FBHIndex, FBHRecursiveIndexes, FreeBoardHistory } from '@xmatter/util-kit';
 
 type Props = {
   branchedHistories: FBHHistory[];
@@ -46,14 +46,14 @@ export const NestedLists = ({
 
   return (
     <>
-      {/* <span
+      <span
         className=""
         style={{
           fontSize: 9,
         }}
       >
-        NHI: {renderHistoryIndex(rootHistoryIndex)}
-      </span> */}
+        {/* NHI: {FreeBoardHistory.renderIndex(rootHistoryIndex)} */}
+      </span>
       {branchedHistories.map((branchedHistory, branchIndex) => {
         return (
           <List

@@ -89,6 +89,12 @@ export default (
   prev: ActivityState = initialActivtityState,
   action: ActivityActions
 ): ActivityState => {
+  console.group('Action', action.type);
+  console.log('payload', (action as any).payload);
+  console.log('prev', prev);
+  console.log('')
+  console.groupEnd();
+
   if (prev.activityType === 'learn') {
     // TODO: Should this be split?
 

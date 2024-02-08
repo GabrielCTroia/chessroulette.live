@@ -46,7 +46,7 @@ export const FreeBoardNotation: React.FC<GameHistoryProps> = ({
           {emptyContent}
         </div>
       )}
-      {FreeBoardHistory.renderIndex(focusedIndex)}
+      {/* {FreeBoardHistory.renderIndex(focusedIndex)} */}
     </div>
   );
 };
