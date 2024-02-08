@@ -31,7 +31,7 @@ import {
   PencilSquareIcon,
 } from '@heroicons/react/16/solid';
 import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor';
-import { FreeBoardHistory } from 'apps/chessroulette-web/components/FreeBoardHistory';
+import { FreeBoardNotation } from 'apps/chessroulette-web/components/FreeBoardNotation';
 import { useLearnActivitySettings } from './useLearnActivitySettings';
 import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
@@ -107,7 +107,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                 const { history } = activityState;
 
-                const lm = FBH.findMoveAtIndexRecursively(
+                const lm = FBH.findMoveAtIndex(
                   history.moves,
                   history.focusedIndex
                 );
@@ -402,7 +402,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         ),
                         renderContent: () => (
                           <div className="flex flex-col flex-1 gap-2 bg-slate-700 min-h-0">
-                            <FreeBoardHistory
+                            <FreeBoardNotation
                               history={activityState.history.moves}
                               // containerClassName="overflow-scroll bg-red-200 sh-full"
                               focusedIndex={activityState.history.focusedIndex}

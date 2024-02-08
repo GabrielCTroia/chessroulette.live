@@ -13,8 +13,8 @@ describe('History Index', () => {
 
   test('increment index at turn level', () => {
     const starting: FBHIndex = [0, 0];
-    const actual = FBH.incrementHistoryIndex(
-      FBH.incrementHistoryIndex(starting)
+    const actual = FBH.incrementIndex(
+      FBH.incrementIndex(starting)
     );
 
     expect(actual).toEqual([1, 0]);
@@ -22,21 +22,21 @@ describe('History Index', () => {
 
   test('increment index at move level', () => {
     const starting: FBHIndex = [0, 0];
-    const actual = FBH.incrementHistoryIndex(starting);
+    const actual = FBH.incrementIndex(starting);
 
     expect(actual).toEqual([0, 1]);
   });
 
   test('decrement index at turn level', () => {
     const starting: FBHIndex = [2, 0];
-    const actual = FBH.decrementHistoryIndex(starting);
+    const actual = FBH.decrementIndex(starting);
 
     expect(actual).toEqual([1, 1]);
   });
 
   test('decrement index at move level', () => {
     const starting: FBHIndex = [2, 1];
-    const actual = FBH.decrementHistoryIndex(starting);
+    const actual = FBH.decrementIndex(starting);
 
     expect(actual).toEqual([2, 0]);
   });
@@ -277,7 +277,7 @@ describe('Get History At Index', () => {
         ],
       ] satisfies FBHHistory;
 
-      const actual = FBH.getLinearChessHistoryAtRecursiveIndex(nestedHistory, [
+      const actual = FBH.calculateLinearHistoryAtIndex(nestedHistory, [
         0,
         0,
         [[0, 1, [[0, 0]]]],

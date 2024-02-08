@@ -55,10 +55,10 @@ const findNextValidMoveIndex = (
 ): FBHIndex => {
   const nextIndex =
     dir === 'right'
-      ? FreeBoardHistory.incrementNestedHistoryIndex(index)
-      : FreeBoardHistory.decrementNestedHistoryIndex(index);
+      ? FreeBoardHistory.incrementIndex(index)
+      : FreeBoardHistory.decrementIndex(index);
 
-  const nextMove = FreeBoardHistory.findMoveAtIndexRecursively(
+  const nextMove = FreeBoardHistory.findMoveAtIndex(
     history,
     nextIndex
   );

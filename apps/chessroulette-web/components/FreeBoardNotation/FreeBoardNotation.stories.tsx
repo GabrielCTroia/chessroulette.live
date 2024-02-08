@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { action } from '@storybook/addon-actions';
-import { FreeBoardHistory } from './FreeBoardHistory';
+import { FreeBoardNotation } from './FreeBoardNotation';
 import { useState } from 'react';
 import {
   FBHHistory,
@@ -8,13 +8,13 @@ import {
   FreeBoardHistory as FBH,
 } from '@xmatter/util-kit';
 
-const meta: Meta<typeof FreeBoardHistory> = {
-  component: FreeBoardHistory,
-  title: 'FreeBoardHistory',
+const meta: Meta<typeof FreeBoardNotation> = {
+  component: FreeBoardNotation,
+  title: 'FreeBoardNotation',
 };
 
 export default meta;
-type Story = StoryObj<typeof FreeBoardHistory>;
+type Story = StoryObj<typeof FreeBoardNotation>;
 
 const BASIC_HISTORY = FBH.pgnToHistory(
   '1. e4 c5 2. Nf3 e6 3. d4 cxd4 4. Nxd4 a6 5. Nc3 Qc7 6. Bd3 Nc6 7. h3'
@@ -23,7 +23,7 @@ const BASIC_HISTORY = FBH.pgnToHistory(
 export const LinearHistory: Story = {
   render: () => (
     <div style={{ width: '400px' }}>
-      <FreeBoardHistory
+      <FreeBoardNotation
         history={BASIC_HISTORY}
         onDelete={action('OnDelete')}
         onRefocus={action('OnRefocus')}
@@ -81,7 +81,7 @@ export const NestedHistory: Story = {
     return (
       <>
         <div className="p-2 border border-slate-600" style={{ width: '400px' }}>
-          <FreeBoardHistory
+          <FreeBoardNotation
             history={historyWithOneGenBranch}
             onDelete={(p) => {
               console.log('on delete', p);

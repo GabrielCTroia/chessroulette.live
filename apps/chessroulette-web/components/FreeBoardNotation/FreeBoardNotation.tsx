@@ -1,7 +1,7 @@
 import React from 'react';
 import { List, ListProps } from './components/List';
 import { useKeysToRefocusHistory } from './hooks';
-import { FBHHistory, FreeBoardHistory as FBH } from '@xmatter/util-kit';
+import { FBHHistory, FreeBoardHistory } from '@xmatter/util-kit';
 
 export type GameHistoryProps = {
   history: FBHHistory;
@@ -19,10 +19,10 @@ export type GameHistoryProps = {
  * @param param0
  * @returns
  */
-export const FreeBoardHistory: React.FC<GameHistoryProps> = ({
+export const FreeBoardNotation: React.FC<GameHistoryProps> = ({
   history = [],
   emptyContent = 'Wow, so empty!',
-  focusedIndex = FBH.getStartingHistoryIndex(),
+  focusedIndex = FreeBoardHistory.getStartingHistoryIndex(),
   onRefocus,
   onDelete,
   containerClassName = '',
@@ -46,7 +46,7 @@ export const FreeBoardHistory: React.FC<GameHistoryProps> = ({
           {emptyContent}
         </div>
       )}
-      {FBH.renderIndex(focusedIndex)}
+      {FreeBoardHistory.renderIndex(focusedIndex)}
     </div>
   );
 };

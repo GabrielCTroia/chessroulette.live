@@ -18,42 +18,42 @@ import { FreeBoardHistory as FBH } from '../FreeBoardHistory';
 describe('Nested indexes', () => {
   test('increment one generation nested index', () => {
     const index: FBHIndex = [0, 0, [[0, 1], 0]];
-    const actual = FBH.incrementNestedHistoryIndex(index);
+    const actual = FBH.incrementIndex(index);
 
     expect(actual).toEqual([0, 0, [[1, 0], 0]]);
   });
 
   test('increment multi generatation nested index', () => {
     const index: FBHIndex = [0, 0, [[0, 1, [[2, 0, [[5, 1], 0]], 2]], 0]];
-    const actual = FBH.incrementNestedHistoryIndex(index);
+    const actual = FBH.incrementIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 1, [[2, 0, [[6, 0], 0]], 2]], 0]]);
   });
 
   test('decrement one generation nested index', () => {
     const index: FBHIndex = [0, 0, [[0, 1], 0]];
-    const actual = FBH.decrementNestedHistoryIndex(index);
+    const actual = FBH.decrementIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 0], 0]]);
   });
 
   test('decrement multi generatation nested index', () => {
     const index: FBHIndex = [0, 0, [[0, 1, [[2, 0, [[5, 1], 0]], 2]], 0]];
-    const actual = FBH.decrementNestedHistoryIndex(index);
+    const actual = FBH.decrementIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 1, [[2, 0, [[5, 0], 0]], 2]], 0]]);
   });
 
   test('when decrementing hits -1 jump to the root history', () => {
     const index: FBHIndex = [0, 0, [[0, 1, [[2, 0, [[0, 0], 0]], 2]], 0]];
-    const actual = FBH.decrementNestedHistoryIndex(index);
+    const actual = FBH.decrementIndex(index);
 
     expect(actual).toEqual([0, 0, [[0, 1, [[2, 0], 2]], 0]]);
   });
 
   test('when all generations hit -1 jump to the each root history', () => {
     const index: FBHIndex = [0, 1, [[0, 0, [[0, 0, [[0, 0]]]]]]];
-    const actual = FBH.decrementNestedHistoryIndex(index);
+    const actual = FBH.decrementIndex(index);
     const expected = [0, 1, [[0, 0, [[0, 0]]]]] as FBHIndex;
 
     expect(actual).toEqual(expected);
@@ -502,7 +502,7 @@ describe('Find Move At Index Recursively', () => {
       ],
     ] as FBHHistory;
 
-    const actual = FBH.findMoveAtIndexRecursively(nestedHistory, [
+    const actual = FBH.findMoveAtIndex(nestedHistory, [
       0,
       0,
       [[0, 1, [[0, 0]]]], // should be b7

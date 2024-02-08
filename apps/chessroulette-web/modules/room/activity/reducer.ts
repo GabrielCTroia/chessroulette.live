@@ -120,7 +120,7 @@ export default (
           promoteToFenBoardPiecesymbol
         ) as FBHMove;
 
-        const prevMove = FreeBoardHistory.findMoveAtIndexRecursively(
+        const prevMove = FreeBoardHistory.findMoveAtIndex(
           prev.activityState.history.moves,
           prev.activityState.history.focusedIndex
         );
@@ -140,7 +140,7 @@ export default (
 
           if (prevFocusRecursiveIndexes) {
             const addAtIndex =
-              FreeBoardHistory.incrementNestedHistoryIndex(prevFocusedIndex);
+              FreeBoardHistory.incrementIndex(prevFocusedIndex);
 
             if (prevMove?.color === nextMove.color) {
               const [nextHistory, addedAtIndex] =
@@ -153,7 +153,7 @@ export default (
               return FreeBoardHistory.addMoveToChessHistory(
                 nextHistory,
                 nextMove,
-                FreeBoardHistory.incrementNestedHistoryIndex(addedAtIndex)
+                FreeBoardHistory.incrementIndex(addedAtIndex)
               );
             }
 
@@ -165,7 +165,7 @@ export default (
           }
 
           const addAtIndex = isFocusedIndexLastInBranch
-            ? FreeBoardHistory.incrementNestedHistoryIndex(
+            ? FreeBoardHistory.incrementIndex(
                 prev.activityState.history.focusedIndex
               )
             : prev.activityState.history.focusedIndex;
@@ -282,7 +282,7 @@ export default (
       };
     } else if (action.type === 'focusHistoryIndex') {
       const historyAtFocusedIndex =
-        FreeBoardHistory.getLinearChessHistoryAtRecursiveIndex(
+        FreeBoardHistory.calculateLinearHistoryAtIndex(
           prev.activityState.history.moves,
           action.payload.index
         );
@@ -311,9 +311,9 @@ export default (
     }
 
     if (action.type === 'deleteHistoryMove') {
-      const nextIndex = FreeBoardHistory.decrementNestedHistoryIndex(
-        action.payload.atIndex
-      );
+      // TODO: Fix this!
+
+      const nextIndex = FreeBoardHistory.decrementIndex(action.payload.atIndex);
       const nextHistory = FreeBoardHistory.getHistoryAtIndex(
         prev.activityState.history.moves,
         nextIndex

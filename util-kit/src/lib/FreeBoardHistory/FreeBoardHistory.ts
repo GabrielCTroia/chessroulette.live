@@ -3,12 +3,11 @@ import {
   ChessPGN,
   DetailedChessMove,
   getNewChessGame,
-  invoke,
   isWhiteColor,
   toShortColor,
+  invoke,
 } from '@xmatter/util-kit';
 import type {
-  FBHBlackMove,
   FBHIndex,
   FBHMove,
   FBHRecursiveIndexes,
@@ -43,14 +42,14 @@ export namespace FreeBoardHistory {
       to: undefined,
     } as FBHMove); // TODO: This could be infered more
 
-  export const getHistoryIndex = (
-    turn: number,
-    color: ChessColor
-  ): FBHIndex => [turn, toShortColor(color) === 'b' ? 1 : 0];
+  const getHistoryIndex = (turn: number, color: ChessColor): FBHIndex => [
+    turn,
+    toShortColor(color) === 'b' ? 1 : 0,
+  ];
 
   export const getStartingHistoryIndex = () => getHistoryIndex(-1, 'b');
 
-  export const isStartingHistoryIndex = (i: FBHIndex) =>
+  const isStartingHistoryIndex = (i: FBHIndex) =>
     areHistoryIndexesEqual(getStartingHistoryIndex(), i);
 
   export const isLastHistoryIndexInBranch = (h: FBHHistory, i: FBHIndex) =>
@@ -86,10 +85,7 @@ export namespace FreeBoardHistory {
     );
   };
 
-  export const incrementHistoryIndex = ([turn, move]: FBHIndex) =>
-    (move === 1 ? [turn + 1, 0] : [turn, move + 1]) as FBHIndex;
-
-  export const incrementNestedHistoryIndex = ([
+  export const incrementIndex = ([
     turn,
     move,
     recursiveIndexes,
@@ -102,15 +98,17 @@ export namespace FreeBoardHistory {
       return [
         turn,
         move,
-        [incrementNestedHistoryIndex(recursiveIndexes[0]), recursiveIndexes[1]],
+        [incrementIndex(recursiveIndexes[0]), recursiveIndexes[1]],
       ];
     }
 
-    return incrementHistoryIndex([turn, move]);
+    return incrementNonRecursiveIndex([turn, move]);
   };
 
-  // TODO: Rename to decrementHistoryIndexRecrsively
-  export const decrementNestedHistoryIndex = ([
+  const incrementNonRecursiveIndex = ([turn, move]: FBHIndex) =>
+    (move === 1 ? [turn + 1, 0] : [turn, move + 1]) as FBHIndex;
+
+  export const decrementIndex = ([
     turn,
     move,
     recursiveIndexes,
@@ -120,7 +118,7 @@ export namespace FreeBoardHistory {
         throw new Error('This is not good. need to change it from -1');
       }
 
-      const nestedIndex = decrementNestedHistoryIndex(recursiveIndexes[0]);
+      const nestedIndex = decrementIndex(recursiveIndexes[0]);
 
       // If went down, remove it and go to the upper generation
       if (nestedIndex[0] === -1) {
@@ -130,30 +128,41 @@ export namespace FreeBoardHistory {
       return [
         turn,
         move,
-        [decrementNestedHistoryIndex(recursiveIndexes[0]), recursiveIndexes[1]],
+        [decrementIndex(recursiveIndexes[0]), recursiveIndexes[1]],
       ];
     }
 
-    return decrementHistoryIndex([turn, move]);
+    return decrementNonRecursiveIndex([turn, move]);
   };
 
-  export const decrementHistoryIndex = ([turn, move]: FBHIndex) =>
+  const decrementNonRecursiveIndex = ([turn, move]: FBHIndex) =>
     (move === 1 ? [turn, move - 1] : [turn - 1, 1]) as FBHIndex;
 
-  export const findMoveAtIndex = (history: FBHHistory, atIndex: FBHIndex) =>
-    findTurnAtIndex(history, atIndex)?.[atIndex[1]];
+  export const findMoveAtIndex = (history: FBHHistory, atIndex: FBHIndex) => {
+    const turn = findTurnAtIndex(history, atIndex);
 
-  export const findTurnAtIndex = (history: FBHHistory, [turnIndex]: FBHIndex) =>
-    history[turnIndex];
+    if (!turn) {
+      return undefined;
+    }
 
-  export const findTurnAtIndexRecursively = (
+    return turn[getDeepestIndex(atIndex)[1]];
+  };
+
+  const findMoveAtIndexNonRecursively = (
+    history: FBHHistory,
+    atIndex: FBHIndex
+  ) => findTurnAtIndexNonRecursively(history, atIndex)?.[atIndex[1]];
+
+  const findTurnAtIndexNonRecursively = (
+    history: FBHHistory,
+    [turnIndex]: FBHIndex
+  ) => history[turnIndex];
+
+  const findTurnAtIndex = (
     history: FBHHistory,
     [turn, movePosition, recursiveHistoryIndex]: FBHIndex
   ): FBHTurn | undefined => {
-    // console.log('findTurnAtIndexRecursively', history, [turn, movePosition]);
-
     if (recursiveHistoryIndex) {
-      // console.log('> recursiveHistoryIndex', recursiveHistoryIndex);
       const [recursiveIndexes, paralelBranchIndex = 0] = recursiveHistoryIndex;
 
       const nestedHistory =
@@ -163,9 +172,7 @@ export namespace FreeBoardHistory {
         return undefined;
       }
 
-      // console.log('> recursiveIndexes', recursiveIndexes);
-
-      return findTurnAtIndexRecursively(
+      return findTurnAtIndex(
         nestedHistory,
         recursiveIndexes === -1
           ? getHistoryLastIndex(nestedHistory) // -1 means last one
@@ -176,22 +183,7 @@ export namespace FreeBoardHistory {
     return history[turn];
   };
 
-  export const findMoveAtIndexRecursively = (
-    history: FBHHistory,
-    atIndex: FBHIndex
-  ) => {
-    const turn = findTurnAtIndexRecursively(history, atIndex);
-
-    if (!turn) {
-      return undefined;
-    }
-
-    return turn[getDeepestIndex(atIndex)[1]];
-  };
-
-  export const getDeepestIndex = (
-    index: FBHRecursiveIndex
-  ): FBHNonRecursiveIndex => {
+  const getDeepestIndex = (index: FBHRecursiveIndex): FBHNonRecursiveIndex => {
     const nextNestedIndex = getNextDeepIndex(index);
 
     return nextNestedIndex
@@ -220,7 +212,6 @@ export namespace FreeBoardHistory {
   export const getHistoryLastIndex = (
     history: FBHHistory,
     recursiveIndexes?: FBHRecursiveIndexes
-    // branchIndex?: number
   ): FBHIndex => {
     const lastTurn = getHistoryLastTurn(history);
 
@@ -240,7 +231,7 @@ export namespace FreeBoardHistory {
   };
 
   /**
-   * This does it recursively
+   * Adds a move to the History at the given index (can be recursive)
    *
    * @param history
    * @param move
@@ -252,12 +243,17 @@ export namespace FreeBoardHistory {
     move: FBHMove,
     atIndex?: FBHIndex
   ): [nextHistory: FBHRecursiveHistory, nextIndex: FBHIndex] => {
-    const isRecursive = atIndex && findMoveAtIndex(history, atIndex);
+    const hasMoveAtIndex =
+      atIndex && findMoveAtIndexNonRecursively(history, atIndex);
+    const isNested = !!hasMoveAtIndex;
 
     // Branched History
-    if (isRecursive) {
+    if (isNested) {
       const [turnIndex, moveIndex, recursiveIndexes] = atIndex;
-      const prevMoveAtIndex = findMoveAtIndex(history, [turnIndex, moveIndex]);
+      const prevMoveAtIndex = findMoveAtIndexNonRecursively(history, [
+        turnIndex,
+        moveIndex,
+      ]);
 
       // if move isn't find return Prev
       if (!prevMoveAtIndex) {
@@ -271,7 +267,7 @@ export namespace FreeBoardHistory {
       //TODO: Add use case for when there already are branched histories
       // This is where it becomes recursive
 
-      const prevTurnAtIndex = findTurnAtIndex(history, atIndex);
+      const prevTurnAtIndex = findTurnAtIndexNonRecursively(history, atIndex);
 
       if (!prevTurnAtIndex) {
         throw new Error('This should not happen b/c findMoveAtIndex() exists');
@@ -373,7 +369,7 @@ export namespace FreeBoardHistory {
       if (prevTurn && isHalfTurn(prevTurn)) {
         const historyWithoutLastTurn = getHistoryAtIndex(
           history,
-          decrementHistoryIndex(getHistoryLastIndex(history))
+          decrementIndex(getHistoryLastIndex(history))
         );
 
         return [
@@ -419,7 +415,14 @@ export namespace FreeBoardHistory {
     ] as FBHHistory;
   };
 
-  export const getLinearChessHistoryAtRecursiveIndex = (
+  /**
+   * Calculates the linear history up to the given (Recursive/Nested) Index
+   *
+   * @param history
+   * @param atIndex
+   * @returns
+   */
+  export const calculateLinearHistoryAtIndex = (
     history: FBHHistory,
     atIndex: FBHIndex
   ): FBHLinearHistory => {
@@ -427,17 +430,16 @@ export namespace FreeBoardHistory {
       index: FBHIndex,
       cache: FBHLinearHistory = []
     ): FBHLinearHistory => {
-      const moveAtIndex = findMoveAtIndexRecursively(history, index);
+      const moveAtIndex = findMoveAtIndex(history, index);
 
       if (!moveAtIndex) {
         return cache;
       }
 
       // Skip if the move is a non move
-      // TODO: maybe this isn't desired? hmm
       if (moveAtIndex.isNonMove) {
         return [
-          ...appendMovesRecursively(decrementNestedHistoryIndex(index), cache),
+          ...appendMovesRecursively(decrementIndex(index), cache),
         ] as FBHLinearHistory;
       }
 
@@ -445,7 +447,7 @@ export namespace FreeBoardHistory {
       const { branchedHistories, ...moveAtIndexWithoutNested } = moveAtIndex;
 
       return [
-        ...appendMovesRecursively(decrementNestedHistoryIndex(index), cache),
+        ...appendMovesRecursively(decrementIndex(index), cache),
         moveAtIndexWithoutNested,
       ] as FBHLinearHistory;
     };
@@ -453,29 +455,23 @@ export namespace FreeBoardHistory {
     return appendMovesRecursively(atIndex);
   };
 
-  export const updateOrInsertMoveInTurn = <T extends FBHRecursiveTurn>(
+  const updateOrInsertMoveInTurn = <T extends FBHRecursiveTurn>(
     turn: T,
     move: FBHMove
   ): T => (isWhiteMove(move) ? [move, ...turn.slice(1)] : [turn[0], move]) as T;
 
-  export const isFullTurn = (
-    mt: FBHRecursiveTurn
-  ): mt is FBHRecursiveFullTurn => !!mt[1];
+  const isFullTurn = (mt: FBHRecursiveTurn): mt is FBHRecursiveFullTurn =>
+    !!mt[1];
 
-  export const isHalfTurn = (
-    mt: FBHRecursiveTurn
-  ): mt is FBHRecursiveHalfTurn => !isFullTurn(mt);
+  const isHalfTurn = (mt: FBHRecursiveTurn): mt is FBHRecursiveHalfTurn =>
+    !isFullTurn(mt);
 
-  export const isWhiteMove = (m: FBHMove): m is FBHWhiteMove =>
-    isWhiteColor(m.color);
-
-  export const isBlackMove = (m: FBHMove): m is FBHBlackMove =>
-    !isWhiteColor(m.color);
+  const isWhiteMove = (m: FBHMove): m is FBHWhiteMove => isWhiteColor(m.color);
 
   export const pgnToHistory = (pgn: ChessPGN): FBHHistory =>
     linearToTurnHistory(getNewChessGame({ pgn }).history({ verbose: true }));
 
-  export const linearToTurnHistory = (
+  const linearToTurnHistory = (
     linearHistory: DetailedChessMove[]
   ): FBHHistory => {
     type U = {
