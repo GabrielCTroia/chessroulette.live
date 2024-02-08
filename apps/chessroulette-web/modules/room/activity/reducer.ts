@@ -143,12 +143,11 @@ export default (
               FreeBoardHistory.incrementIndex(prevFocusedIndex);
 
             if (prevMove?.color === nextMove.color) {
-              const [nextHistory, addedAtIndex] =
-                FreeBoardHistory.addMove(
-                  prev.activityState.history.moves,
-                  FreeBoardHistory.getNonMove(swapColor(nextMove.color)),
-                  addAtIndex
-                );
+              const [nextHistory, addedAtIndex] = FreeBoardHistory.addMove(
+                prev.activityState.history.moves,
+                FreeBoardHistory.getNonMove(swapColor(nextMove.color)),
+                addAtIndex
+              );
 
               return FreeBoardHistory.addMove(
                 nextHistory,
@@ -177,10 +176,7 @@ export default (
               FreeBoardHistory.getNonMove(swapColor(nextMove.color))
             );
 
-            return FreeBoardHistory.addMove(
-              nextHistory,
-              nextMove
-            );
+            return FreeBoardHistory.addMove(nextHistory, nextMove);
           }
 
           // If it's not the last branch
@@ -200,10 +196,7 @@ export default (
               addAtIndex
             );
 
-            return FreeBoardHistory.addMove(
-              nextHistory,
-              nextMove
-            );
+            return FreeBoardHistory.addMove(nextHistory, nextMove);
           }
 
           return FreeBoardHistory.addMove(
@@ -282,7 +275,7 @@ export default (
       };
     } else if (action.type === 'focusHistoryIndex') {
       const historyAtFocusedIndex =
-        FreeBoardHistory.calculateLinearHistoryAtIndex(
+        FreeBoardHistory.calculateLinearHistoryToIndex(
           prev.activityState.history.moves,
           action.payload.index
         );
@@ -314,7 +307,7 @@ export default (
       // TODO: Fix this!
 
       const nextIndex = FreeBoardHistory.decrementIndex(action.payload.atIndex);
-      const nextHistory = FreeBoardHistory.slice(
+      const nextHistory = FreeBoardHistory.sliceHistory(
         prev.activityState.history.moves,
         nextIndex
       );

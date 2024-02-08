@@ -375,7 +375,7 @@ export namespace FreeBoardHistory {
       const prevTurn = getLastTurnInHistory(history);
 
       if (prevTurn && isHalfTurn(prevTurn)) {
-        const historyWithoutLastTurn = slice(
+        const historyWithoutLastTurn = sliceHistory(
           history,
           decrementIndex(getLastIndexInHistory(history))
         );
@@ -393,14 +393,18 @@ export namespace FreeBoardHistory {
   };
 
   /**
-   * Returns the History at the given index (including the index). Returns all history if the index is greater
+   * Returns the History at the given index (including the index).
+   *  Returns all history if the index is greater
    *
    * @param history
    * @param toIndex inclusive
    * @returns
    */
-  export const slice = (history: FBHHistory, toIndex: FBHIndex): FBHHistory => {
-    const [turnIndex, movePosition, nestedIndex] = toIndex;
+  export const sliceHistory = (
+    history: FBHHistory,
+    toIndex: FBHIndex
+  ): FBHHistory => {
+    const [turnIndex, movePosition, recursiveIndexes] = toIndex;
 
     // Don't return last items as it's the default for array.slice() with negative numbers
     if (turnIndex < 0) {
@@ -410,8 +414,48 @@ export namespace FreeBoardHistory {
     const turnsToIndex = history.slice(0, turnIndex) as FBHHistory;
     const turnAtIndex = history[turnIndex];
 
+    // Return early if the index is longer than the history length
     if (!turnAtIndex) {
       return turnsToIndex;
+    }
+
+    // If it;s nested than only slice the nested branch
+
+    if (recursiveIndexes) {
+      const [nestedIndex, branchIndex = 0] = recursiveIndexes;
+
+      if (nestedIndex === -1) {
+        return history;
+      }
+
+      // console.log('nested index', renderIndex(nestedIndex), branchIndex);
+
+      const moveAtIndex = turnAtIndex[movePosition];
+
+      // If the branchedHistory doesn't exist than return the full history
+      if (!moveAtIndex?.branchedHistories?.[branchIndex]) {
+        return history;
+      }
+
+      const nextMove: FBHRecursiveMove = {
+        ...moveAtIndex,
+        branchedHistories: [
+          ...moveAtIndex.branchedHistories.slice(0, branchIndex),
+          sliceHistory(moveAtIndex.branchedHistories[branchIndex], nestedIndex),
+          ...moveAtIndex.branchedHistories.slice(branchIndex + 1),
+        ],
+      };
+
+      const nextTurn =
+        movePosition === 0
+          ? [nextMove, turnAtIndex[1]]
+          : [turnAtIndex[0], nextMove];
+
+      return [
+        ...turnsToIndex,
+        nextTurn,
+        ...(history.slice(turnIndex + 1) as FBHHistory), // turnsFromIndex
+      ] as FBHHistory;
     }
 
     return [
@@ -427,7 +471,7 @@ export namespace FreeBoardHistory {
    * @param atIndex
    * @returns
    */
-  export const calculateLinearHistoryAtIndex = (
+  export const calculateLinearHistoryToIndex = (
     history: FBHHistory,
     atIndex: FBHIndex
   ): FBHLinearHistory => {
@@ -475,9 +519,9 @@ export namespace FreeBoardHistory {
 
   /**
    * Transforms a pgn tp FreeBoardHistory
-   * 
-   * @param pgn 
-   * @returns 
+   *
+   * @param pgn
+   * @returns
    */
   export const pgnToHistory = (pgn: ChessPGN): FBHHistory =>
     linearToTurnHistory(getNewChessGame({ pgn }).history({ verbose: true }));
