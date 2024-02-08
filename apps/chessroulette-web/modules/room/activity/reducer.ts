@@ -307,15 +307,17 @@ export default (
       // TODO: Fix this!
 
       // const nextIndex = FreeBoardHistory.decrementIndexAbsolutely(action.payload.atIndex);
-      const nextHistory = FreeBoardHistory.sliceHistory(
-        prev.activityState.history.moves,
-        action.payload.atIndex
-      );
+      const [slicedHistory, lastIndexInSlicedHistory] =
+        FreeBoardHistory.sliceHistory(
+          prev.activityState.history.moves,
+          action.payload.atIndex
+        );
 
-      // TODO: This should come from the sliceHistoryMethod
+      const nextHistory =
+        FreeBoardHistory.removeTrailingNonMoves(slicedHistory);
       const nextIndex = FreeBoardHistory.findNextValidMoveIndex(
         nextHistory,
-        FreeBoardHistory.decrementIndex(action.payload.atIndex),
+        FreeBoardHistory.incrementIndex(lastIndexInSlicedHistory),
         'left'
       );
 

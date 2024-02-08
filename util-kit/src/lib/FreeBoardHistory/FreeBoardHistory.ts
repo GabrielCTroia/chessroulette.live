@@ -252,7 +252,7 @@ export namespace FreeBoardHistory {
     const lastTurn = getLastTurnInHistory(history);
 
     if (!lastTurn) {
-      return [0, 0];
+      return getStartingIndex();
     }
 
     return [history.length - 1, isHalfTurn(lastTurn) ? 0 : 1];
@@ -395,7 +395,7 @@ export namespace FreeBoardHistory {
       const prevTurn = getLastTurnInHistory(history);
 
       if (prevTurn && isHalfTurn(prevTurn)) {
-        const historyWithoutLastTurn = sliceHistory(
+        const [historyWithoutLastTurn] = sliceHistory(
           history,
           getLastIndexInHistory(history)
         );
@@ -447,14 +447,14 @@ export namespace FreeBoardHistory {
   export const sliceHistory = (
     history: FBHHistory,
     toIndex: FBHIndex
-  ): FBHHistory => {
+  ): [nextHistory: FBHHistory, lastIndexInHistory: FBHIndex] => {
     const [turnIndex, movePosition, recursiveIndexes] = toIndex;
 
     if (recursiveIndexes) {
       const [nestedIndex, branchIndex = 0] = recursiveIndexes;
 
       if (nestedIndex === -1) {
-        return history;
+        return [history, getLastIndexInHistory(history)];
       }
 
       const turnsToIndexExclusively = history.slice(0, turnIndex) as FBHHistory;
@@ -462,17 +462,20 @@ export namespace FreeBoardHistory {
 
       // Return early if the index is longer than the history length
       if (!turnAtIndex) {
-        return turnsToIndexExclusively;
+        return [
+          turnsToIndexExclusively,
+          getLastIndexInHistory(turnsToIndexExclusively),
+        ];
       }
 
       const moveAtIndex = turnAtIndex[movePosition];
 
       // If the branchedHistory doesn't exist than return the full history
       if (!moveAtIndex?.branchedHistories?.[branchIndex]) {
-        return history;
+        return [history, getLastIndexInHistory(history)];
       }
 
-      const nextBranch = sliceHistory(
+      const [nextBranch, slicedAtNestedIndex] = sliceHistory(
         moveAtIndex.branchedHistories[branchIndex],
         nestedIndex
       );
@@ -494,15 +497,28 @@ export namespace FreeBoardHistory {
           ? [nextMove, turnAtIndex[1]]
           : [turnAtIndex[0], nextMove];
 
-      return [
+      const nextHistory = [
         ...turnsToIndexExclusively,
         nextTurn,
         ...(history.slice(turnIndex + 1) as FBHHistory), // turnsFromIndex
       ] as FBHHistory;
+
+      return [
+        nextHistory,
+        [
+          turnIndex,
+          movePosition,
+          // Don't add the nested index if starting position, instead let it jump to the root generation
+          areIndexesEqual(slicedAtNestedIndex, getStartingIndex())
+            ? undefined
+            : // Don't add the branch index if 0
+              [slicedAtNestedIndex, branchIndex > 0 ? branchIndex : undefined],
+        ],
+      ];
     }
 
     if (isIndexLowerThan(toIndex, [0, 1])) {
-      return [];
+      return [[], getStartingIndex()];
     }
 
     // Don't return last items as it's the default for array.slice() with negative numbers
@@ -520,13 +536,49 @@ export namespace FreeBoardHistory {
 
     // Return early if the index is longer than the history length
     if (!turnAtIndex) {
-      return turnsToIndexExclusively;
+      return [
+        turnsToIndexExclusively,
+        getLastIndexInHistory(turnsToIndexExclusively),
+      ];
     }
 
-    return [
+    const nextHistory = [
       ...turnsToIndexExclusively,
       decMovePosition === 0 ? [turnAtIndex[0]] : turnAtIndex,
     ] as FBHHistory;
+
+    return [nextHistory, getLastIndexInHistory(nextHistory)];
+  };
+
+  /**
+   * Remvoes trailing non-moves in history
+   *  Does not remove non moves in the middle of history
+   *
+   * @param history
+   */
+  export const removeTrailingNonMoves = (history: FBHHistory): FBHHistory => {
+    const lastTurn = getLastTurnInHistory(history);
+
+    if (!lastTurn) {
+      return history;
+    }
+
+    const [whiteMove, blackMove] = lastTurn;
+
+    const baseHistory = history.slice(0, -1) as FBHHistory;
+
+    if (!blackMove) {
+      if (whiteMove.isNonMove) {
+        return removeTrailingNonMoves(baseHistory);
+      }
+    } else if (blackMove.isNonMove) {
+      return removeTrailingNonMoves([
+        ...baseHistory,
+        [whiteMove],
+      ] as FBHHistory);
+    }
+
+    return history;
   };
 
   /**
@@ -645,6 +697,10 @@ export namespace FreeBoardHistory {
     index: FBHIndex,
     dir: 'left' | 'right'
   ): FBHIndex => {
+    if (history.length === 0) {
+      return FreeBoardHistory.getStartingIndex();
+    }
+
     const nextIndex =
       dir === 'right'
         ? FreeBoardHistory.incrementIndex(index)
@@ -652,7 +708,7 @@ export namespace FreeBoardHistory {
 
     const nextMove = FreeBoardHistory.findMoveAtIndex(history, nextIndex);
 
-    if (nextMove?.isNonMove) {
+    if (!nextMove || nextMove .isNonMove) {
       return findNextValidMoveIndex(history, nextIndex, dir);
     }
 
