@@ -135,6 +135,26 @@ export namespace FreeBoardHistory {
     return decrementNonRecursiveIndex([turn, move]);
   };
 
+  export const decrementIndexAbsolutely = ([
+    turn,
+    move,
+    recursiveIndexes,
+  ]: FBHIndex): FBHIndex => {
+    if (recursiveIndexes) {
+      if (recursiveIndexes[0] === -1) {
+        throw new Error('This is not good. need to change it from -1');
+      }
+
+      return [
+        turn,
+        move,
+        [decrementIndexAbsolutely(recursiveIndexes[0]), recursiveIndexes[1]],
+      ];
+    }
+
+    return decrementNonRecursiveIndex([turn, move]);
+  };
+
   const decrementNonRecursiveIndex = ([turn, move]: FBHIndex) =>
     (move === 1 ? [turn, move - 1] : [turn - 1, 1]) as FBHIndex;
 
@@ -377,7 +397,7 @@ export namespace FreeBoardHistory {
       if (prevTurn && isHalfTurn(prevTurn)) {
         const historyWithoutLastTurn = sliceHistory(
           history,
-          decrementIndex(getLastIndexInHistory(history))
+          getLastIndexInHistory(history)
         );
 
         return [
@@ -390,6 +410,30 @@ export namespace FreeBoardHistory {
     });
 
     return [nextHistory, getLastIndexInHistory(nextHistory)];
+  };
+
+  const isIndexLowerThan = (a: FBHIndex, b: FBHIndex): boolean => {
+    if (a[0] < b[0]) {
+      return true;
+    }
+
+    if (a[0] === b[0] && a[1] < b[1]) {
+      return true;
+    }
+
+    // If they both have recursivity, check it as well
+    if (
+      a[0] === b[0] &&
+      a[1] === b[1] &&
+      a[2] &&
+      b[2] &&
+      a[2][0] !== -1 &&
+      b[2][0] !== -1
+    ) {
+      return isIndexLowerThan(a[2][0], b[2][0]);
+    }
+
+    return false;
   };
 
   /**
@@ -406,21 +450,6 @@ export namespace FreeBoardHistory {
   ): FBHHistory => {
     const [turnIndex, movePosition, recursiveIndexes] = toIndex;
 
-    // Don't return last items as it's the default for array.slice() with negative numbers
-    if (turnIndex < 0) {
-      return [];
-    }
-
-    const turnsToIndex = history.slice(0, turnIndex) as FBHHistory;
-    const turnAtIndex = history[turnIndex];
-
-    // Return early if the index is longer than the history length
-    if (!turnAtIndex) {
-      return turnsToIndex;
-    }
-
-    // If it;s nested than only slice the nested branch
-
     if (recursiveIndexes) {
       const [nestedIndex, branchIndex = 0] = recursiveIndexes;
 
@@ -428,7 +457,13 @@ export namespace FreeBoardHistory {
         return history;
       }
 
-      // console.log('nested index', renderIndex(nestedIndex), branchIndex);
+      const turnsToIndexExclusively = history.slice(0, turnIndex) as FBHHistory;
+      const turnAtIndex = history[turnIndex];
+
+      // Return early if the index is longer than the history length
+      if (!turnAtIndex) {
+        return turnsToIndexExclusively;
+      }
 
       const moveAtIndex = turnAtIndex[movePosition];
 
@@ -437,13 +472,21 @@ export namespace FreeBoardHistory {
         return history;
       }
 
+      const nextBranch = sliceHistory(
+        moveAtIndex.branchedHistories[branchIndex],
+        nestedIndex
+      );
+
+      const nextBranchedHistories = [
+        ...moveAtIndex.branchedHistories.slice(0, branchIndex),
+        ...(nextBranch.length > 0 ? [nextBranch] : []), // Ensures the empty arrays doesn't get added
+        ...moveAtIndex.branchedHistories.slice(branchIndex + 1),
+      ];
+
       const nextMove: FBHRecursiveMove = {
         ...moveAtIndex,
-        branchedHistories: [
-          ...moveAtIndex.branchedHistories.slice(0, branchIndex),
-          sliceHistory(moveAtIndex.branchedHistories[branchIndex], nestedIndex),
-          ...moveAtIndex.branchedHistories.slice(branchIndex + 1),
-        ],
+        branchedHistories:
+          nextBranchedHistories.length > 0 ? nextBranchedHistories : undefined,
       };
 
       const nextTurn =
@@ -452,15 +495,37 @@ export namespace FreeBoardHistory {
           : [turnAtIndex[0], nextMove];
 
       return [
-        ...turnsToIndex,
+        ...turnsToIndexExclusively,
         nextTurn,
         ...(history.slice(turnIndex + 1) as FBHHistory), // turnsFromIndex
       ] as FBHHistory;
     }
 
+    if (isIndexLowerThan(toIndex, [0, 1])) {
+      return [];
+    }
+
+    // Don't return last items as it's the default for array.slice() with negative numbers
+
+    const [decTurnIndex, decMovePosition] = decrementIndexAbsolutely([
+      turnIndex,
+      movePosition,
+    ]);
+
+    const turnsToIndexExclusively = history.slice(
+      0,
+      decTurnIndex
+    ) as FBHHistory;
+    const turnAtIndex = history[decTurnIndex];
+
+    // Return early if the index is longer than the history length
+    if (!turnAtIndex) {
+      return turnsToIndexExclusively;
+    }
+
     return [
-      ...turnsToIndex,
-      movePosition === 0 ? [turnAtIndex[0]] : turnAtIndex,
+      ...turnsToIndexExclusively,
+      decMovePosition === 0 ? [turnAtIndex[0]] : turnAtIndex,
     ] as FBHHistory;
   };
 
@@ -566,6 +631,32 @@ export namespace FreeBoardHistory {
     );
 
     return cached ? ([...turns, [cached]] as FBHHistory) : turns;
+  };
+
+  /**
+   * If there are non-moves, it skips over them
+   *
+   * @param index
+   * @param dir
+   * @returns
+   */
+  export const findNextValidMoveIndex = (
+    history: FBHHistory,
+    index: FBHIndex,
+    dir: 'left' | 'right'
+  ): FBHIndex => {
+    const nextIndex =
+      dir === 'right'
+        ? FreeBoardHistory.incrementIndex(index)
+        : FreeBoardHistory.decrementIndex(index);
+
+    const nextMove = FreeBoardHistory.findMoveAtIndex(history, nextIndex);
+
+    if (nextMove?.isNonMove) {
+      return findNextValidMoveIndex(history, nextIndex, dir);
+    }
+
+    return nextIndex;
   };
 
   export const renderIndex = ([turn, move, nestedIndex]: FBHIndex): string => {

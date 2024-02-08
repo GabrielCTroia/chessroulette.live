@@ -306,10 +306,17 @@ export default (
     if (action.type === 'deleteHistoryMove') {
       // TODO: Fix this!
 
-      const nextIndex = FreeBoardHistory.decrementIndex(action.payload.atIndex);
+      // const nextIndex = FreeBoardHistory.decrementIndexAbsolutely(action.payload.atIndex);
       const nextHistory = FreeBoardHistory.sliceHistory(
         prev.activityState.history.moves,
-        nextIndex
+        action.payload.atIndex
+      );
+
+      // TODO: This should come from the sliceHistoryMethod
+      const nextIndex = FreeBoardHistory.findNextValidMoveIndex(
+        nextHistory,
+        FreeBoardHistory.decrementIndex(action.payload.atIndex),
+        'left'
       );
 
       const instance = new ChessFENBoard(

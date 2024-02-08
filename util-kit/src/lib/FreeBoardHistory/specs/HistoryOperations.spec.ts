@@ -4,13 +4,13 @@ import { FreeBoardHistory as FBH } from '../FreeBoardHistory';
 
 describe('Slice History', () => {
   test('Gets an empty history when the index is below starting', () => {
-    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [-1, 1]);
+    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 0]);
 
     expect(actual).toEqual([]);
   });
 
   test('gets only the first move when the index is Starting Index', () => {
-    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 0]);
+    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
 
     expect(actual).toEqual([
       [
@@ -25,7 +25,7 @@ describe('Slice History', () => {
   });
 
   test('get the first turn when index is at the first full turn', () => {
-    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [0, 1]);
+    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 0]);
 
     expect(actual).toEqual([
       [
@@ -46,7 +46,7 @@ describe('Slice History', () => {
   });
 
   test('at Half Turn Index ', () => {
-    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 0]);
+    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 1]);
 
     expect(actual).toEqual([
       [
@@ -75,7 +75,7 @@ describe('Slice History', () => {
   });
 
   test('at Full Turn Index ', () => {
-    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [1, 1]);
+    const actual = FBH.sliceHistory(LONG_HISTORY_WITH_HALF_LAST_TURN, [2, 0]);
 
     expect(actual).toEqual([
       [
@@ -168,7 +168,9 @@ describe('Slice History', () => {
       ],
     ] satisfies FBHHistory;
 
-    const actual = FBH.sliceHistory(nestedHistory, [0, 0, [[0, 1, [[0, 0]]]]]);
+    const actual = FBH.sliceHistory(nestedHistory, [0, 0, [[0, 1, [[0, 1]]]]]);
+
+    console.log('actual', JSON.stringify(actual, null, 2));
 
     const expected = [
       [
@@ -299,7 +301,7 @@ describe('Slice History', () => {
     const actual = FBH.sliceHistory(nestedHistory, [
       0,
       0,
-      [[0, 1, [[0, 1], 1]]],
+      [[0, 1, [[1, 0], 1]]],
     ]);
 
     const expected = [
