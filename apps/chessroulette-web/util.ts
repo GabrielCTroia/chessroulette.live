@@ -13,3 +13,14 @@ export function getRandomInt(givenMin: number, givenMax: number) {
 
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+const _alphabet =
+  'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+export const getRandomStr = (N: number = 6) =>
+  Array(N)
+    .join()
+    .split(',')
+    .map(function () {
+      return _alphabet.charAt(Math.floor(Math.random() * _alphabet.length));
+    })
+    .join('');

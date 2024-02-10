@@ -9,7 +9,7 @@ import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProv
 import RoomTemplate from 'apps/chessroulette-web/templates/RoomTemplate';
 import { config } from 'apps/chessroulette-web/config';
 import { getServerSession } from 'next-auth';
-import { authOptions } from 'apps/xmatter-auth/auth';
+import { authOptions } from 'apps/chessroulette-web/services/auth';
 
 const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID as string;
 const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN as string;
@@ -42,7 +42,7 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: { slug: string };
+  params: { rid: string };
   searchParams: Partial<{ theme: string }>;
 }) {
   const session = (await getServerSession(authOptions)) || undefined;
@@ -61,15 +61,17 @@ export default async function Page({
   //   next: { revalidate: 3600 }, // Will revalidate every 1 hour
   // });
 
-  const slug = decodeURIComponent(params.slug);
+  const id = decodeURIComponent(params.rid);
 
-  if (!isResourceIdentifierOfType('room', slug)) {
-    return null;
-  }
+  // if (!isResourceIdentifierOfType('room', slug)) {
+  //   return null;
+  // }
 
-  const rid: ResourceIdentifier<'room'> = `room:${
-    toResourceIdentifierObj(slug).resourceId
-  }`;
+  // const rid: ResourceIdentifier<'room'> = `room:${
+  //   toResourceIdentifierObj(slug).resourceId
+  // }`;
+
+  const rid: ResourceIdentifier<'room'> = `room:${id}`;
 
   // TODO: make it better
   const iceServers = await twilio.getIceServers();
@@ -78,8 +80,6 @@ export default async function Page({
     <RoomTemplate themeName={searchParams.theme} session={session}>
       <LearnActivity
         rid={rid}
-        playingColor="black"
-        fen="rnbqkbnr/pp2pppp/8/3p4/2p1PP2/2P2NP1/PP1P3P/RNBQKB1R w KQkq - 0 1"
         iceServers={
           iceServers || [
             // DEFAULT

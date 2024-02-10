@@ -22,7 +22,7 @@
     "debounce": "^2.0.0",
     "deepmerge-ts": "^5.1.0",
     "deox": "^3.3.1",
-    "fp-ts": "^2.16.1",
+    "fp-ts": "^2.16.2",
     "hex-to-rgba": "^2.0.1",
     "io-ts": "^2.2.21",
     "io-ts-types": "^0.5.19",
@@ -48,12 +48,14 @@
     "react-transition-group": "^4.4.5",
     "server-only": "^0.0.1",
     "shallow-equal": "^3.1.0",
+    "ts-async-result": "^1.2.0",
     "ts-pubsy": "^0.3.0",
     "ts-results": "^3.3.0",
     "tslib": "^2.3.0",
     "twilio": "^4.20.1",
     "use-debounced-effect": "^2.0.1",
-    "use-deep-compare-effect": "^1.8.1"
+    "use-deep-compare-effect": "^1.8.1",
+    "zod": "^3.22.4"
   },
   "devDependencies": {
     "@nx-tools/nx-prisma": "^5.1.0",
