@@ -35,7 +35,6 @@ import { FreeBoardNotation } from 'apps/chessroulette-web/components/FreeBoardNo
 import { useLearnActivitySettings } from './useLearnActivitySettings';
 import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
-import { useBoardTheme } from 'apps/chessroulette-web/components/Chessboard/useBoardTheme';
 
 type ChessColor = 'white' | 'black';
 
@@ -51,7 +50,6 @@ type Tabs = 'history' | 'import';
 export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   const userId = useUserId();
   const settings = useLearnActivitySettings();
-  const boardTheme = useBoardTheme();
 
   const [editMode, setEditMode] = useState({
     isActive: false,
@@ -202,7 +200,6 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                           dispatch({ type: 'clearCircles' });
                         }}
                         circlesMap={activityState.circles}
-                        customPieces={boardTheme.customPieces}
                       />
                     )}
 

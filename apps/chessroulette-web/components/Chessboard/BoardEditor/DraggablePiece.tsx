@@ -1,22 +1,15 @@
 import React from 'react';
-import { PieceSan, isObject, keyInObject } from '@xmatter/util-kit';
-import { pieces as pieceGraphics } from '../assets/mahaPieces';
-import { DraggableItem, DraggablePieceProps } from './DraggableItem';
+import { PieceSan } from '@xmatter/util-kit';
+import { DraggableItem, DraggableItemProps } from './DraggableItem';
 
-type Props = DraggablePieceProps & {
-  pieceSan: PieceSan;
-  squareSize: number;
-};
+type Props = React.PropsWithChildren &
+  DraggableItemProps & {
+    pieceSan: PieceSan;
+    squareSize: number;
+  };
 
 export const DraggablePiece: React.FC<Props> = React.memo(
-  ({ squareSize, ...props }) => {
-    const img = pieceGraphics[props.pieceSan];
-    const imgSrc = isObject(img) && keyInObject(img, 'src') ? img.src : img;
-
-    return (
-      <DraggableItem {...props}>
-        <img src={imgSrc} style={{ width: squareSize }} />
-      </DraggableItem>
-    );
-  }
+  ({ squareSize, children, ...props }) => (
+    <DraggableItem {...props}>{children}</DraggableItem>
+  )
 );

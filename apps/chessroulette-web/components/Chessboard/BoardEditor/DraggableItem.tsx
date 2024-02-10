@@ -2,14 +2,14 @@ import { PieceSan, noop } from '@xmatter/util-kit';
 import { useEffect } from 'react';
 import { useDrag } from 'react-dnd';
 
-export type DraggablePieceProps = React.PropsWithChildren & {
+export type DraggableItemProps = React.PropsWithChildren & {
   pieceSan: PieceSan;
   className?: string;
   onDraggingStarted?: (pieceSan: PieceSan) => void;
   onDraggingStopped?: (pieceSan: PieceSan) => void;
 };
 
-export const DraggableItem: React.FC<DraggablePieceProps> = ({
+export const DraggableItem: React.FC<DraggableItemProps> = ({
   pieceSan,
   onDraggingStarted = noop,
   onDraggingStopped = noop,

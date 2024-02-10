@@ -30,7 +30,6 @@ import { deepmerge } from 'deepmerge-ts';
 import { ChessboardSquare } from './ChessboardSquare';
 import { useBoardTheme } from './useBoardTheme';
 
-
 export type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
 export type ChessboardContainerProps = Omit<
@@ -42,15 +41,15 @@ export type ChessboardContainerProps = Omit<
   arrowsMap?: ArrowsMap;
   circlesMap?: CirclesMap;
   arrowColor?: string;
-  onMove?: (m: ShortChessMove) => boolean;
-  onPieceDrop?: (from: Square, to: Square, piece: PieceSan) => void;
   lastMove?: ShortChessMove;
-  onArrowsChange?: (arrows: ArrowsMap) => void;
-  onCircleDraw?: (circleTuple: CircleDrawTuple) => void;
-  onClearCircles?: () => void;
   inCheckSquares?: SquareMap;
   boardOrientation?: ChessColor;
   containerClassName?: string;
+  onMove?: (m: ShortChessMove) => boolean;
+  onPieceDrop?: (from: Square, to: Square, piece: PieceSan) => void;
+  onArrowsChange?: (arrows: ArrowsMap) => void;
+  onCircleDraw?: (circleTuple: CircleDrawTuple) => void;
+  onClearCircles?: () => void;
 };
 
 export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
@@ -281,6 +280,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
         customArrowColor={arrowColor}
         onArrowsChange={onArrowsChangeAfterMount}
         onSquareRightClick={onSquareRightClick}
+        customPieces={boardTheme.customPieces}
         {...props}
       />
     </div>

@@ -19,7 +19,7 @@ import { noop } from 'movex-core-util';
 import { useBoardTheme } from '../useBoardTheme';
 import { getSquareSize } from './util';
 import { DropContainer } from './DropContainer';
-import { DraggablePiece } from './DraggablePiece';
+import { DraggableItem } from './DraggableItem';
 
 type Props = Pick<ChessboardContainerProps, 'sizePx'> & {
   fen: ChessFEN;
@@ -85,15 +85,24 @@ export const BoardEditor = ({
     [draggingPieces]
   );
 
-  const renderPiece = (pieceSan: PieceSan) => (
-    <DraggablePiece
-      key={pieceSan}
-      pieceSan={pieceSan}
-      squareSize={squareSize}
-      onDraggingStarted={onPieceDraggingStarted}
-      onDraggingStopped={onPieceDraggingStopped}
-      className="hover:cursor-pointer hover:bg-slate-200"
-    />
+  const renderPiece = useCallback(
+    (pieceSan: PieceSan) => (
+      <DraggableItem
+        key={pieceSan}
+        pieceSan={pieceSan}
+        onDraggingStarted={onPieceDraggingStarted}
+        onDraggingStopped={onPieceDraggingStopped}
+        className="hover:cursor-pointer hover:bg-slate-200"
+      >
+        {boardTheme.renderPiece({ squareWidth: squareSize, pieceSan })}
+      </DraggableItem>
+    ),
+    [
+      boardTheme.renderPiece,
+      onPieceDraggingStarted,
+      onPieceDraggingStopped,
+      squareSize,
+    ]
   );
 
   const [draggedPiece, setDraggedPiece] = useState<{
@@ -101,10 +110,6 @@ export const BoardEditor = ({
     from: Square;
     dropped: boolean;
   }>();
-
-  const cb = useCallback(() => {
-    console.log('dragged piece', draggedPiece);
-  }, [draggedPiece]);
 
   return (
     <div
@@ -171,7 +176,7 @@ export const BoardEditor = ({
                       from: prevFrom,
                     } = prev;
 
-                    console.log('on drag end', prev, from, prevFrom);
+                    // console.log('on drag end', prev, from, prevFrom);
 
                     // If the draggedPiece haven't dropped yet, it means it got dragged outside
                     if (
@@ -206,10 +211,6 @@ export const BoardEditor = ({
           </div>
         </div>
       </DndProvider>
-      {/* <div> */}
-      {/* {draggedPiece} */}
-      {/* <Text>{editedFen}</Text> */}
-      {/* </div> */}
     </div>
   );
 };
