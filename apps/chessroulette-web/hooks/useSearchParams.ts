@@ -50,6 +50,14 @@ export const useUpdateableSearchParams = () => {
 
         return searchParams.toString();
       },
+
+      current: () => currentSearchParams,
+      toObject: () =>
+        toDictIndexedBy(
+          Array.from(currentSearchParams.entries()),
+          ([key]) => key,
+          ([, val]) => val
+        ),
     }),
     [currentSearchParams]
   );

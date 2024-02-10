@@ -1,5 +1,6 @@
 import {
   GetComponentProps,
+  PieceSan,
   objectKeys,
   toDictIndexedBy,
 } from '@xmatter/util-kit';
@@ -19,6 +20,10 @@ type Theme = {
     lastMoveFromSquare: string;
     hoveredSquare: string;
     customPieces?: ChessBoardProps['customPieces'];
+    renderPiece?: (p: {
+      pieceSan: PieceSan;
+      squareWidth: number;
+    }) => React.ReactElement;
   };
 };
 
@@ -46,25 +51,42 @@ const outpostTheme: Theme = {
   },
 };
 
+const renderKidsThemePiece: Theme['board']['renderPiece'] = ({
+  pieceSan,
+  squareWidth,
+}) => (
+  <Piece
+    registry={MahaPieces}
+    squareSize={squareWidth * 1}
+    pieceSan={pieceSan}
+    className="mb-4"
+    style={{
+      marginTop: '-1%',
+    }}
+  />
+);
+
 const kidsTheme: Theme = {
   name: 'kids',
   board: {
     ...chessrouletteTheme.board,
+    renderPiece: renderKidsThemePiece,
     customPieces: toDictIndexedBy(
       objectKeys(MahaPieces),
       (pieceSan) => pieceSan,
       (pieceSan) => (p: { squareWidth: number }) =>
-        (
-          <Piece
-            registry={MahaPieces}
-            squareSize={p.squareWidth * 1}
-            pieceSan={pieceSan}
-            className="mb-4"
-            style={{
-              marginTop: '-1%',
-            }}
-          />
-        )
+        renderKidsThemePiece({ pieceSan, squareWidth: p.squareWidth })
+      // (
+      //   <Piece
+      //     registry={MahaPieces}
+      //     squareSize={p.squareWidth * 1}
+      //     pieceSan={pieceSan}
+      //     className="mb-4"
+      //     style={{
+      //       marginTop: '-1%',
+      //     }}
+      //   />
+      // )
     ),
   },
 };

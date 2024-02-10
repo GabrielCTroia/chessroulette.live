@@ -5,12 +5,13 @@ import movexConfig from 'apps/chessroulette-web/movex.config';
 import { useMovexResourceType } from 'movex-react';
 import { initialRoomState } from '../room/movex/reducer';
 import { useRouter } from 'next/navigation';
-import { toRidAsObj, toRidAsStr } from 'movex';
-import { getRandomInt, getRandomStr } from 'apps/chessroulette-web/util';
+import { toRidAsObj } from 'movex';
+import { getRandomInt } from 'apps/chessroulette-web/util';
 import { initialLearnActivityState } from '../room/activity/reducer';
 import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
 import { Session } from 'next-auth';
 import React from 'react';
+import { links } from '../room/links';
 
 type Props = {
   session?: Session;
@@ -32,17 +33,18 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
               ?.create({
                 ...initialRoomState,
                 activity: initialLearnActivityState,
-              }, `op${String(getRandomStr(8))}`)
+              })
               .map((s) => {
-                const pathname = `/r/learn/${toRidAsObj(s.rid).resourceId}`;
-
                 router.push(
-                  `${pathname}?` +
-                    updateableSearchParams.set((prev) => ({
-                      ...prev,
-                      userId: prev.userId || getRandomInt(1, 9999),
-                      instructor: 1,
-                    }))
+                  links.getRoomLink({
+                    ...updateableSearchParams.toObject(),
+                    id: toRidAsObj(s.rid).resourceId,
+                    activity: 'learn',
+                    instructor: '1',
+                    userId:
+                      updateableSearchParams.get('userId') ||
+                      String(getRandomInt(1, 9999)),
+                  })
                 );
               });
           }}
@@ -57,16 +59,17 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
                 activity: initialLearnActivityState,
               })
               .map((s) => {
-                const pathname = `learn/${toRidAsStr(s.rid)}`;
-
                 router.push(
-                  `${pathname}?` +
-                    updateableSearchParams.set((prev) => ({
-                      ...prev,
-                      userId: prev.userId || getRandomInt(0, 999),
-                      theme: 'outpost',
-                      instructor: 1,
-                    }))
+                  links.getRoomLink({
+                    ...updateableSearchParams.toObject(),
+                    id: toRidAsObj(s.rid).resourceId,
+                    activity: 'learn',
+                    instructor: '1',
+                    theme: 'op',
+                    userId:
+                      updateableSearchParams.get('userId') ||
+                      String(getRandomInt(1, 9999)),
+                  })
                 );
               });
           }}
@@ -80,20 +83,21 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
             roomResource
               ?.create({
                 ...initialRoomState,
-                
-                activity: initialLearnActivityState,
-              }, 'mygivenId')
-              .map((s) => {
-                const pathname = `learn/${toRidAsStr(s.rid)}`;
 
+                activity: initialLearnActivityState,
+              })
+              .map((s) => {
                 router.push(
-                  `${pathname}?` +
-                    updateableSearchParams.set((prev) => ({
-                      ...prev,
-                      userId: prev.userId || getRandomInt(0, 999),
-                      instructor: 1,
-                      theme: 'kids',
-                    }))
+                  links.getRoomLink({
+                    ...updateableSearchParams.toObject(),
+                    id: toRidAsObj(s.rid).resourceId,
+                    activity: 'learn',
+                    instructor: '1',
+                    theme: 'kids',
+                    userId:
+                      updateableSearchParams.get('userId') ||
+                      String(getRandomInt(1, 9999)),
+                  })
                 );
               });
           }}

@@ -1,3 +1,4 @@
+import { links } from 'apps/chessroulette-web/modules/room/links';
 import { getRandomStr } from 'apps/chessroulette-web/util';
 import { Metadata } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
@@ -31,17 +32,31 @@ export function GET(request: NextRequest) {
     }
   });
 
-  const roomId = client.slice(0, 3) + getRandomStr(6);
+  const roomId = client.slice(0, 3) + getRandomStr(7);
 
-  // TODO: Here the room can be created on demand via the API
-  const baseUrl = `${
-    request.nextUrl.origin
-  }/r/new?activity=${activity}&id=${roomId}&${nextParams.toString()}`;
+  const instructor = links.getRoomLink(
+    {
+      id: roomId,
+      activity,
+      instructor: '1',
+      ...nextParamsObj,
+    },
+    request.nextUrl
+  );
+
+  const student = links.getRoomLink(
+    {
+      id: roomId,
+      activity,
+      ...nextParamsObj,
+    },
+    request.nextUrl
+  );
 
   return NextResponse.json({
     links: {
-      instructor: `${baseUrl}&instructor=1`,
-      student: baseUrl,
+      instructor,
+      student,
     },
   });
 }
