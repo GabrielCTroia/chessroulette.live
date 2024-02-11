@@ -5,6 +5,7 @@ import { ResourceIdentifier } from 'movex-core-util';
 import { MovexBoundResource } from 'movex-react';
 import { LearnTemplate } from './LearnTemplate';
 import {
+  ChessColor,
   ChessFEN,
   ChessFENBoard,
   FreeBoardHistory as FBH,
@@ -14,27 +15,25 @@ import {
   toDictIndexedBy,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import Streaming from '../Streaming';
 import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
 import { Button } from 'apps/chessroulette-web/components/Button';
 import { Tabs } from 'apps/chessroulette-web/components/Tabs';
-import { ClipboardCopyButton } from 'apps/chessroulette-web/components/ClipboardCopyButton';
+
 import { Square } from 'react-chessboard/dist/chessboard/types';
-import { SquareMap } from '../activity/reducer';
+import { SquareMap, ArrowsMap, CirclesMap } from '../activity/reducer';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
-import {
-  ArrowsUpDownIcon,
-  DocumentDuplicateIcon,
-  CheckIcon,
-} from '@heroicons/react/16/solid';
+import { ArrowsUpDownIcon } from '@heroicons/react/16/solid';
 import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor';
 import { FreeBoardNotation } from 'apps/chessroulette-web/components/FreeBoardNotation';
 import { useLearnActivitySettings } from './useLearnActivitySettings';
 import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboard';
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
+import { FenPreview } from './components/FenPreview';
+import { ChaptersTab } from './chapters/ChaptersTab';
 
-type ChessColor = 'white' | 'black';
+// type ChessColor = 'white' | 'black';
 
 type Props = {
   rid: ResourceIdentifier<'room'>;
@@ -49,9 +48,16 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   const userId = useUserId();
   const settings = useLearnActivitySettings();
 
-  const [editMode, setEditMode] = useState({
-    isActive: true,
+  const [editMode, setEditMode] = useState<{
+    isActive: boolean;
+    fen: ChessFEN;
+    arrowsMap?: ArrowsMap;
+    circlesMap?: CirclesMap;
+    orientation: ChessColor;
+  }>({
+    isActive: false,
     fen: ChessFENBoard.STARTING_FEN,
+    orientation: playingColor,
   }); // TODO: Set it so it's coming from the state (url)
 
   const Board = settings.canMakeInvalidMoves ? Freeboard : Playboard;
@@ -62,6 +68,10 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
       fen: nextFen,
     }));
   }, []);
+
+  useEffect(() => {
+    console.log('Edit Mode State Updated', editMode);
+  }, [editMode]);
 
   return (
     <LearnTemplate
@@ -171,15 +181,55 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         fen={editMode.fen}
                         sizePx={p.center.width}
                         onUpdated={updateEditedFen}
-                        boardOrientation={playingColor}
-                        onFlipBoard={() => {
-                          dispatch({
-                            type: 'changeBoardOrientation',
-                            payload:
-                              activityState.boardOrientation === 'black'
-                                ? 'white'
-                                : 'black',
+                        boardOrientation={editMode.orientation || playingColor}
+                        onArrowsChange={(arrowsMap) => {
+                          // console.log('on arrow change?');
+                          // dispatch({ type: 'arrowChange', payload });
+                          setEditMode((prev) => ({
+                            ...prev,
+                            arrowsMap,
+                          }));
+                        }}
+                        arrowsMap={editMode.arrowsMap}
+                        circlesMap={editMode.circlesMap}
+                        onCircleDraw={(circleTuple) => {
+                          setEditMode((prev) => {
+                            const [at, hex] = circleTuple;
+
+                            const circleId = `${at}`;
+
+                            const { [circleId]: existent, ...restOfCirles } =
+                              prev.circlesMap || {};
+
+                            return {
+                              ...prev,
+                              circlesMap: {
+                                ...restOfCirles,
+                                ...(!!existent
+                                  ? undefined // Set it to undefined if same
+                                  : { [circleId]: circleTuple }),
+                              },
+                            };
                           });
+                        }}
+                        onClearCircles={() => {
+                          setEditMode((prev) => ({
+                            ...prev,
+                            circlesMap: {},
+                          }));
+                        }}
+                        onFlipBoard={() => {
+                          setEditMode((prev) => ({
+                            ...prev,
+                            orientation: swapColor(prev.orientation),
+                          }));
+                          // dispatch({
+                          //   type: 'changeBoardOrientation',
+                          //   payload:
+                          //     activityState.boardOrientation === 'black'
+                          //       ? 'white'
+                          //       : 'black',
+                          // });
                         }}
                       />
                     ) : (
@@ -263,6 +313,181 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                 const { activityState } = state.activity;
 
+                if (editMode.isActive) {
+                  return (
+                    <Tabs
+                      containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
+                      headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
+                      contentClassName="flex-1 flex min-h-0"
+                      currentIndex={0}
+                      renderContainerHeader={({ tabs, focus }) => (
+                        <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">
+                          {tabs.map((c) => c)}
+                          <div className="flex-1" />
+
+                          {settings.isInstructor && (
+                            <>
+                              {editMode.isActive ? (
+                                <>
+                                  <Button
+                                    // className="bg-red-400 hover:bg-red-600 active:bg-red-800 font-bold"
+                                    onClick={() => {
+                                      setEditMode((prev) => ({
+                                        ...prev,
+                                        isActive: false,
+                                      }));
+                                    }}
+                                    // type="custom"
+                                    type="secondary"
+                                    size="sm"
+                                  >
+                                    Cancel
+                                  </Button>
+                                  <Button
+                                    className="bg-green-400 hover:bg-green-600 active:bg-green-800 font-bold"
+                                    onClick={() => {
+                                      dispatch({
+                                        type: 'importFen',
+                                        payload: editMode.fen,
+                                      });
+
+                                      setEditMode((prev) => ({
+                                        ...prev,
+                                        isActive: false,
+                                      }));
+                                    }}
+                                    type="custom"
+                                    size="sm"
+                                  >
+                                    Use Board
+                                  </Button>
+                                </>
+                              ) : (
+                                <Button
+                                  className="bg-indigo-400 hover:bg-indigo-600 active:bg-indigo-800 font-bold"
+                                  onClick={() => {
+                                    setEditMode(() => ({
+                                      isActive: true,
+                                      fen: activityState.fen,
+                                      circlesMap: {},
+                                      arrowsMap: {},
+                                      orientation:
+                                        activityState.boardOrientation,
+                                    }));
+                                  }}
+                                  type="custom"
+                                  size="sm"
+                                  icon="PencilSquareIcon"
+                                >
+                                  Edit Lesson
+                                </Button>
+                              )}
+                            </>
+                          )}
+                        </div>
+                      )}
+                      tabs={[
+                        {
+                          renderHeader: (p) => (
+                            <Button
+                              onClick={p.focus}
+                              size="sm"
+                              className={`bg-slate-600 font-bold hover:bg-slate-800 ${
+                                p.isFocused && 'bg-slate-800'
+                              }`}
+                            >
+                              Edit Chapters
+                            </Button>
+                          ),
+                          renderContent: () => {
+                            return (
+                              <ChaptersTab
+                                canEdit
+                                fen={editMode.fen}
+                                chaptersMap={activityState.chaptersMap}
+                                className="min-h-0"
+                                onUseChapter={(id) => {
+                                  const nextChapter =
+                                    activityState.chaptersMap[id];
+
+                                  setEditMode((prev) => ({
+                                    ...prev,
+                                    fen: nextChapter.fen,
+                                    arrowsMap: nextChapter.arrowsMap || {},
+                                    circlesMap: nextChapter.circlesMap || {},
+                                    orientation: nextChapter.orientation,
+                                  }));
+                                }}
+                                onDeleteChapter={(id) => {
+                                  dispatch({
+                                    type: 'deleteChapter',
+                                    payload: { id },
+                                  });
+                                }}
+                                onCreate={(name) => {
+                                  dispatch({
+                                    type: 'createChapter',
+                                    payload: {
+                                      name,
+                                      fen: editMode.fen,
+                                      arrowsMap: editMode.arrowsMap,
+                                      circlesMap: editMode.circlesMap,
+                                      orientation:
+                                        activityState.boardOrientation,
+                                    },
+                                  });
+
+                                  setTimeout(() => {});
+                                }}
+                              />
+                            );
+                          },
+                        },
+                        {
+                          renderHeader: (p) => (
+                            <Button
+                              onClick={p.focus}
+                              size="sm"
+                              className={`bg-slate-600 font-bold hover:bg-slate-800 ${
+                                p.isFocused && 'bg-slate-800'
+                              }`}
+                            >
+                              Import
+                            </Button>
+                          ),
+                          renderContent: (p) => (
+                            <PgnInputBox
+                              containerClassName="flex-1 h-full"
+                              contentClassName="p-3 bg-slate-600 rounded-b-lg"
+                              onChange={(inputType, nextInput) => {
+                                if (inputType === 'FEN') {
+                                  dispatch({
+                                    type: 'importFen',
+                                    payload: nextInput,
+                                  });
+                                } else if (inputType === 'PGN') {
+                                  dispatch({
+                                    type: 'importPgn',
+                                    payload: nextInput,
+                                  });
+                                }
+
+                                // setTimeout(() => {
+                                // setEditMode((prev) => ({
+                                //   ...prev,
+                                //   fen: ChessFENBoard.STARTING_FEN,
+                                // }));
+                                // }, 1000);
+                                p.focus(0);
+                              }}
+                            />
+                          ),
+                        },
+                      ]}
+                    />
+                  );
+                }
+
                 return (
                   <Tabs
                     containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
@@ -315,10 +540,13 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                               <Button
                                 className="bg-indigo-400 hover:bg-indigo-600 active:bg-indigo-800 font-bold"
                                 onClick={() => {
-                                  setEditMode((prev) => ({
+                                  setEditMode({
                                     isActive: true,
                                     fen: activityState.fen,
-                                  }));
+                                    circlesMap: {},
+                                    arrowsMap: {},
+                                    orientation: activityState.boardOrientation,
+                                  });
                                 }}
                                 type="custom"
                                 size="sm"
@@ -363,26 +591,59 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                 });
                               }}
                             />
-                            <div className="flex items-space-between p-1 pl-3 border border-slate-400 rounded-lg">
-                              <p className="flex-1 overflow-x-scroll text-wrap break-all text-slate-400">
-                                FEN: {activityState.fen}
-                              </p>
-                              <ClipboardCopyButton
-                                value={activityState.fen}
-                                type="custom"
-                                size="sm"
-                                render={(copied) =>
-                                  copied ? (
-                                    <CheckIcon className="w-5 h-5 text-slate-400 text-green-500" />
-                                  ) : (
-                                    <DocumentDuplicateIcon className="w-5 h-5 text-slate-400 hover:text-slate-200" />
-                                  )
-                                }
-                              />
-                            </div>
+                            <FenPreview fen={activityState.fen} />
                           </div>
                         ),
                       },
+                      settings.isInstructor
+                        ? {
+                            renderHeader: (p) => (
+                              <Button
+                                onClick={p.focus}
+                                size="sm"
+                                className={`bg-slate-600 font-bold hover:bg-slate-800 ${
+                                  p.isFocused && 'bg-slate-800'
+                                }`}
+                              >
+                                Chapters
+                              </Button>
+                            ),
+                            renderContent: () => (
+                              <ChaptersTab
+                                fen={editMode.fen}
+                                chaptersMap={activityState.chaptersMap}
+                                className="min-h-0"
+                                onUseChapter={(id) => {
+                                  dispatch({
+                                    type: 'playChapter',
+                                    payload: { id },
+                                  });
+                                }}
+                                onDeleteChapter={(id) => {
+                                  dispatch({
+                                    type: 'deleteChapter',
+                                    payload: { id },
+                                  });
+                                }}
+                                onCreate={(name) => {
+                                  dispatch({
+                                    type: 'createChapter',
+                                    payload: {
+                                      name,
+                                      fen: editMode.fen,
+                                      arrowsMap: editMode.arrowsMap,
+                                      circlesMap: editMode.circlesMap,
+                                      orientation:
+                                        activityState.boardOrientation,
+                                    },
+                                  });
+
+                                  setTimeout(() => {});
+                                }}
+                              />
+                            ),
+                          }
+                        : undefined,
                       settings.canImport
                         ? {
                             renderHeader: (p) => (

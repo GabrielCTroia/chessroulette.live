@@ -215,6 +215,8 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
     []
   );
 
+  console.log('customSquareStyles' ,customSquareStyles)
+
   // const s = useRef<any>();
   return (
     <div

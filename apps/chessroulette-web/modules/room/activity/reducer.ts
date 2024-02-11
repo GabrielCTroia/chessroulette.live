@@ -18,7 +18,7 @@ import {
   swapColor,
 } from '@xmatter/util-kit';
 import { Square } from 'chess.js';
-import { Action } from 'movex-core-util';
+import { Action, objectKeys } from 'movex-core-util';
 
 export type ArrowDrawTuple = [from: Square, to: Square, hex?: string];
 export type ArrowsMap = Record<ChessArrowId, ArrowDrawTuple>;
@@ -40,6 +40,7 @@ export type LearnActivityState = {
       moves: FBHHistory;
       focusedIndex: FBHIndex;
     };
+    chaptersMap: Record<Chapter['id'], Chapter>;
   };
 };
 
@@ -55,6 +56,16 @@ export const initialActivtityState: ActivityState = {
   activityState: {},
 };
 
+export type Chapter = {
+  id: string;
+  name: string;
+  fen: ChessFEN;
+  arrowsMap?: ArrowsMap;
+  circlesMap?: CirclesMap;
+  createdAt: number;
+  orientation: ChessColor;
+};
+
 export const initialLearnActivityState: LearnActivityState = {
   activityType: 'learn',
   activityState: {
@@ -67,6 +78,7 @@ export const initialLearnActivityState: LearnActivityState = {
       moves: [],
       focusedIndex: [-1, 1],
     },
+    chaptersMap: {},
   },
 };
 
@@ -81,7 +93,17 @@ export type ActivityActions =
   | Action<'changeBoardOrientation', ChessColor>
   | Action<'arrowChange', ArrowsMap>
   | Action<'drawCircle', CircleDrawTuple>
-  | Action<'clearCircles'>;
+  | Action<'clearCircles'>
+  | Action<'createChapter', Omit<Chapter, 'id' | 'createdAt'>>
+  | Action<
+      'updateChapter',
+      {
+        id: Chapter['id'];
+        state: Partial<Omit<Chapter, 'id' | 'createdAt'>>;
+      }
+    >
+  | Action<'deleteChapter', { id: Chapter['id'] }>
+  | Action<'playChapter', { id: Chapter['id'] }>;
 
 // PART 3: The Reducer – This is where all the logic happens
 
@@ -92,7 +114,7 @@ export default (
   console.group('Action', action.type);
   console.log('payload', (action as any).payload);
   console.log('prev', prev);
-  console.log('')
+  console.log('');
   console.groupEnd();
 
   if (prev.activityType === 'learn') {
@@ -406,6 +428,78 @@ export default (
         activityState: {
           ...prev.activityState,
           circles: {},
+        },
+      };
+    }
+
+    if (action.type === 'createChapter') {
+      const nextChapterId = String(
+        objectKeys(prev.activityState.chaptersMap).length
+      );
+
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          chaptersMap: {
+            ...prev.activityState.chaptersMap,
+            [nextChapterId]: {
+              id: nextChapterId,
+              createdAt: new Date().getTime(),
+              ...action.payload,
+            },
+          },
+        },
+      };
+    }
+
+    if (action.type === 'updateChapter') {
+      const { [action.payload.id]: prevChapter } =
+        prev.activityState.chaptersMap;
+
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          chaptersMap: {
+            ...prev.activityState.chaptersMap,
+            [action.payload.id]: {
+              ...prevChapter,
+              ...action.payload.state,
+            },
+          },
+        },
+      };
+    }
+
+    if (action.type === 'deleteChapter') {
+      const { [action.payload.id]: removed, ...nextChapters } =
+        prev.activityState.chaptersMap;
+
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          chaptersMap: nextChapters,
+        },
+      };
+    }
+
+    if (action.type === 'playChapter') {
+      const { [action.payload.id]: chapter } = prev.activityState.chaptersMap;
+
+      if (!chapter) {
+        return prev;
+      }
+
+      return {
+        ...prev,
+        activityState: {
+          ...prev.activityState,
+          fen: chapter.fen,
+          arrows: chapter.arrowsMap || {},
+          circles: chapter.circlesMap || {},
+          boardOrientation: chapter.orientation,
         },
       };
     }

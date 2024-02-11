@@ -27,7 +27,16 @@ import {
   ArrowPathIcon,
 } from '@heroicons/react/16/solid';
 
-type Props = Pick<ChessboardContainerProps, 'sizePx' | 'boardOrientation'> & {
+type Props = Pick<
+  ChessboardContainerProps,
+  | 'sizePx'
+  | 'boardOrientation'
+  | 'arrowsMap'
+  | 'onArrowsChange'
+  | 'circlesMap'
+  | 'onCircleDraw'
+  | 'onClearCircles'
+> & {
   fen: ChessFEN;
   onUpdated: (fen: ChessFEN) => void;
   onFlipBoard?: () => void;
@@ -133,6 +142,11 @@ export const BoardEditor = ({
     };
   }, [props.boardOrientation, renderPiece, blackPieces, whitePieces]);
 
+  const resetArrowsAndCircles = () => {
+    props.onClearCircles?.();
+    props.onArrowsChange?.({});
+  };
+
   return (
     <div
       className="flex flex-col sjustify-between items-center justify-center gap-2 sbg-slate-700 rounded-xl borders border-slate-700"
@@ -173,6 +187,8 @@ export const BoardEditor = ({
                 onUpdated(fenBoard.fen);
 
                 setHoveredSquare(undefined);
+
+                // props.onArrowsChange()
 
                 return true;
               }}
@@ -233,6 +249,8 @@ export const BoardEditor = ({
                 title="Clear Board"
                 onClick={() => {
                   onUpdated('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
+
+                  resetArrowsAndCircles();
                 }}
               />
               <ArrowPathIcon
@@ -240,6 +258,8 @@ export const BoardEditor = ({
                 title="Starting Position"
                 onClick={() => {
                   onUpdated(ChessFENBoard.STARTING_FEN);
+
+                  resetArrowsAndCircles();
                 }}
               />
             </div>

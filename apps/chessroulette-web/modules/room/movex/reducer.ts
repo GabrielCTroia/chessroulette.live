@@ -121,7 +121,11 @@ export default (state = initialRoomState, action: RoomActions): RoomState => {
     action.type === 'drawCircle' ||
     action.type === 'clearCircles' ||
     action.type === 'deleteHistoryMove' ||
-    action.type === 'importFen'
+    action.type === 'importFen' ||
+    action.type === 'createChapter' ||
+    action.type === 'deleteChapter' ||
+    action.type === 'updateChapter' ||
+    action.type === 'playChapter'
   ) {
     // console.log('heere')
     return {
