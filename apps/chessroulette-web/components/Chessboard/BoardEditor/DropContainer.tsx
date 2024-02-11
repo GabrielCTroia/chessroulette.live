@@ -1,7 +1,7 @@
-import { PieceSan } from '@xmatter/util-kit';
+import { PieceSan, invoke } from '@xmatter/util-kit';
 import { Square } from 'chess.js';
 import { useMemo, useRef } from 'react';
-import { useContainerRect } from '../../ContainerWithDimensions';
+import { Rect, useContainerRect } from '../../ContainerWithDimensions';
 import {
   absoluteCoordsToSquare,
   boardCoordsToSquare,
@@ -9,13 +9,58 @@ import {
   getSquareSize,
 } from './util';
 import { useDrop } from 'react-dnd';
-import { DndItem } from './types';
+import { AbsoluteCoord, DndItem } from './types';
+
+// export const getMouseCoords = (
+//   // e: MouseEvent,
+//   rect: Rect,
+//   flipped = false
+// ): AbsoluteCoord => {
+//   // const rect = (e.target as any).getBoundingClientRect();
+
+//   const absolutePos = {
+//     x: e.clientX - rect.left, // x position within the element.,
+//     y: e.clientY - rect.top, // y position within the element.,
+//   };
+
+//   if (flipped) {
+//     const next = {
+//       x: rect.width - absolutePos.x,
+//       y: rect.height - absolutePos.y,
+//     };
+
+//     return next;
+//   }
+
+//   return absolutePos;
+// };
+
+const getAbsoluteCoords = (
+  rect: Rect,
+  clientCoords: { x: number; y: number },
+  isFlipped = false
+) => {
+  const absolute = {
+    x: clientCoords.x - rect.left,
+    y: clientCoords.y - rect.top,
+  };
+
+  if (isFlipped) {
+    return {
+      x: rect.width - absolute.x,
+      y: rect.height - absolute.y,
+    };
+  }
+
+  return absolute;
+};
 
 export const DropContainer = (
   props: React.PropsWithChildren & {
     onDrop: (pieceSan: PieceSan, sq: Square) => void;
     onHover?: (pieceSan: PieceSan, sq: Square) => void;
     isActive: boolean;
+    isFlipped?: boolean;
   }
 ) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -35,10 +80,29 @@ export const DropContainer = (
           return;
         }
 
-        const absoluteCoords = {
-          x: offsets.x - rect.left,
-          y: offsets.y - rect.top,
-        };
+        const absoluteCoords = getAbsoluteCoords(
+          rect,
+          offsets,
+          props.isFlipped
+        );
+
+        // const absoluteCoords = invoke(() => {
+        //   const absolute = {
+        //     x: offsets.x - rect.left,
+        //     y: offsets.y - rect.top,
+        //   };
+
+        //   if (props.isFlipped) {
+        //     return {
+        //       x: rect.width - absolute.x,
+        //       y: rect.height - absolute.y,
+        //     };
+        //   }
+
+        //   return absolute;
+
+        // return next;
+        // });
 
         const droppedOnSquare = absoluteCoordsToSquare({
           absoluteCoords,
@@ -57,10 +121,16 @@ export const DropContainer = (
             return;
           }
 
-          const absoluteCoords = {
-            x: offsets.x - rect.left,
-            y: offsets.y - rect.top,
-          };
+          // const absoluteCoords = {
+          //   x: offsets.x - rect.left,
+          //   y: offsets.y - rect.top,
+          // };
+
+          const absoluteCoords = getAbsoluteCoords(
+            rect,
+            offsets,
+            props.isFlipped
+          );
 
           const droppedOnSquare = boardCoordsToSquare(
             getBoardCoordsFromAbsoluteCoords({
@@ -82,7 +152,7 @@ export const DropContainer = (
       //   offset: monitor.getDifferenceFromInitialOffset(),
       // }),
     }),
-    [rect, squareSize]
+    [rect, squareSize, props.isFlipped]
   );
 
   return (

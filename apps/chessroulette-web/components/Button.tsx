@@ -1,5 +1,6 @@
 import React from 'react';
 import { PropsWithChildren } from 'react';
+import * as Icons from '@heroicons/react/16/solid';
 
 export type ButtonProps = Omit<
   React.DetailedHTMLProps<
@@ -14,6 +15,7 @@ export type ButtonProps = Omit<
     className?: string;
     disabled?: boolean;
     size?: 'sm' | 'md' | 'lg';
+    icon?: keyof typeof Icons;
   }>;
 
 const classes = {
@@ -34,17 +36,21 @@ export const Button: React.FC<ButtonProps> = ({
   onClick,
   className,
   size = 'md',
+  icon,
   ...props
 }) => {
+  const Icon = icon ? Icons[icon] : null;
+
   return (
     <button
       className={`hover:cursor-pointer ${classes[type]} ${classes[size]} ${
         disabled ? 'bg-slate-400 hover:bg-slate-400' : ''
-      } ${className}`}
+      } flex items-center gap-1 ${className}`}
       onClick={onClick}
       disabled={disabled === true}
       {...props}
     >
+      {Icon && <Icon className="h-5 w-5 inline" />}
       {children}
     </button>
   );

@@ -1,10 +1,11 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ChessFEN,
   ChessFENBoard,
   PieceSan,
   objectKeys,
   pieceSanToFenBoardPieceSymbol,
+  toShortColor,
 } from '@xmatter/util-kit';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -20,10 +21,16 @@ import { useBoardTheme } from '../useBoardTheme';
 import { getSquareSize } from './util';
 import { DropContainer } from './DropContainer';
 import { DraggableItem } from './DraggableItem';
+import {
+  ArrowsUpDownIcon,
+  TrashIcon,
+  ArrowPathIcon,
+} from '@heroicons/react/16/solid';
 
-type Props = Pick<ChessboardContainerProps, 'sizePx'> & {
+type Props = Pick<ChessboardContainerProps, 'sizePx' | 'boardOrientation'> & {
   fen: ChessFEN;
   onUpdated: (fen: ChessFEN) => void;
+  onFlipBoard?: () => void;
 };
 
 const whitePieces: PieceSan[] = ['wP', 'wB', 'wN', 'wQ', 'wR'];
@@ -33,6 +40,7 @@ export const BoardEditor = ({
   fen = ChessFENBoard.STARTING_FEN,
   sizePx,
   onUpdated = noop,
+  onFlipBoard = noop,
   ...props
 }: Props) => {
   const fenBoard = useInstance<ChessFENBoard>(new ChessFENBoard(fen));
@@ -55,9 +63,9 @@ export const BoardEditor = ({
     };
   }, [sizePx]);
 
-  // useEffect(() => {
-  //   onUpdated(editedFen);
-  // }, [editedFen, onUpdated]);
+  useEffect(() => {
+    fenBoard.loadFen(fen);
+  }, [fen]);
 
   const boardTheme = useBoardTheme();
   const [hoveredSquare, setHoveredSquare] = useState<Square>();
@@ -92,7 +100,7 @@ export const BoardEditor = ({
         pieceSan={pieceSan}
         onDraggingStarted={onPieceDraggingStarted}
         onDraggingStopped={onPieceDraggingStopped}
-        className="hover:cursor-pointer hover:bg-slate-200"
+        className="hover:cursor-pointer hover:bg-slate-500"
       >
         {boardTheme.renderPiece({ squareWidth: squareSize, pieceSan })}
       </DraggableItem>
@@ -111,22 +119,36 @@ export const BoardEditor = ({
     dropped: boolean;
   }>();
 
+  const extraPiecesLayout = useMemo(() => {
+    if (toShortColor(props.boardOrientation || 'w') === 'w') {
+      return {
+        top: blackPieces.map(renderPiece),
+        bottom: whitePieces.map(renderPiece),
+      };
+    }
+
+    return {
+      bottom: blackPieces.map(renderPiece),
+      top: whitePieces.map(renderPiece),
+    };
+  }, [props.boardOrientation, renderPiece, blackPieces, whitePieces]);
+
   return (
     <div
-      className="flex flex-col sjustify-between items-center justify-center"
+      className="flex flex-col sjustify-between items-center justify-center gap-2 sbg-slate-700 rounded-xl borders border-slate-700"
       style={{ height: sizePx }}
     >
       <DndProvider backend={HTML5Backend}>
+        <div className="flex flex-scol flex-1s rounded-lg overflow-hidden bg-slate-600">
+          {extraPiecesLayout.top}
+        </div>
         <div
-          className="flex flex-cosl justify-between items-center justify-center"
+          className="flex flex-cosl sjustify-between justify-center gap-2"
           style={{
             width: sizePx,
             // height: sizePx,
           }}
         >
-          <div className="flex flex-col flex-1s rounded-lg overflow-hidden bg-slate-100">
-            {blackPieces.map(renderPiece)}
-          </div>
           <DropContainer
             isActive={isDragging}
             onHover={(_, square) => {
@@ -139,6 +161,7 @@ export const BoardEditor = ({
               onUpdated(fenBoard.fen);
               setHoveredSquare(undefined);
             }}
+            isFlipped={props.boardOrientation !== 'white'}
           >
             <ChessboardContainer
               fen={fen}
@@ -147,7 +170,6 @@ export const BoardEditor = ({
               onMove={(p) => {
                 fenBoard.move(p.from, p.to);
 
-                // setEditedFen(fenBoard.fen);
                 onUpdated(fenBoard.fen);
 
                 setHoveredSquare(undefined);
@@ -155,15 +177,9 @@ export const BoardEditor = ({
                 return true;
               }}
               onPieceDragBegin={(piece, from) => {
-                // console.log('onPieceDragStart', piece, from);
-                // console.log('onPieceDragStart', draggedPiece);
-
                 setDraggedPiece({ piece, dropped: false, from });
               }}
               onPieceDrop={(from, to, piece) => {
-                // console.log('on piece drop boar deditor', args);
-                // console.log('dropped', draggedPiece);
-
                 setDraggedPiece({ piece, dropped: true, from });
                 return true;
               }}
@@ -175,8 +191,6 @@ export const BoardEditor = ({
                       dropped,
                       from: prevFrom,
                     } = prev;
-
-                    // console.log('on drag end', prev, from, prevFrom);
 
                     // If the draggedPiece haven't dropped yet, it means it got dragged outside
                     if (
@@ -206,9 +220,35 @@ export const BoardEditor = ({
               }}
             />
           </DropContainer>
-          <div className="flex flex-col flex-1s rounded-lg overflow-hidden sbg-opacity-30 bg-slate-100">
-            {whitePieces.map(renderPiece)}
+
+          <div className="flex flex-col">
+            <div className="flex flex-1 flex-col gap-3">
+              <ArrowsUpDownIcon
+                className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
+                title="Flip Board"
+                onClick={onFlipBoard}
+              />
+              <TrashIcon
+                className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
+                title="Clear Board"
+                onClick={() => {
+                  onUpdated('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
+                }}
+              />
+              <ArrowPathIcon
+                className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
+                title="Starting Position"
+                onClick={() => {
+                  onUpdated(ChessFENBoard.STARTING_FEN);
+                }}
+              />
+            </div>
+
+            <div className="flex-1" />
           </div>
+        </div>
+        <div className="flex flsex-col flex-1s rounded-lg overflow-hidden bg-slate-600">
+          {extraPiecesLayout.bottom}
         </div>
       </DndProvider>
     </div>

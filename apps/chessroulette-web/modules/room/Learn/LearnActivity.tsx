@@ -12,7 +12,6 @@ import {
   invoke,
   swapColor,
   toDictIndexedBy,
-  toShortColor,
 } from '@xmatter/util-kit';
 import { useUserId } from 'apps/chessroulette-web/hooks/useUserId/useUserId';
 import { useCallback, useState } from 'react';
@@ -28,7 +27,6 @@ import {
   ArrowsUpDownIcon,
   DocumentDuplicateIcon,
   CheckIcon,
-  PencilSquareIcon,
 } from '@heroicons/react/16/solid';
 import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor';
 import { FreeBoardNotation } from 'apps/chessroulette-web/components/FreeBoardNotation';
@@ -52,7 +50,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   const settings = useLearnActivitySettings();
 
   const [editMode, setEditMode] = useState({
-    isActive: false,
+    isActive: true,
     fen: ChessFENBoard.STARTING_FEN,
   }); // TODO: Set it so it's coming from the state (url)
 
@@ -164,6 +162,8 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                   ? swapColor(activityState.boardOrientation)
                   : activityState.boardOrientation;
 
+                console.log('playing color', playingColor);
+
                 return (
                   <div className="flex border-slate-900">
                     {editMode.isActive ? (
@@ -171,6 +171,16 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         fen={editMode.fen}
                         sizePx={p.center.width}
                         onUpdated={updateEditedFen}
+                        boardOrientation={playingColor}
+                        onFlipBoard={() => {
+                          dispatch({
+                            type: 'changeBoardOrientation',
+                            payload:
+                              activityState.boardOrientation === 'black'
+                                ? 'white'
+                                : 'black',
+                          });
+                        }}
                       />
                     ) : (
                       <Board
@@ -204,7 +214,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                     )}
 
                     <div className="flex flex-col p-1 pt-0 pb-0">
-                      {settings.canFlipBoard && (
+                      {!editMode.isActive && settings.canFlipBoard && (
                         <div className="mb-2">
                           <ArrowsUpDownIcon
                             className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black hover:rounded-lg"
@@ -217,20 +227,6 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                     ? 'white'
                                     : 'black',
                               });
-                            }}
-                          />
-                        </div>
-                      )}
-                      {settings.canEditBoard && (
-                        <div className="">
-                          <PencilSquareIcon
-                            className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black hover:rounded-lg"
-                            title="Edit Board"
-                            onClick={() => {
-                              setEditMode((prev) => ({
-                                ...prev,
-                                isActive: !prev.isActive,
-                              }));
                             }}
                           />
                         </div>
@@ -267,96 +263,6 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                 const { activityState } = state.activity;
 
-                if (editMode.isActive) {
-                  const editFenInstance = new ChessFENBoard(editMode.fen);
-
-                  const changeTo = swapColor(
-                    editFenInstance.getFenState().turn
-                  );
-
-                  return (
-                    <div className="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl">
-                      <div className="flex-1 flex min-h-0">
-                        <div className="flex flex-col flex-1 gap-2 bg-slate-700 min-h-0 jsutify-between">
-                          <div className="flex flex-1 flex-col gap-2">
-                            <Button
-                              size="sm"
-                              onClick={() => {
-                                dispatch({
-                                  type: 'importFen',
-                                  payload: editMode.fen,
-                                });
-
-                                setEditMode({
-                                  isActive: false,
-                                  fen: ChessFENBoard.STARTING_FEN,
-                                });
-                              }}
-                            >
-                              Use Board
-                            </Button>
-                            <Button
-                              size="sm"
-                              type="custom"
-                              className="bg-blue-600 hover:bg-blue-400 capitalize"
-                              onClick={() => {
-                                editFenInstance.setFenNotation({
-                                  fromState: {
-                                    turn: toShortColor(changeTo),
-                                  },
-                                });
-
-                                setEditMode((prev) => ({
-                                  ...prev,
-                                  fen: editFenInstance.fen,
-                                }));
-                              }}
-                            >
-                              Change Turn to{' '}
-                              <span className="font-bold">{changeTo}</span>
-                            </Button>
-                            {/* <Button
-                              size="sm"
-                              type="custom"
-                              className="bg-red-600"
-                              onClick={() => {
-                                dispatch({
-                                  type: 'importFen',
-                                  payload: editMode.fen,
-                                });
-
-                                setEditMode({
-                                  isActive: true,
-                                  fen: '',
-                                });
-                              }}
-                            >
-                              Clear Board
-                            </Button> */}
-                          </div>
-                          <div className="flex items-space-between p-1 pl-3 border border-slate-400 rounded-lg">
-                            <p className="flex-1 overflow-x-scroll text-wrap break-all text-slate-400">
-                              FEN: {editMode.fen}
-                            </p>
-                            <ClipboardCopyButton
-                              value={editMode.fen}
-                              type="custom"
-                              size="sm"
-                              render={(copied) =>
-                                copied ? (
-                                  <CheckIcon className="w-5 h-5 text-slate-400 text-green-500" />
-                                ) : (
-                                  <DocumentDuplicateIcon className="w-5 h-5 text-slate-400 hover:text-slate-200" />
-                                )
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  );
-                }
-
                 return (
                   <Tabs
                     containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
@@ -369,18 +275,59 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         <div className="flex-1" />
 
                         {settings.isInstructor && (
-                          <Button
-                            className="bg-red-900 hover:bg-red-600 active:bg-red-800 font-bold"
-                            onClick={() => {
-                              dispatch({ type: 'importPgn', payload: '' });
+                          <>
+                            {editMode.isActive ? (
+                              <>
+                                <Button
+                                  // className="bg-red-400 hover:bg-red-600 active:bg-red-800 font-bold"
+                                  onClick={() => {
+                                    setEditMode((prev) => ({
+                                      ...prev,
+                                      isActive: false,
+                                    }));
+                                  }}
+                                  // type="custom"
+                                  type="secondary"
+                                  size="sm"
+                                >
+                                  Cancel
+                                </Button>
+                                <Button
+                                  className="bg-green-400 hover:bg-green-600 active:bg-green-800 font-bold"
+                                  onClick={() => {
+                                    dispatch({
+                                      type: 'importFen',
+                                      payload: editMode.fen,
+                                    });
 
-                              focus(0);
-                            }}
-                            type="custom"
-                            size="sm"
-                          >
-                            Reset Board
-                          </Button>
+                                    setEditMode((prev) => ({
+                                      ...prev,
+                                      isActive: false,
+                                    }));
+                                  }}
+                                  type="custom"
+                                  size="sm"
+                                >
+                                  Use Board
+                                </Button>
+                              </>
+                            ) : (
+                              <Button
+                                className="bg-indigo-400 hover:bg-indigo-600 active:bg-indigo-800 font-bold"
+                                onClick={() => {
+                                  setEditMode((prev) => ({
+                                    isActive: true,
+                                    fen: activityState.fen,
+                                  }));
+                                }}
+                                type="custom"
+                                size="sm"
+                                icon="PencilSquareIcon"
+                              >
+                                Edit Board
+                              </Button>
+                            )}
+                          </>
                         )}
                       </div>
                     )}
@@ -466,10 +413,12 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                     });
                                   }
 
+                                  // setTimeout(() => {
                                   setEditMode((prev) => ({
                                     ...prev,
-                                    isActive: false,
+                                    fen: ChessFENBoard.STARTING_FEN,
                                   }));
+                                  // }, 1000);
                                   p.focus(0);
                                 }}
                               />
