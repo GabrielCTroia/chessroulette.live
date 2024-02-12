@@ -1,12 +1,7 @@
 import { links } from 'apps/chessroulette-web/modules/room/links';
 import { getRandomStr } from 'apps/chessroulette-web/util';
-import { Metadata } from 'next';
 import { NextRequest, NextResponse } from 'next/server';
 import z from 'zod';
-
-export const metadata: Metadata = {
-  title: 'Chessroulette',
-};
 
 const paramsSchema = z.object({
   client: z.string(), // Outpost // TODO: this can be used later when they hit the api, now just the op prefixed id
