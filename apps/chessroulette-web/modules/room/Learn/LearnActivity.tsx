@@ -55,7 +55,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
     circlesMap?: CirclesMap;
     orientation: ChessColor;
   }>({
-    isActive: false,
+    isActive: true,
     fen: ChessFENBoard.STARTING_FEN,
     orientation: playingColor,
   }); // TODO: Set it so it's coming from the state (url)

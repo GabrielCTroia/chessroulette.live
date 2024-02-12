@@ -62,6 +62,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
   inCheckSquares,
   boardOrientation = 'white',
   containerClassName,
+  customSquareStyles,
   ...props
 }) => {
   const boardTheme = useBoardTheme();
@@ -85,7 +86,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
 
   const arrowColor = useArrowColor();
 
-  const customSquareStyles = useMemo(() => {
+  const mergedCustomSquareStyles = useMemo(() => {
     const lastMoveStyle = lastMove && {
       [lastMove.from]: {
         background: boardTheme.lastMoveFromSquare,
@@ -140,9 +141,12 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
     return deepmerge(
       lastMoveStyle || {},
       circledStyle || {},
-      checkedStyle || {}
+      checkedStyle || {},
+      customSquareStyles || {},
     );
-  }, [lastMove, circlesMap, props.sizePx, inCheckSquares, boardTheme]);
+  }, [lastMove, circlesMap, props.sizePx, inCheckSquares, customSquareStyles, boardTheme]);
+
+  // console.log('customSquareStyles', customSquareStyles);
 
   const [promoMove, setPromoMove] = useState<ShortChessMove>();
   const [localBoardArrowsMap, setLocalBoardArrowsMap] = useState<ArrowsMap>({});
@@ -249,7 +253,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
             resetArrows();
           }
         }}
-        customSquareStyles={customSquareStyles}
+        customSquareStyles={mergedCustomSquareStyles}
         customArrows={arrowsToRender}
         autoPromoteToQueen={false}
         onPromotionCheck={(from, to, piece) => {

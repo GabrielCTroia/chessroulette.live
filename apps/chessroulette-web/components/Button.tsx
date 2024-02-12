@@ -45,7 +45,7 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       className={`hover:cursor-pointer ${classes[type]} ${classes[size]} ${
         disabled ? 'bg-slate-400 hover:bg-slate-400' : ''
-      } flex items-center gap-1 ${className}`}
+      } flex items-center justify-center gap-1 ${className}`}
       onClick={onClick}
       disabled={disabled === true}
       {...props}

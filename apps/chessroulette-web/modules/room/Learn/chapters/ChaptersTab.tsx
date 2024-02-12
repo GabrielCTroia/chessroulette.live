@@ -77,7 +77,7 @@ export const ChaptersTab = ({
                 onChange={(e) => {
                   setNewChapterName(e.target.value);
                 }}
-                className="bg-gray-50 mborder sborder-gray-300 text-gray-900 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block bg-opacity-0 text-white block dark:text-white p-2.5 "
+                className="bg-gray-50 text-sm rounded-md focus:ring-blue-500 focus:border-blue-500 block bg-opacity-0 text-white block p-2.5"
               />
             </div>
 
