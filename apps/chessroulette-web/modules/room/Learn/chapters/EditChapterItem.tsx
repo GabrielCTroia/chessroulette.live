@@ -160,7 +160,7 @@ export const EditChapterItem = ({
               size="sm"
               type="secondary"
               onClick={() => {
-                onUpdateFen(ChessFENBoard.STARTING_FEN);
+                onUpdateFen(ChessFENBoard.ONLY_KINGS_FEN);
 
                 onClearArrowsAndCircles();
               }}
@@ -173,7 +173,7 @@ export const EditChapterItem = ({
               size="sm"
               type="secondary"
               onClick={() => {
-                onUpdateFen(ChessFENBoard.ONLY_KINGS_FEN);
+                onUpdateFen(ChessFENBoard.STARTING_FEN);
                 onClearArrowsAndCircles();
               }}
               icon="ArrowPathIcon"

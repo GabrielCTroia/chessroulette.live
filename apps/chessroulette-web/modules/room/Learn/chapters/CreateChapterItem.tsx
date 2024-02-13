@@ -53,7 +53,8 @@ export const CreateChapterItem = ({
           size="sm"
           type="secondary"
           onClick={() => {
-            onUpdateFen(ChessFENBoard.STARTING_FEN);
+            onUpdateFen(ChessFENBoard.ONLY_KINGS_FEN);
+
             onClearArrowsAndCircles();
           }}
           icon="TrashIcon"
@@ -65,7 +66,7 @@ export const CreateChapterItem = ({
           size="sm"
           type="secondary"
           onClick={() => {
-            onUpdateFen(ChessFENBoard.ONLY_KINGS_FEN);
+            onUpdateFen(ChessFENBoard.STARTING_FEN);
             onClearArrowsAndCircles();
           }}
           icon="ArrowPathIcon"
@@ -73,7 +74,6 @@ export const CreateChapterItem = ({
         >
           Starting Position
         </Button>
-
         <div className="flex-1" />
 
         <Button

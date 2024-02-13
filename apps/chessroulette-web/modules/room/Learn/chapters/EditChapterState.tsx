@@ -73,7 +73,7 @@ export const EditChapterState = ({ state, onUpdate = noop }: Props) => {
           />
           <label
             htmlFor="white"
-            className="ml-1 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            className="ml-1 ms-2 text-sm font-medium text-gray-300"
           >
             White
           </label>
@@ -94,7 +94,7 @@ export const EditChapterState = ({ state, onUpdate = noop }: Props) => {
           />
           <label
             htmlFor="black"
-            className="ml-1 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            className="ml-1 ms-2 text-sm font-medium text-gray-300"
           >
             Black
           </label>
@@ -123,7 +123,7 @@ export const EditChapterState = ({ state, onUpdate = noop }: Props) => {
             />
             <label
               htmlFor="white-king-castle"
-              className="ml-1 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              className="ml-1 ms-2 text-sm font-medium text-gray-300"
             >
               White O-O
             </label>
@@ -148,7 +148,7 @@ export const EditChapterState = ({ state, onUpdate = noop }: Props) => {
             />
             <label
               htmlFor="white-queen-castle"
-              className="ml-1 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              className="ml-1 ms-2 text-sm font-medium text-gray-300"
             >
               White O-O-O
             </label>
@@ -172,7 +172,7 @@ export const EditChapterState = ({ state, onUpdate = noop }: Props) => {
             />
             <label
               htmlFor="black-king-castle"
-              className="ml-1 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              className="ml-1 ms-2 text-sm font-medium text-gray-300"
             >
               Black O-O
             </label>
@@ -197,7 +197,7 @@ export const EditChapterState = ({ state, onUpdate = noop }: Props) => {
             />
             <label
               htmlFor="black-queen-castle"
-              className="ml-1 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+              className="ml-1 ms-2 text-sm font-medium text-gray-300"
             >
               Black O-O-O
             </label>
