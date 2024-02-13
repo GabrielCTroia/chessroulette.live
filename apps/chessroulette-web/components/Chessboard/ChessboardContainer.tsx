@@ -287,6 +287,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
         onArrowsChange={onArrowsChangeAfterMount}
         onSquareRightClick={onSquareRightClick}
         customPieces={boardTheme.customPieces}
+        promotionDialogVariant="vertical"
         {...props}
       />
     </div>
