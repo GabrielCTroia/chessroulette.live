@@ -33,7 +33,7 @@ export function GET(request: NextRequest) {
     {
       id: roomId,
       activity,
-      instructor: '1',
+      instructor: true,
       ...nextParamsObj,
     },
     request.nextUrl

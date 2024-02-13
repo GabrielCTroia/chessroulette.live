@@ -67,18 +67,12 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   const [editMode, setEditMode] = useState<{
     isActive: boolean;
     state: Pick<ChapterState, 'fen' | 'arrowsMap' | 'circlesMap'>;
-    // fen: ChessFEN;
-    // arrowsMap?: ArrowsMap;
-    // circlesMap?: CirclesMap;
-    // orientation: ChessColor;
   }>({
     isActive: isEditParamsSet,
     state: {
       fen: ChessFENBoard.STARTING_FEN,
     },
-    // fen: ChessFENBoard.STARTING_FEN,
-    // orientation: playingColor,
-  }); // TODO: Set it so it's coming from the state (url)
+  });
 
   const Board = settings.canMakeInvalidMoves ? Freeboard : Playboard;
 
@@ -251,7 +245,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                             state: {
                               ...prev.state,
                               circlesMap: {},
-                            }
+                            },
                           }));
                         }}
                         onFlipBoard={() => {
@@ -438,210 +432,6 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                       }}
                     />
                   );
-
-                  // return (
-                  //   <EditChaptersTab
-                  //     canEdit
-                  //     chaptersMap={activityState.chaptersMap}
-                  //     className="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
-                  //     boardFen={editMode.fen}
-                  //     onCreate={(name) => {
-                  //       dispatch({
-                  //         type: 'createChapter',
-                  //         payload: {
-                  //           arrowsMap: editMode.arrowsMap,
-                  //           circlesMap: editMode.circlesMap,
-                  //           fen: editMode.fen,
-                  //           name,
-                  //         },
-                  //       });
-                  //     }}
-                  //     onUseBoard={() => {
-                  //       dispatch({
-                  //         type: 'importFen',
-                  //         payload: editMode.fen,
-                  //       });
-
-                  //       router.push(
-                  //         `${currentPathName}?${updatedableSearchParams.set(
-                  //           (prev) => ({
-                  //             ...prev,
-                  //             edit: undefined,
-                  //           })
-                  //         )}`
-                  //       );
-
-                  //       // setEditMode((prev) => ({
-                  //       //   ...prev,
-                  //       //   isActive: false,
-                  //       // }));
-                  //     }}
-                  //     onUpdateFen={(fen) =>
-                  //       setEditMode((prev) => ({
-                  //         ...prev,
-                  //         fen,
-                  //       }))
-                  //     }
-                  //   />
-                  // );
-                  // return (
-                  //   <Tabs
-                  //     containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
-                  //     headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
-                  //     contentClassName="flex-1 flex min-h-0"
-                  //     currentIndex={0}
-                  //     renderContainerHeader={({ tabs, focus }) => (
-                  //       <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">
-                  //         {tabs.map((c) => c)}
-                  //         <div className="flex-1" />
-
-                  //         {settings.isInstructor && (
-                  //           <>
-                  //             <Button
-                  //               // className="bg-red-400 hover:bg-red-600 active:bg-red-800 font-bold"
-                  //               onClick={() => {
-                  //                 setEditMode((prev) => ({
-                  //                   ...prev,
-                  //                   isActive: false,
-                  //                 }));
-                  //               }}
-                  //               // type="custom"
-                  //               type="secondary"
-                  //               size="sm"
-                  //             >
-                  //               Cancel
-                  //             </Button>
-                  //             <Button
-                  //               className="bg-green-400 hover:bg-green-600 active:bg-green-800 font-bold"
-                  //               onClick={() => {
-                  //                 dispatch({
-                  //                   type: 'importFen',
-                  //                   payload: editMode.fen,
-                  //                 });
-
-                  //                 setEditMode((prev) => ({
-                  //                   ...prev,
-                  //                   isActive: false,
-                  //                 }));
-                  //               }}
-                  //               type="custom"
-                  //               size="sm"
-                  //             >
-                  //               Use Board
-                  //             </Button>
-                  //           </>
-                  //         )}
-                  //       </div>
-                  //     )}
-                  //     tabs={[
-                  //       {
-                  //         renderHeader: (p) => (
-                  //           <Button
-                  //             onClick={p.focus}
-                  //             size="sm"
-                  //             type="secondary"
-                  //             isActive={p.isFocused}
-                  //           >
-                  //             Edit Chapters
-                  //           </Button>
-                  //         ),
-                  //         renderContent: () => {
-                  //           return (
-                  //             <ChaptersTab
-                  //               canEdit
-                  //               fen={editMode.fen}
-                  //               chaptersMap={activityState.chaptersMap}
-                  //               className="min-h-0"
-                  //               onUseChapter={(id) => {
-                  //                 const nextChapter =
-                  //                   activityState.chaptersMap[id];
-
-                  //                 setEditMode((prev) => ({
-                  //                   ...prev,
-                  //                   fen: nextChapter.fen,
-                  //                   arrowsMap: nextChapter.arrowsMap || {},
-                  //                   circlesMap: nextChapter.circlesMap || {},
-                  //                   orientation: nextChapter.orientation,
-                  //                 }));
-                  //               }}
-                  //               onDeleteChapter={(id) => {
-                  //                 dispatch({
-                  //                   type: 'deleteChapter',
-                  //                   payload: { id },
-                  //                 });
-                  //               }}
-                  //               onCreate={(name) => {
-                  //                 dispatch({
-                  //                   type: 'createChapter',
-                  //                   payload: {
-                  //                     name,
-                  //                     fen: editMode.fen,
-                  //                     arrowsMap: editMode.arrowsMap,
-                  //                     circlesMap: editMode.circlesMap,
-                  //                     orientation:
-                  //                       activityState.boardOrientation,
-                  //                   },
-                  //                 });
-                  //               }}
-                  //               onDeleteChapter={(id) => {
-                  //                 dispatch({
-                  //                   type: 'deleteChapter',
-                  //                   payload: { id },
-                  //                 });
-                  //               }}
-                  //               onUpdateChapter={(id, state) => {
-                  //                 // console.log('on dpate chapter', id, state);
-                  //                 dispatch({
-                  //                   type: 'updateChapter',
-                  //                   payload: { id, state },
-                  //                 });
-                  //               }}
-                  //             />
-                  //           );
-                  //         },
-                  //       },
-                  //       {
-                  //         renderHeader: (p) => (
-                  //           <Button
-                  //             onClick={p.focus}
-                  //             size="sm"
-                  //             type="secondary"
-                  //             isActive={p.isFocused}
-                  //           >
-                  //             Import
-                  //           </Button>
-                  //         ),
-                  //         renderContent: (p) => (
-                  //           <PgnInputBox
-                  //             containerClassName="flex-1 h-full"
-                  //             contentClassName="p-3 bg-slate-600 rounded-b-lg"
-                  //             onChange={(inputType, nextInput) => {
-                  //               if (inputType === 'FEN') {
-                  //                 dispatch({
-                  //                   type: 'importFen',
-                  //                   payload: nextInput,
-                  //                 });
-                  //               } else if (inputType === 'PGN') {
-                  //                 dispatch({
-                  //                   type: 'importPgn',
-                  //                   payload: nextInput,
-                  //                 });
-                  //               }
-
-                  //               // setTimeout(() => {
-                  //               // setEditMode((prev) => ({
-                  //               //   ...prev,
-                  //               //   fen: ChessFENBoard.STARTING_FEN,
-                  //               // }));
-                  //               // }, 1000);
-                  //               p.focus(0);
-                  //             }}
-                  //           />
-                  //         ),
-                  //       },
-                  //     ]}
-                  //   />
-                  // );
                 }
 
                 return (
@@ -653,25 +443,6 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                     renderContainerHeader={({ tabs, focus }) => (
                       <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">
                         {tabs.map((c) => c)}
-                        {/* <div className="flex-1" />
-
-                        <Button
-                          className="bg-indigo-400 hover:bg-indigo-600 active:bg-indigo-800 font-bold"
-                          onClick={() => {
-                            setEditMode({
-                              isActive: true,
-                              fen: activityState.fen,
-                              circlesMap: {},
-                              arrowsMap: {},
-                              orientation: activityState.boardOrientation,
-                            });
-                          }}
-                          type="custom"
-                          size="sm"
-                          icon="PencilSquareIcon"
-                        >
-                          Edit
-                        </Button> */}
                       </div>
                     )}
                     tabs={[

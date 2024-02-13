@@ -40,7 +40,7 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
                     ...updateableSearchParams.toObject(),
                     id: toRidAsObj(s.rid).resourceId,
                     activity: 'learn',
-                    instructor: '1',
+                    instructor: true,
                     userId:
                       updateableSearchParams.get('userId') ||
                       String(getRandomInt(1, 9999)),
@@ -64,7 +64,7 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
                     ...updateableSearchParams.toObject(),
                     id: toRidAsObj(s.rid).resourceId,
                     activity: 'learn',
-                    instructor: '1',
+                    instructor: true,
                     theme: 'op',
                     userId:
                       updateableSearchParams.get('userId') ||
@@ -92,7 +92,7 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
                     ...updateableSearchParams.toObject(),
                     id: toRidAsObj(s.rid).resourceId,
                     activity: 'learn',
-                    instructor: '1',
+                    instructor: true,
                     theme: 'kids',
                     userId:
                       updateableSearchParams.get('userId') ||
