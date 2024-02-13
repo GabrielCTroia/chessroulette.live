@@ -16,13 +16,16 @@ export const OnboardingWidget: React.FC<Props> = ({
 }) => {
   return (
     <div className={`flex flex-col ${containerClassName}`}>
-      {session?.user ? (
+      <OnboardingMenuContainer>
+        <Avatar shortName={'U'} />
+      </OnboardingMenuContainer>
+      {/* {session?.user ? (
         <OnboardingMenuContainer>
           <Avatar shortName={session.user.name || 'T'} />
         </OnboardingMenuContainer>
       ) : (
         <Link href="/api/auth/signin">Sign In</Link>
-      )}
+      )} */}
     </div>
   );
 };
