@@ -94,7 +94,7 @@ export const Button: React.FC<ButtonProps> = ({
       className={`hover:cursor-pointer ${classes[type]} ${classes[size]} ${
         disabled ? 'bg-slate-400 hover:bg-slate-400' : ''
       } flex items-center justify-center gap-1 ${className} ${
-        bgColor ? getButtonColors(bgColor) : ''
+        bgColor ? toStringColors(getButtonColors(bgColor)) : ''
       } ${
         isActive && type !== 'custom'
           ? getButtonColors(bgColor || typeToColors[type]).active

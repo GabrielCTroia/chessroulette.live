@@ -66,7 +66,7 @@ export type ChapterState = {
   fen: ChessFEN;
   arrowsMap?: ArrowsMap;
   circlesMap?: CirclesMap;
-  orientation: ChessColor;
+  // orientation: ChessColor;
 };
 
 export const initialLearnActivityState: LearnActivityState = {
@@ -502,7 +502,7 @@ export default (
           fen: chapter.fen,
           arrows: chapter.arrowsMap || {},
           circles: chapter.circlesMap || {},
-          boardOrientation: chapter.orientation,
+          // boardOrientation: chapter.orientation,
         },
       };
     }

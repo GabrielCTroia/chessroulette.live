@@ -36,6 +36,8 @@ export type FenState = {
 export class ChessFENBoard {
   static STARTING_FEN: ChessFEN =
     'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+
+  static ONLY_KINGS_FEN: ChessFEN = '4k3/8/8/8/8/8/8/4K3 w - - 0 1';
   // '8/8/8/8/8/8/8/8 w - - 0 1'; // TODO: Add ability to have an empty baord
 
   // This is a get because it's meant to be readonly

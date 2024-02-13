@@ -21,9 +21,13 @@ import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
 import { Button } from 'apps/chessroulette-web/components/Button';
 import { Tabs } from 'apps/chessroulette-web/components/Tabs';
 import { Square } from 'react-chessboard/dist/chessboard/types';
-import { SquareMap, ArrowsMap, CirclesMap } from '../activity/reducer';
+import {
+  SquareMap,
+  ArrowsMap,
+  CirclesMap,
+  ChapterState,
+} from '../activity/reducer';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
-import { ArrowsUpDownIcon } from '@heroicons/react/16/solid';
 import { BoardEditor } from 'apps/chessroulette-web/components/Chessboard/BoardEditor';
 import { FreeBoardNotation } from 'apps/chessroulette-web/components/FreeBoardNotation';
 import { useLearnActivitySettings } from './useLearnActivitySettings';
@@ -32,7 +36,10 @@ import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboar
 import { FenPreview } from './components/FenPreview';
 import { ChaptersTab } from './chapters/ChaptersTab';
 import { Icon } from 'apps/chessroulette-web/components/Icon';
-import { useSearchParams } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
+import { EditChaptersWidget } from './chapters/EditChaptersWidget';
 
 // type ChessColor = 'white' | 'black';
 
@@ -46,6 +53,10 @@ type Props = {
 type Tabs = 'history' | 'import';
 
 export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
+  const router = useRouter();
+  const currentPathName = usePathname();
+  const updatedableSearchParams = useUpdateableSearchParams();
+
   const userId = useUserId();
   const settings = useLearnActivitySettings();
 
@@ -55,14 +66,18 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
   const [editMode, setEditMode] = useState<{
     isActive: boolean;
-    fen: ChessFEN;
-    arrowsMap?: ArrowsMap;
-    circlesMap?: CirclesMap;
-    orientation: ChessColor;
+    state: Pick<ChapterState, 'fen' | 'arrowsMap' | 'circlesMap'>;
+    // fen: ChessFEN;
+    // arrowsMap?: ArrowsMap;
+    // circlesMap?: CirclesMap;
+    // orientation: ChessColor;
   }>({
     isActive: isEditParamsSet,
-    fen: ChessFENBoard.STARTING_FEN,
-    orientation: playingColor,
+    state: {
+      fen: ChessFENBoard.STARTING_FEN,
+    },
+    // fen: ChessFENBoard.STARTING_FEN,
+    // orientation: playingColor,
   }); // TODO: Set it so it's coming from the state (url)
 
   const Board = settings.canMakeInvalidMoves ? Freeboard : Playboard;
@@ -70,7 +85,10 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   const updateEditedFen = useCallback((nextFen: ChessFEN) => {
     setEditMode((prev) => ({
       ...prev,
-      fen: nextFen,
+      state: {
+        ...prev.state,
+        fen: nextFen,
+      },
     }));
   }, []);
 
@@ -79,7 +97,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
     setEditMode((prev) => ({
       ...prev,
       isActive: isEditParamsSet,
-    }))
+    }));
   }, [isEditParamsSet]);
 
   return (
@@ -181,42 +199,48 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                   ? swapColor(activityState.boardOrientation)
                   : activityState.boardOrientation;
 
-                console.log('playing color', playingColor);
+                // console.log('playing color', playingColor);
 
                 return (
                   <div className="flex border-slate-900">
                     {editMode.isActive ? (
                       <BoardEditor
-                        fen={editMode.fen}
+                        fen={editMode.state.fen}
                         sizePx={p.center.width}
                         onUpdated={updateEditedFen}
-                        boardOrientation={editMode.orientation || playingColor}
+                        boardOrientation={playingColor}
                         onArrowsChange={(arrowsMap) => {
                           // console.log('on arrow change?');
                           // dispatch({ type: 'arrowChange', payload });
                           setEditMode((prev) => ({
                             ...prev,
-                            arrowsMap,
+                            state: {
+                              ...prev.state,
+                              arrowsMap,
+                            },
                           }));
                         }}
-                        arrowsMap={editMode.arrowsMap}
-                        circlesMap={editMode.circlesMap}
+                        arrowsMap={editMode.state.arrowsMap}
+                        circlesMap={editMode.state.circlesMap}
                         onCircleDraw={(circleTuple) => {
                           setEditMode((prev) => {
-                            const [at, hex] = circleTuple;
+                            const [at] = circleTuple;
 
                             const circleId = `${at}`;
 
                             const { [circleId]: existent, ...restOfCirles } =
-                              prev.circlesMap || {};
+                              prev.state.circlesMap || {};
 
                             return {
                               ...prev,
-                              circlesMap: {
-                                ...restOfCirles,
-                                ...(!!existent
-                                  ? undefined // Set it to undefined if same
-                                  : { [circleId]: circleTuple }),
+                              state: {
+                                ...prev.state,
+                                circlesMap: {
+                                  ...restOfCirles,
+                                  ...(!!existent
+                                    ? undefined // Set it to undefined if same
+                                    : { [circleId]: circleTuple }),
+                                },
                               },
                             };
                           });
@@ -224,14 +248,17 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         onClearCircles={() => {
                           setEditMode((prev) => ({
                             ...prev,
-                            circlesMap: {},
+                            state: {
+                              ...prev.state,
+                              circlesMap: {},
+                            }
                           }));
                         }}
                         onFlipBoard={() => {
-                          setEditMode((prev) => ({
-                            ...prev,
-                            orientation: swapColor(prev.orientation),
-                          }));
+                          // setEditMode((prev) => ({
+                          //   ...prev,
+                          //   orientation: swapColor(prev.orientation),
+                          // }));
                           // dispatch({
                           //   type: 'changeBoardOrientation',
                           //   payload:
@@ -326,180 +353,295 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
                 if (editMode.isActive) {
                   return (
-                    <Tabs
-                      containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
-                      headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
-                      contentClassName="flex-1 flex min-h-0"
-                      currentIndex={0}
-                      renderContainerHeader={({ tabs, focus }) => (
-                        <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">
-                          {tabs.map((c) => c)}
-                          <div className="flex-1" />
-
-                          {settings.isInstructor && (
-                            <>
-                              {editMode.isActive ? (
-                                <>
-                                  <Button
-                                    // className="bg-red-400 hover:bg-red-600 active:bg-red-800 font-bold"
-                                    onClick={() => {
-                                      setEditMode((prev) => ({
-                                        ...prev,
-                                        isActive: false,
-                                      }));
-                                    }}
-                                    // type="custom"
-                                    type="secondary"
-                                    size="sm"
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    className="bg-green-400 hover:bg-green-600 active:bg-green-800 font-bold"
-                                    onClick={() => {
-                                      dispatch({
-                                        type: 'importFen',
-                                        payload: editMode.fen,
-                                      });
-
-                                      setEditMode((prev) => ({
-                                        ...prev,
-                                        isActive: false,
-                                      }));
-                                    }}
-                                    type="custom"
-                                    size="sm"
-                                  >
-                                    Use Board
-                                  </Button>
-                                </>
-                              ) : (
-                                <Button
-                                  className="bg-indigo-400 hover:bg-indigo-600 active:bg-indigo-800 font-bold"
-                                  onClick={() => {
-                                    setEditMode(() => ({
-                                      isActive: true,
-                                      fen: activityState.fen,
-                                      circlesMap: {},
-                                      arrowsMap: {},
-                                      orientation:
-                                        activityState.boardOrientation,
-                                    }));
-                                  }}
-                                  type="custom"
-                                  size="sm"
-                                  icon="PencilSquareIcon"
-                                >
-                                  Edit Lesson
-                                </Button>
-                              )}
-                            </>
-                          )}
-                        </div>
-                      )}
-                      tabs={[
-                        {
-                          renderHeader: (p) => (
-                            <Button
-                              onClick={p.focus}
-                              size="sm"
-                              type="secondary"
-                              isActive={p.isFocused}
-                            >
-                              Edit Chapters
-                            </Button>
-                          ),
-                          renderContent: () => {
-                            return (
-                              <ChaptersTab
-                                canEdit
-                                fen={editMode.fen}
-                                chaptersMap={activityState.chaptersMap}
-                                className="min-h-0"
-                                onUseChapter={(id) => {
-                                  const nextChapter =
-                                    activityState.chaptersMap[id];
-
-                                  setEditMode((prev) => ({
-                                    ...prev,
-                                    fen: nextChapter.fen,
-                                    arrowsMap: nextChapter.arrowsMap || {},
-                                    circlesMap: nextChapter.circlesMap || {},
-                                    orientation: nextChapter.orientation,
-                                  }));
-                                }}
-                                onDeleteChapter={(id) => {
-                                  dispatch({
-                                    type: 'deleteChapter',
-                                    payload: { id },
-                                  });
-                                }}
-                                onCreate={(name) => {
-                                  dispatch({
-                                    type: 'createChapter',
-                                    payload: {
-                                      name,
-                                      fen: editMode.fen,
-                                      arrowsMap: editMode.arrowsMap,
-                                      circlesMap: editMode.circlesMap,
-                                      orientation:
-                                        activityState.boardOrientation,
-                                    },
-                                  });
-                                }}
-                                onUpdateChapter={(id, state) => {
-                                  // console.log('on dpate chapter', id, state);
-                                  dispatch({
-                                    type: 'updateChapter',
-                                    payload: { id, state },
-                                  });
-                                }}
-                              />
-                            );
+                    <EditChaptersWidget
+                      boardState={editMode.state}
+                      chaptersMap={activityState.chaptersMap}
+                      onCreate={(s) => {
+                        dispatch({
+                          type: 'createChapter',
+                          payload: {
+                            name: s.name,
+                            fen: s.fen,
+                            arrowsMap: editMode.state.arrowsMap,
+                            circlesMap: editMode.state.circlesMap,
                           },
-                        },
-                        {
-                          renderHeader: (p) => (
-                            <Button
-                              onClick={p.focus}
-                              size="sm"
-                              type="secondary"
-                              isActive={p.isFocused}
-                            >
-                              Import
-                            </Button>
-                          ),
-                          renderContent: (p) => (
-                            <PgnInputBox
-                              containerClassName="flex-1 h-full"
-                              contentClassName="p-3 bg-slate-600 rounded-b-lg"
-                              onChange={(inputType, nextInput) => {
-                                if (inputType === 'FEN') {
-                                  dispatch({
-                                    type: 'importFen',
-                                    payload: nextInput,
-                                  });
-                                } else if (inputType === 'PGN') {
-                                  dispatch({
-                                    type: 'importPgn',
-                                    payload: nextInput,
-                                  });
-                                }
+                        });
+                      }}
+                      onDeleteChapter={(id) => {
+                        dispatch({
+                          type: 'deleteChapter',
+                          payload: { id },
+                        });
+                      }}
+                      onUpdateChapter={(id, state) => {
+                        dispatch({
+                          type: 'updateChapter',
+                          payload: { id, state },
+                        });
+                      }}
+                      onUpdateFen={(fen) => {
+                        setEditMode((prev) => ({
+                          ...prev,
+                          state: {
+                            ...prev.state,
+                            fen,
+                          },
+                        }));
+                      }}
+                      onExitEditMode={() => {
+                        router.push(
+                          `${currentPathName}?${updatedableSearchParams.set(
+                            (prev) => ({
+                              ...prev,
+                              edit: undefined,
+                            })
+                          )}`
+                        );
+                      }}
+                      onUseChapter={(id) => {
+                        const nextChapter = activityState.chaptersMap[id];
 
-                                // setTimeout(() => {
-                                // setEditMode((prev) => ({
-                                //   ...prev,
-                                //   fen: ChessFENBoard.STARTING_FEN,
-                                // }));
-                                // }, 1000);
-                                p.focus(0);
-                              }}
-                            />
-                          ),
-                        },
-                      ]}
+                        setEditMode((prev) => ({
+                          ...prev,
+                          state: {
+                            ...prev.state,
+                            fen: nextChapter.fen,
+                            arrowsMap: nextChapter.arrowsMap,
+                            circlesMap: nextChapter.circlesMap,
+                          },
+                        }));
+                      }}
+                      onUseCurrentBoard={() => {
+                        dispatch({
+                          type: 'importFen',
+                          payload: editMode.state.fen,
+                        });
+
+                        router.push(
+                          `${currentPathName}?${updatedableSearchParams.set(
+                            (prev) => ({
+                              ...prev,
+                              edit: undefined,
+                            })
+                          )}`
+                        );
+                      }}
+                      onClearArrowsAndCircles={() => {
+                        setEditMode((prev) => ({
+                          ...prev,
+                          state: {
+                            ...prev.state,
+                            arrowsMap: undefined,
+                            circlesMap: undefined,
+                          },
+                        }));
+                      }}
                     />
                   );
+
+                  // return (
+                  //   <EditChaptersTab
+                  //     canEdit
+                  //     chaptersMap={activityState.chaptersMap}
+                  //     className="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
+                  //     boardFen={editMode.fen}
+                  //     onCreate={(name) => {
+                  //       dispatch({
+                  //         type: 'createChapter',
+                  //         payload: {
+                  //           arrowsMap: editMode.arrowsMap,
+                  //           circlesMap: editMode.circlesMap,
+                  //           fen: editMode.fen,
+                  //           name,
+                  //         },
+                  //       });
+                  //     }}
+                  //     onUseBoard={() => {
+                  //       dispatch({
+                  //         type: 'importFen',
+                  //         payload: editMode.fen,
+                  //       });
+
+                  //       router.push(
+                  //         `${currentPathName}?${updatedableSearchParams.set(
+                  //           (prev) => ({
+                  //             ...prev,
+                  //             edit: undefined,
+                  //           })
+                  //         )}`
+                  //       );
+
+                  //       // setEditMode((prev) => ({
+                  //       //   ...prev,
+                  //       //   isActive: false,
+                  //       // }));
+                  //     }}
+                  //     onUpdateFen={(fen) =>
+                  //       setEditMode((prev) => ({
+                  //         ...prev,
+                  //         fen,
+                  //       }))
+                  //     }
+                  //   />
+                  // );
+                  // return (
+                  //   <Tabs
+                  //     containerClassName="bg-slate-700 p-3 flex flex-col flex-1 min-h-0 soverflow-hidden rounded-lg shadow-2xl"
+                  //     headerContainerClassName="flex gap-3 pb-3 border-b border-slate-500"
+                  //     contentClassName="flex-1 flex min-h-0"
+                  //     currentIndex={0}
+                  //     renderContainerHeader={({ tabs, focus }) => (
+                  //       <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">
+                  //         {tabs.map((c) => c)}
+                  //         <div className="flex-1" />
+
+                  //         {settings.isInstructor && (
+                  //           <>
+                  //             <Button
+                  //               // className="bg-red-400 hover:bg-red-600 active:bg-red-800 font-bold"
+                  //               onClick={() => {
+                  //                 setEditMode((prev) => ({
+                  //                   ...prev,
+                  //                   isActive: false,
+                  //                 }));
+                  //               }}
+                  //               // type="custom"
+                  //               type="secondary"
+                  //               size="sm"
+                  //             >
+                  //               Cancel
+                  //             </Button>
+                  //             <Button
+                  //               className="bg-green-400 hover:bg-green-600 active:bg-green-800 font-bold"
+                  //               onClick={() => {
+                  //                 dispatch({
+                  //                   type: 'importFen',
+                  //                   payload: editMode.fen,
+                  //                 });
+
+                  //                 setEditMode((prev) => ({
+                  //                   ...prev,
+                  //                   isActive: false,
+                  //                 }));
+                  //               }}
+                  //               type="custom"
+                  //               size="sm"
+                  //             >
+                  //               Use Board
+                  //             </Button>
+                  //           </>
+                  //         )}
+                  //       </div>
+                  //     )}
+                  //     tabs={[
+                  //       {
+                  //         renderHeader: (p) => (
+                  //           <Button
+                  //             onClick={p.focus}
+                  //             size="sm"
+                  //             type="secondary"
+                  //             isActive={p.isFocused}
+                  //           >
+                  //             Edit Chapters
+                  //           </Button>
+                  //         ),
+                  //         renderContent: () => {
+                  //           return (
+                  //             <ChaptersTab
+                  //               canEdit
+                  //               fen={editMode.fen}
+                  //               chaptersMap={activityState.chaptersMap}
+                  //               className="min-h-0"
+                  //               onUseChapter={(id) => {
+                  //                 const nextChapter =
+                  //                   activityState.chaptersMap[id];
+
+                  //                 setEditMode((prev) => ({
+                  //                   ...prev,
+                  //                   fen: nextChapter.fen,
+                  //                   arrowsMap: nextChapter.arrowsMap || {},
+                  //                   circlesMap: nextChapter.circlesMap || {},
+                  //                   orientation: nextChapter.orientation,
+                  //                 }));
+                  //               }}
+                  //               onDeleteChapter={(id) => {
+                  //                 dispatch({
+                  //                   type: 'deleteChapter',
+                  //                   payload: { id },
+                  //                 });
+                  //               }}
+                  //               onCreate={(name) => {
+                  //                 dispatch({
+                  //                   type: 'createChapter',
+                  //                   payload: {
+                  //                     name,
+                  //                     fen: editMode.fen,
+                  //                     arrowsMap: editMode.arrowsMap,
+                  //                     circlesMap: editMode.circlesMap,
+                  //                     orientation:
+                  //                       activityState.boardOrientation,
+                  //                   },
+                  //                 });
+                  //               }}
+                  //               onDeleteChapter={(id) => {
+                  //                 dispatch({
+                  //                   type: 'deleteChapter',
+                  //                   payload: { id },
+                  //                 });
+                  //               }}
+                  //               onUpdateChapter={(id, state) => {
+                  //                 // console.log('on dpate chapter', id, state);
+                  //                 dispatch({
+                  //                   type: 'updateChapter',
+                  //                   payload: { id, state },
+                  //                 });
+                  //               }}
+                  //             />
+                  //           );
+                  //         },
+                  //       },
+                  //       {
+                  //         renderHeader: (p) => (
+                  //           <Button
+                  //             onClick={p.focus}
+                  //             size="sm"
+                  //             type="secondary"
+                  //             isActive={p.isFocused}
+                  //           >
+                  //             Import
+                  //           </Button>
+                  //         ),
+                  //         renderContent: (p) => (
+                  //           <PgnInputBox
+                  //             containerClassName="flex-1 h-full"
+                  //             contentClassName="p-3 bg-slate-600 rounded-b-lg"
+                  //             onChange={(inputType, nextInput) => {
+                  //               if (inputType === 'FEN') {
+                  //                 dispatch({
+                  //                   type: 'importFen',
+                  //                   payload: nextInput,
+                  //                 });
+                  //               } else if (inputType === 'PGN') {
+                  //                 dispatch({
+                  //                   type: 'importPgn',
+                  //                   payload: nextInput,
+                  //                 });
+                  //               }
+
+                  //               // setTimeout(() => {
+                  //               // setEditMode((prev) => ({
+                  //               //   ...prev,
+                  //               //   fen: ChessFENBoard.STARTING_FEN,
+                  //               // }));
+                  //               // }, 1000);
+                  //               p.focus(0);
+                  //             }}
+                  //           />
+                  //         ),
+                  //       },
+                  //     ]}
+                  //   />
+                  // );
                 }
 
                 return (
@@ -511,66 +653,25 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                     renderContainerHeader={({ tabs, focus }) => (
                       <div className="flex flex-row gap-3 pb-3 border-b border-slate-500">
                         {tabs.map((c) => c)}
-                        <div className="flex-1" />
+                        {/* <div className="flex-1" />
 
-                        {settings.isInstructor && (
-                          <>
-                            {editMode.isActive ? (
-                              <>
-                                <Button
-                                  // className="bg-red-400 hover:bg-red-600 active:bg-red-800 font-bold"
-                                  onClick={() => {
-                                    setEditMode((prev) => ({
-                                      ...prev,
-                                      isActive: false,
-                                    }));
-                                  }}
-                                  // type="custom"
-                                  type="secondary"
-                                  size="sm"
-                                >
-                                  Cancel
-                                </Button>
-                                <Button
-                                  className="bg-green-400 hover:bg-green-600 active:bg-green-800 font-bold"
-                                  onClick={() => {
-                                    dispatch({
-                                      type: 'importFen',
-                                      payload: editMode.fen,
-                                    });
-
-                                    setEditMode((prev) => ({
-                                      ...prev,
-                                      isActive: false,
-                                    }));
-                                  }}
-                                  type="custom"
-                                  size="sm"
-                                >
-                                  Use Board
-                                </Button>
-                              </>
-                            ) : (
-                              <Button
-                                className="bg-indigo-400 hover:bg-indigo-600 active:bg-indigo-800 font-bold"
-                                onClick={() => {
-                                  setEditMode({
-                                    isActive: true,
-                                    fen: activityState.fen,
-                                    circlesMap: {},
-                                    arrowsMap: {},
-                                    orientation: activityState.boardOrientation,
-                                  });
-                                }}
-                                type="custom"
-                                size="sm"
-                                icon="PencilSquareIcon"
-                              >
-                                Edit
-                              </Button>
-                            )}
-                          </>
-                        )}
+                        <Button
+                          className="bg-indigo-400 hover:bg-indigo-600 active:bg-indigo-800 font-bold"
+                          onClick={() => {
+                            setEditMode({
+                              isActive: true,
+                              fen: activityState.fen,
+                              circlesMap: {},
+                              arrowsMap: {},
+                              orientation: activityState.boardOrientation,
+                            });
+                          }}
+                          type="custom"
+                          size="sm"
+                          icon="PencilSquareIcon"
+                        >
+                          Edit
+                        </Button> */}
                       </div>
                     )}
                     tabs={[
@@ -625,7 +726,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                             ),
                             renderContent: () => (
                               <ChaptersTab
-                                fen={editMode.fen}
+                                boardFen={editMode.state.fen}
                                 chaptersMap={activityState.chaptersMap}
                                 className="min-h-0"
                                 onUseChapter={(id) => {
@@ -671,7 +772,10 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                   // setTimeout(() => {
                                   setEditMode((prev) => ({
                                     ...prev,
-                                    fen: ChessFENBoard.STARTING_FEN,
+                                    state: {
+                                      ...prev.state,
+                                      fen: ChessFENBoard.STARTING_FEN,
+                                    },
                                   }));
                                   // }, 1000);
                                   p.focus(0);

@@ -239,7 +239,7 @@ export const BoardEditor = ({
           </DropContainer>
 
           <div className="flex flex-col">
-            <div className="flex flex-1 flex-col gap-3">
+            {/* <div className="flex flex-1 flex-col gap-3">
               <Icon
                 name="ArrowsUpDownIcon"
                 className="h-5 w-5 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
@@ -269,7 +269,7 @@ export const BoardEditor = ({
                   resetArrowsAndCircles();
                 }}
               />
-            </div>
+            </div> */}
 
             <div className="flex-1" />
           </div>

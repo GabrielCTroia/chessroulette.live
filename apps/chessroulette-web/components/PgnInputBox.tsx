@@ -12,6 +12,7 @@ type Props = {
   isInvalid?: boolean;
   containerClassName?: string;
   contentClassName?: string;
+  compact?: boolean;
 };
 
 const isValidFenOrPGN = (input: string): Result<'FEN' | 'PGN', void> => {
@@ -28,7 +29,11 @@ const isValidFenOrPGN = (input: string): Result<'FEN' | 'PGN', void> => {
   return Err.EMPTY;
 };
 
-export const PgnInputBox: React.FC<Props> = ({ value = '', ...props }) => {
+export const PgnInputBox: React.FC<Props> = ({
+  value = '',
+  compact = false,
+  ...props
+}) => {
   const [input, setInput] = useState<string>();
   const [validType, setValidType] = useState<'FEN' | 'PGN' | null>();
 
@@ -46,6 +51,41 @@ export const PgnInputBox: React.FC<Props> = ({ value = '', ...props }) => {
     250,
     [input]
   );
+
+  if (compact) {
+    return (
+      <DragAndDrop
+        fileTypes={['PGN', 'FEN', 'TXT']}
+        className={`border-dashed border rounded-md border-slate-600 text-gray-300 ${props.containerClassName}`}
+        onUpload={(f: any) => {
+          // TODO: Validate PGN
+
+          const fileData = new FileReader();
+          fileData.onloadend = (s) => {
+            if (s.target && typeof s.target.result === 'string') {
+              // setInput(s.target.result);
+              const input = s.target.result;
+
+              if (!input) {
+                return;
+              }
+
+              if (ChessFENBoard.validateFenString(input).ok) {
+                props.onChange('FEN', input);
+              } else if (isValidPgn(input)) {
+                props.onChange('PGN', input);
+              }
+            }
+          };
+          fileData.readAsText(f);
+        }}
+      >
+        <div className="border p-2 border-dashed rounded-md cursor-pointer">
+          Upload or Drop a PGN or FEN File
+        </div>
+      </DragAndDrop>
+    );
+  }
 
   return (
     <div className={`flex flex-col flex-1 gap-3 ${props.containerClassName}`}>

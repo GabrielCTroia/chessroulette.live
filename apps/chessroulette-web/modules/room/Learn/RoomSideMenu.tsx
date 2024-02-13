@@ -24,8 +24,10 @@ export const RoomSideMenu = () => {
       return '';
     }
 
+    // TODO: All of these should be somewhere else
     url.searchParams.set('userId', String(nextUserId));
     url.searchParams.delete('instructor');
+    url.searchParams.delete('edit');
 
     return url.href;
   }, [url, nextUserId]);

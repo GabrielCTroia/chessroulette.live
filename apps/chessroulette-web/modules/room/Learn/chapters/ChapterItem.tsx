@@ -2,6 +2,11 @@ import { useEffect, useState } from 'react';
 import { Button } from 'apps/chessroulette-web/components/Button';
 import { Chapter, ChapterState } from '../../activity/reducer';
 import { noop } from '@xmatter/util-kit';
+import { FenPreview } from '../components/FenPreview';
+
+import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
+import { DragAndDrop } from 'apps/chessroulette-web/components/DragAndDrop';
+import { Text } from 'apps/chessroulette-web/components/Text';
 
 export type Props = {
   chapter: Chapter;
@@ -9,6 +14,7 @@ export type Props = {
   onUse?: () => void;
   onDelete?: () => void;
   onUpdate?: (s: Partial<ChapterState>) => void;
+  expanded?: boolean;
 };
 
 export const ChapterItem = ({
@@ -17,6 +23,7 @@ export const ChapterItem = ({
   onUpdate = noop,
   onUse = noop,
   onDelete = noop,
+  expanded = true,
 }: Props) => {
   const [uncommitedState, setUncommitedState] =
     useState<Partial<ChapterState>>();
@@ -31,51 +38,10 @@ export const ChapterItem = ({
   return (
     <div
       key={chapter.id}
-      className="flex flex-1 py-2 border-b border-slate-400 hover:cursor-pointer hover:bg-slate-600 "
+      className="flex flex-1 flex-col gap-2 pt-2 hover:cursor-pointer hover:bg-slate-600 p-2 py-3 border-b border-slate-400"
+      onClick={onUse}
     >
-      <div className="flex-1 flex items-center" onClick={onUse}>
-        <input
-          className="w-fulls text-sm rounded-md hover:border-slate-400 focus:border-slate-400 border border-transparent block bg-transparent text-white block py-1 px-2"
-          value={uncommitedState?.name ?? chapter.name}
-          onChange={(e) => {
-            setUncommitedState((prev) => ({
-              ...prev,
-              name: e.target.value,
-            }));
-          }}
-        />
-      </div>
-      {canEdit && (
-        <div className="flex flex-1 align-end justify-end gap-2">
-          {uncommitedState ? (
-            <>
-              <Button
-                size="xs"
-                // type="clear"
-                disabled={uncommitedState?.name === ''}
-                onClick={() => {
-                  onUpdate(uncommitedState);
-                }}
-              >
-                Save
-              </Button>
-              <Button
-                size="xs"
-                type="clear"
-                onClick={() => {
-                  setUncommitedState(undefined);
-                }}
-              >
-                Cancel
-              </Button>
-            </>
-          ) : (
-            <Button size="xs" type="clear" onClick={onDelete} icon="TrashIcon" iconKind="outline">
-              Delete
-            </Button>
-          )}
-        </div>
-      )}
+        {chapter.name}
     </div>
   );
 };
