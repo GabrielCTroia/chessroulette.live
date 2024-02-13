@@ -1,3 +1,5 @@
+'use client';
+
 import { DependencyList, useMemo } from 'react';
 
 export const useCallbackIf = <T extends Function>(

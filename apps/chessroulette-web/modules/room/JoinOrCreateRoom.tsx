@@ -10,22 +10,17 @@ import {
   toResourceIdentifierObj,
   toResourceIdentifierStr,
 } from 'movex-core-util';
-import { Ok } from 'ts-results';
+
 import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
 import { getRandomInt } from 'apps/chessroulette-web/util';
+import { links } from './links';
 
 type Props = {
-  // rid: ResourceIdentifier<'room'>;
   id: string;
   activity: 'learn'; // To expand in the future
-  forwardSearchParamsString?: string; // These are the search Params
 };
 
-export const JoinOrCreateRoom: React.FC<Props> = ({
-  activity,
-  id,
-  forwardSearchParamsString = '',
-}: Props) => {
+export const JoinOrCreateRoom: React.FC<Props> = ({ activity, id }: Props) => {
   const roomResource = useMovexResourceType(movexConfig, 'room');
   const router = useRouter();
   const updateableSearchParams = useUpdateableSearchParams();
@@ -49,24 +44,14 @@ export const JoinOrCreateRoom: React.FC<Props> = ({
           )
         )
         .map((r) => {
-          // `${pathname}?` +
-          //           updateableSearchParams.set((prev) => ({
-          //             ...prev,
-          //             userId: prev.userId || getRandomInt(0, 999),
-          //             theme: 'outpost',
-          //             instructor: 1,
-          //           }))
-
           router.replace(
-            `/r/learn/${
-              toResourceIdentifierObj(r.rid).resourceId
-            }?${forwardSearchParamsString}` +
-              updateableSearchParams.set((prev) => ({
-                userId: prev.userId || getRandomInt(0, 999),
-              }))
-            // `/r/learn/${
-            //   toResourceIdentifierObj(r.rid).resourceId
-            // }?${forwardSearchParamsString}`
+            links.getRoomLink({
+              ...updateableSearchParams.toObject(),
+              id: toResourceIdentifierObj(r.rid).resourceId,
+              activity: 'learn',
+              userId:
+                updateableSearchParams.get('userId') || getRandomInt(0, 999),
+            })
           );
         });
     }

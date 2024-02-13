@@ -18,11 +18,14 @@ const paramsSchema = z.object({
 
 export default function Page({
   searchParams,
+  params,
 }: {
   searchParams: Record<string, string>;
+  params: Record<string, string>;
 }) {
-  const params = new URLSearchParams(searchParams);
-  const result = paramsSchema.safeParse(Object.fromEntries(params));
+  const result = paramsSchema.safeParse(
+    Object.fromEntries(new URLSearchParams({ ...searchParams, ...params }))
+  );
 
   if (!result.success) {
     return <>{JSON.stringify(result.error)}</>;
@@ -41,6 +44,11 @@ export default function Page({
   // TODO: Here the room can be created on demand via the API
 
   // const formattedId = `${client}${id}`;
+  // return (
+  //   <div>
+  //     works {activity} {id}
+  //   </div>
+  // )
 
   return (
     <JoinOrCreateRoom

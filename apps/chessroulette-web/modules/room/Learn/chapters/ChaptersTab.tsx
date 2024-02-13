@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { objectKeys } from 'movex-core-util';
 import { ChapterItem } from './ChapterItem';
 import { Button } from 'apps/chessroulette-web/components/Button';
-import { links, useCurrentRoomLinks } from '../../links';
+import { useCurrentRoomLinks } from '../../hooks/useCurrentLinks';
 
 export type Props = {
   boardFen: ChessFEN;

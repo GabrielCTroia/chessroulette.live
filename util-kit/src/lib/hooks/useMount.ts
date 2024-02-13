@@ -1,3 +1,5 @@
+'use client';
+
 import { EffectCallback, useCallback, useEffect, useRef } from 'react';
 
 export const useMount = (mount: EffectCallback) => useEffect(mount, []);

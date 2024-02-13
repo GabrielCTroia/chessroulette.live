@@ -10,8 +10,6 @@ import { Button } from 'apps/chessroulette-web/components/Button';
 import { Icon } from 'apps/chessroulette-web/components/Icon';
 import { useRouter, usePathname } from 'next/navigation';
 import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
-// import { Router } from 'next/router';
-// import {} from 'ne'
 
 export const RoomSideMenu = () => {
   const router = useRouter();
@@ -67,16 +65,7 @@ export const RoomSideMenu = () => {
                 edit: '1',
               }));
 
-              // console.log('searchParams', searchParams.toObject());
-
               router.push(`${pathName}?${nextSearchParams}`);
-              // setEditMode({
-              //   isActive: true,
-              //   fen: activityState.fen,
-              //   circlesMap: {},
-              //   arrowsMap: {},
-              //   orientation: activityState.boardOrientation,
-              // });
             }}
             type="custom"
             size="sm"

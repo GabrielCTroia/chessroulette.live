@@ -1,9 +1,6 @@
-import { keyInObject, toDictIndexedBy } from '@xmatter/util-kit';
-import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
-import { objectKeys } from 'movex-core-util';
-import { useRouter, useParams } from 'next/navigation';
+import { objectKeys, toDictIndexedBy } from '@xmatter/util-kit';
 
-type RoomParams = {
+export type RoomLinkParams = {
   instructor?: boolean;
   edit?: boolean;
   theme?: string;
@@ -14,72 +11,57 @@ export const links = {
     {
       id,
       activity,
-      instructor,
-      edit,
-      theme,
       ...params
     }: {
       id: string;
       activity: 'learn'; // Add more
-    } & RoomParams,
+    } & RoomLinkParams,
     nav?: {
       origin: string;
     }
-  ) => {
-    const searchParams = new URLSearchParams(
-      toDictIndexedBy(
-        objectKeys(params),
-        (key) => String(key),
-        (key) => String(params[key])
-      )
-    );
-
-    if (instructor) {
-      searchParams.set('instructor', '1');
+  ) =>
+    `${nav?.origin ?? ''}/r/${activity}/${id}?${toSearchParams(
+      params
+    ).toString()}`,
+  getOnDemandRoomCreationLink: (
+    {
+      id,
+      ...params
+    }: {
+      id: string;
+      activity: 'learn'; // Add more
+    } & RoomLinkParams,
+    nav?: {
+      origin: string;
     }
-
-    if (edit) {
-      searchParams.set('edit', '1');
-    }
-
-    if (theme) {
-      searchParams.set('theme', theme);
-    }
-
-    return `${
-      nav?.origin ?? ''
-    }/r/${activity}/${id}?${searchParams.toString()}`;
-  },
+  ) => `${nav?.origin ?? ''}/r/new/${id}?${toSearchParams(params).toString()}`,
 };
 
-export const useCurrentRoomLinks = () => {
-  const router = useRouter();
-  const searchParams = useUpdateableSearchParams();
-  const currentParams = useParams();
+const toSearchParams = ({
+  instructor,
+  edit,
+  theme,
+  ...params
+}: RoomLinkParams) => {
+  const searchParams = new URLSearchParams(
+    toDictIndexedBy(
+      objectKeys(params),
+      (key) => String(key),
+      (key) => String(params[key])
+    )
+  );
 
-  return {
-    setForCurrentRoom: (params: RoomParams) => {
-      if (
-        !(
-          keyInObject(currentParams, 'rid') &&
-          typeof currentParams.rid === 'string'
-        )
-      ) {
-        throw new Error('UsecurrentRoom: The room Id must be a string');
-      }
+  if (instructor) {
+    searchParams.set('instructor', '1');
+  }
 
-      const roomId = currentParams.rid;
+  if (edit) {
+    searchParams.set('edit', '1');
+  }
 
-      const prevParams = searchParams.toObject();
+  if (theme) {
+    searchParams.set('theme', theme);
+  }
 
-      const link = links.getRoomLink({
-        id: roomId,
-        activity: 'learn', // this should change
-        ...prevParams,
-        ...params,
-      });
-
-      router.push(link);
-    },
-  };
+  return searchParams;
 };

@@ -29,7 +29,7 @@ export function GET(request: NextRequest) {
 
   const roomId = client.slice(0, 3) + getRandomStr(7);
 
-  const instructor = links.getRoomLink(
+  const instructor = links.getOnDemandRoomCreationLink(
     {
       id: roomId,
       activity,
@@ -39,7 +39,7 @@ export function GET(request: NextRequest) {
     request.nextUrl
   );
 
-  const student = links.getRoomLink(
+  const student = links.getOnDemandRoomCreationLink(
     {
       id: roomId,
       activity,
