@@ -26,6 +26,7 @@ import {
   TrashIcon,
   ArrowPathIcon,
 } from '@heroicons/react/16/solid';
+import { Icon } from '../../Icon';
 
 type Props = Pick<
   ChessboardContainerProps,
@@ -239,13 +240,17 @@ export const BoardEditor = ({
 
           <div className="flex flex-col">
             <div className="flex flex-1 flex-col gap-3">
-              <ArrowsUpDownIcon
-                className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
+              <Icon
+                name="ArrowsUpDownIcon"
+                className="h-5 w-5 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
                 title="Flip Board"
+                kind='outline'
                 onClick={onFlipBoard}
               />
-              <TrashIcon
-                className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
+              <Icon
+                name="TrashIcon"
+                kind='outline'
+                className="h-5 w-5 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
                 title="Clear Board"
                 onClick={() => {
                   onUpdated('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
@@ -253,8 +258,10 @@ export const BoardEditor = ({
                   resetArrowsAndCircles();
                 }}
               />
-              <ArrowPathIcon
-                className="h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
+              <Icon
+                name='ArrowPathIcon'
+                kind="outline"
+                className="h-5 w-5 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
                 title="Starting Position"
                 onClick={() => {
                   onUpdated(ChessFENBoard.STARTING_FEN);

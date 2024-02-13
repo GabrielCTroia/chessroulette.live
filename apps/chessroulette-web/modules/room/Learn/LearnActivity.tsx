@@ -20,7 +20,6 @@ import Streaming from '../Streaming';
 import { PgnInputBox } from 'apps/chessroulette-web/components/PgnInputBox';
 import { Button } from 'apps/chessroulette-web/components/Button';
 import { Tabs } from 'apps/chessroulette-web/components/Tabs';
-
 import { Square } from 'react-chessboard/dist/chessboard/types';
 import { SquareMap, ArrowsMap, CirclesMap } from '../activity/reducer';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
@@ -32,6 +31,8 @@ import { Freeboard } from 'apps/chessroulette-web/components/Chessboard/Freeboar
 import { Playboard } from 'apps/chessroulette-web/components/Chessboard/Playboard';
 import { FenPreview } from './components/FenPreview';
 import { ChaptersTab } from './chapters/ChaptersTab';
+import { Icon } from 'apps/chessroulette-web/components/Icon';
+import { useSearchParams } from 'next/navigation';
 
 // type ChessColor = 'white' | 'black';
 
@@ -48,6 +49,10 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   const userId = useUserId();
   const settings = useLearnActivitySettings();
 
+  const searchParams = useSearchParams();
+
+  const isEditParamsSet = searchParams.get('edit') === '1';
+
   const [editMode, setEditMode] = useState<{
     isActive: boolean;
     fen: ChessFEN;
@@ -55,7 +60,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
     circlesMap?: CirclesMap;
     orientation: ChessColor;
   }>({
-    isActive: true,
+    isActive: isEditParamsSet,
     fen: ChessFENBoard.STARTING_FEN,
     orientation: playingColor,
   }); // TODO: Set it so it's coming from the state (url)
@@ -70,8 +75,12 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
   }, []);
 
   useEffect(() => {
-    console.log('Edit Mode State Updated', editMode);
-  }, [editMode]);
+    // console.log('Edit Mode State Updated', editMode);
+    setEditMode((prev) => ({
+      ...prev,
+      isActive: isEditParamsSet,
+    }))
+  }, [isEditParamsSet]);
 
   return (
     <LearnTemplate
@@ -266,7 +275,9 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                     <div className="flex flex-col p-1 pt-0 pb-0">
                       {!editMode.isActive && settings.canFlipBoard && (
                         <div className="mb-2">
-                          <ArrowsUpDownIcon
+                          <Icon
+                            name="ArrowsUpDownIcon"
+                            kind="outline"
                             className=" h-6 w-6 hover:bg-slate-300 hover:cursor-pointer hover:text-black hover:rounded-lg"
                             title="Flip Board"
                             onClick={() => {
@@ -392,9 +403,8 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                             <Button
                               onClick={p.focus}
                               size="sm"
-                              className={`bg-slate-600 font-bold hover:bg-slate-800 ${
-                                p.isFocused && 'bg-slate-800'
-                              }`}
+                              type="secondary"
+                              isActive={p.isFocused}
                             >
                               Edit Chapters
                             </Button>
@@ -436,8 +446,13 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                         activityState.boardOrientation,
                                     },
                                   });
-
-                                  setTimeout(() => {});
+                                }}
+                                onUpdateChapter={(id, state) => {
+                                  // console.log('on dpate chapter', id, state);
+                                  dispatch({
+                                    type: 'updateChapter',
+                                    payload: { id, state },
+                                  });
                                 }}
                               />
                             );
@@ -448,9 +463,8 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                             <Button
                               onClick={p.focus}
                               size="sm"
-                              className={`bg-slate-600 font-bold hover:bg-slate-800 ${
-                                p.isFocused && 'bg-slate-800'
-                              }`}
+                              type="secondary"
+                              isActive={p.isFocused}
                             >
                               Import
                             </Button>
@@ -552,7 +566,7 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                 size="sm"
                                 icon="PencilSquareIcon"
                               >
-                                Edit Board
+                                Edit
                               </Button>
                             )}
                           </>
@@ -605,7 +619,8 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                   p.isFocused && 'bg-slate-800'
                                 }`}
                               >
-                                Chapters
+                                Chapters (
+                                {Object.keys(activityState.chaptersMap).length})
                               </Button>
                             ),
                             renderContent: () => (
@@ -618,27 +633,6 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                                     type: 'playChapter',
                                     payload: { id },
                                   });
-                                }}
-                                onDeleteChapter={(id) => {
-                                  dispatch({
-                                    type: 'deleteChapter',
-                                    payload: { id },
-                                  });
-                                }}
-                                onCreate={(name) => {
-                                  dispatch({
-                                    type: 'createChapter',
-                                    payload: {
-                                      name,
-                                      fen: editMode.fen,
-                                      arrowsMap: editMode.arrowsMap,
-                                      circlesMap: editMode.circlesMap,
-                                      orientation:
-                                        activityState.boardOrientation,
-                                    },
-                                  });
-
-                                  setTimeout(() => {});
                                 }}
                               />
                             ),

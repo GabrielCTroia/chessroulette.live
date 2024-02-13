@@ -58,11 +58,14 @@ export const initialActivtityState: ActivityState = {
 
 export type Chapter = {
   id: string;
+  createdAt: number;
+} & ChapterState;
+
+export type ChapterState = {
   name: string;
   fen: ChessFEN;
   arrowsMap?: ArrowsMap;
   circlesMap?: CirclesMap;
-  createdAt: number;
   orientation: ChessColor;
 };
 
@@ -94,12 +97,12 @@ export type ActivityActions =
   | Action<'arrowChange', ArrowsMap>
   | Action<'drawCircle', CircleDrawTuple>
   | Action<'clearCircles'>
-  | Action<'createChapter', Omit<Chapter, 'id' | 'createdAt'>>
+  | Action<'createChapter', ChapterState>
   | Action<
       'updateChapter',
       {
         id: Chapter['id'];
-        state: Partial<Omit<Chapter, 'id' | 'createdAt'>>;
+        state: Partial<ChapterState>;
       }
     >
   | Action<'deleteChapter', { id: Chapter['id'] }>

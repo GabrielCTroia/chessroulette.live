@@ -13,6 +13,11 @@ module.exports = {
   theme: {
     extend: {},
   },
+  safelist: [
+    {
+      pattern: /bg-*-.+/,
+    }
+  ],
   //   aspectRatio: {
   //     auto: 'auto',
   //     square: '1 / 1',

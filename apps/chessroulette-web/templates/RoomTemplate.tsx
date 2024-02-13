@@ -35,7 +35,7 @@ export default function RoomTemplate(props: Props) {
       <menu className="bg-slate-700 flex-0 flex flex-col p-2">
         <OnboardingWidget session={props.session} />
         <div className="pb-6 border-b border-slate-500 mb-4" />
-        <RoomSideMenu  />
+        <RoomSideMenu />
       </menu>
     </div>
   );
