@@ -1,9 +1,11 @@
 import {
   ChessColor,
   ChessFEN,
+  ChessFENBoard,
   GetComponentProps,
   PieceSan,
   ShortChessMove,
+  invoke,
   objectKeys,
   toChessArrowFromId,
   toChessArrowId,
@@ -11,12 +13,17 @@ import {
   toLongColor,
   useCallbackIf,
 } from '@xmatter/util-kit';
-import { Square } from 'chess.js';
+import { Piece, Square } from 'chess.js';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Chessboard } from 'react-chessboard';
 import { Arrow } from 'react-chessboard/dist/chessboard/types';
 import { useArrowColor } from './useArrowColor';
-import { isPromotableMove } from 'util-kit/src/lib/ChessFENBoard/chessUtils';
+import {
+  fenBoardPieceSymbolToDetailedChessPiece,
+  isPromotableMove,
+  pieceSanToPiece,
+  pieceToPieceSan,
+} from 'util-kit/src/lib/ChessFENBoard/chessUtils';
 import {
   ArrowsMap,
   CircleDrawTuple,
@@ -29,6 +36,7 @@ import { shallowEqualObjects } from 'shallow-equal';
 import { deepmerge } from 'deepmerge-ts';
 import { ChessboardSquare } from './ChessboardSquare';
 import { useBoardTheme } from './useBoardTheme';
+import useInstance from '@use-it/instance';
 
 export type ChessBoardProps = GetComponentProps<typeof Chessboard>;
 
@@ -59,6 +67,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
   onArrowsChange = noop,
   onCircleDraw = noop,
   onPieceDrop = noop,
+  onMove = noop,
   inCheckSquares,
   boardOrientation = 'white',
   containerClassName,
@@ -85,68 +94,6 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
   );
 
   const arrowColor = useArrowColor();
-
-  const mergedCustomSquareStyles = useMemo(() => {
-    const lastMoveStyle = lastMove && {
-      [lastMove.from]: {
-        background: boardTheme.lastMoveFromSquare,
-      },
-      [lastMove.to]: {
-        background: boardTheme.lastMoveToSquare,
-      },
-    };
-
-    const circledStyle =
-      circlesMap &&
-      toDictIndexedBy(
-        Object.values(circlesMap),
-        ([sq]) => sq,
-        ([_, hex]) => ({
-          position: 'relative',
-          '> .circleDiv': {
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            right: '0',
-            bottom: '0',
-            background: `radial-gradient(ellipse at     center, 
-              rgba(255,113,12,0) 60%,
-              ${hex} 51.5%)`,
-            borderRadius: '50%',
-          },
-        })
-      );
-
-    const checkedStyle =
-      inCheckSquares &&
-      toDictIndexedBy(
-        objectKeys(inCheckSquares),
-        (sq) => sq,
-        () => ({
-          position: 'relative',
-          '> .inCheckDiv': {
-            // content: `''`,
-            position: 'absolute',
-            left: '0',
-            top: '0',
-            right: '0',
-            bottom: '0',
-            background: 'red',
-            borderRadius: '50%',
-            opacity: 0.7,
-          },
-        })
-      );
-
-    return deepmerge(
-      lastMoveStyle || {},
-      circledStyle || {},
-      checkedStyle || {},
-      customSquareStyles || {},
-    );
-  }, [lastMove, circlesMap, props.sizePx, inCheckSquares, customSquareStyles, boardTheme]);
-
-  // console.log('customSquareStyles', customSquareStyles);
 
   const [promoMove, setPromoMove] = useState<ShortChessMove>();
   const [localBoardArrowsMap, setLocalBoardArrowsMap] = useState<ArrowsMap>({});
@@ -219,14 +166,177 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
     []
   );
 
-  // console.log('customSquareStyles' ,customSquareStyles)
+  const [pendingMove, setPendingMove] = useState<{
+    from: Square;
+    piece: Piece;
+    to?: Square;
+  }>();
 
-  // const s = useRef<any>();
+  // TODO: This is only a HACK until the library implements the square/piece in the onClick Handlers
+  const fenBoardInstance = useInstance<ChessFENBoard>(new ChessFENBoard(fen));
+  useEffect(() => {
+    fenBoardInstance.loadFen(fen);
+
+    // Clear the pending Move if the Fen has changed (by opponent)
+    setPendingMove(undefined);
+  }, [fen]);
+
+  const onSquareClick = (square: Square) => {
+    const piece = invoke(() => {
+      const _pieceSan = fenBoardInstance.piece(square);
+
+      if (!_pieceSan) {
+        return undefined;
+      }
+
+      return fenBoardPieceSymbolToDetailedChessPiece(_pieceSan);
+    });
+
+    // If there is no existent Pending Move ('from' set)
+    if (!pendingMove?.from) {
+      // If the square isn't a piece return early
+      if (!piece) {
+        return;
+      }
+
+      setPendingMove({ from: square, piece });
+      return;
+    }
+
+    // If there is an existent Pending Move ('from' set), but no to set
+    if (!pendingMove?.to) {
+      // Return early if the from and to square are the same
+      if (square === pendingMove.from) {
+        setPendingMove(undefined);
+        return;
+      }
+
+      // Simply change the pending moves if the same side
+      if (piece?.color === pendingMove.piece.color) {
+        setPendingMove({
+          piece,
+          from: square,
+        });
+        return;
+      }
+
+      if (onPromotionCheck(pendingMove.from, square, pendingMove.piece)) {
+        // Set the Promotion Move
+        // setPendingMove({
+        //   ...pendingMove,
+        //   to: square,
+        // });
+        setPromoMove({
+          ...pendingMove,
+          to: square,
+        });
+        return;
+      }
+
+      const isValid = onMove({
+        from: pendingMove.from,
+        to: square,
+      });
+
+      if (isValid) {
+        setPendingMove(undefined);
+      }
+    }
+  };
+
+  const onPromotionCheck = (from: Square, to: Square, piece: Piece) => {
+    const isPromoMove = isPromotableMove({ from, to }, piece);
+
+    if (isPromoMove) {
+      setPromoMove({ from, to });
+    }
+
+    return isPromoMove;
+  };
+
+  const mergedCustomSquareStyles = useMemo(() => {
+    const lastMoveStyle = lastMove && {
+      [lastMove.from]: {
+        background: boardTheme.lastMoveFromSquare,
+      },
+      [lastMove.to]: {
+        background: boardTheme.lastMoveToSquare,
+      },
+    };
+
+    const circledStyle =
+      circlesMap &&
+      toDictIndexedBy(
+        Object.values(circlesMap),
+        ([sq]) => sq,
+        ([_, hex]) => ({
+          position: 'relative',
+          '> .circleDiv': {
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            right: '0',
+            bottom: '0',
+            background: `radial-gradient(ellipse at     center, 
+              rgba(255,113,12,0) 60%,
+              ${hex} 51.5%)`,
+            borderRadius: '50%',
+          },
+        })
+      );
+
+    const checkedStyle =
+      inCheckSquares &&
+      toDictIndexedBy(
+        objectKeys(inCheckSquares),
+        (sq) => sq,
+        () => ({
+          position: 'relative',
+          '> .inCheckDiv': {
+            // content: `''`,
+            position: 'absolute',
+            left: '0',
+            top: '0',
+            right: '0',
+            bottom: '0',
+            background: 'red',
+            borderRadius: '50%',
+            opacity: 0.7,
+          },
+        })
+      );
+
+    const clickedSquareStyle = {
+      ...(pendingMove?.from && {
+        [pendingMove?.from]: {
+          background: boardTheme.clickedPieceSquare,
+        },
+      }),
+    };
+
+    return deepmerge(
+      lastMoveStyle || {},
+      circledStyle || {},
+      checkedStyle || {},
+      customSquareStyles || {},
+      clickedSquareStyle || {}
+    );
+  }, [
+    lastMove,
+    circlesMap,
+    props.sizePx,
+    inCheckSquares,
+    customSquareStyles,
+    boardTheme,
+    pendingMove?.from,
+  ]);
+
   return (
     <div
       className={`relative overflow-hidden rounded-lg ${containerClassName}`}
     >
       <Chessboard
+        id="Chessboard" // TODO: should this be unique per instance?
         position={fen}
         boardWidth={props.sizePx}
         showBoardNotation
@@ -241,9 +351,11 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
           onPieceDrop(from, to, p);
 
           // As long as the on PromotionPieceSelect is present this doesn't get triggered with a pieceSelect
-          return !!props.onMove?.({ from, to });
+          return !!onMove({ from, to });
         }}
-        onSquareClick={() => {
+        onSquareClick={(sq) => {
+          onSquareClick(sq);
+
           // Reset the Arrows and Circles if present
           if (circlesMap && Object.keys(circlesMap).length > 0) {
             resetCircles();
@@ -256,17 +368,9 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
         customSquareStyles={mergedCustomSquareStyles}
         customArrows={arrowsToRender}
         autoPromoteToQueen={false}
-        onPromotionCheck={(from, to, piece) => {
-          // console.log('hererere', from, to, piece);
-
-          const isPromoMove = isPromotableMove({ from, to }, piece);
-
-          if (isPromoMove) {
-            setPromoMove({ from, to });
-          }
-
-          return isPromoMove;
-        }}
+        onPromotionCheck={(from, to, pieceSan) =>
+          onPromotionCheck(from, to, pieceSanToPiece(pieceSan))
+        }
         onPromotionPieceSelect={(promoteTo) => {
           if (!promoMove) {
             return false;
@@ -278,7 +382,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
             return false;
           }
 
-          return !!props.onMove?.({
+          return !!onMove({
             ...promoMove,
             promoteTo,
           });
@@ -288,6 +392,8 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
         onSquareRightClick={onSquareRightClick}
         customPieces={boardTheme.customPieces}
         promotionDialogVariant="vertical"
+        promotionToSquare={promoMove?.to}
+        showPromotionDialog={!!promoMove?.to}
         {...props}
       />
     </div>

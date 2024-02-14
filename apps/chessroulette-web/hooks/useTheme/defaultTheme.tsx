@@ -20,6 +20,7 @@ type Theme = {
     lastMoveToSquare: string;
     lastMoveFromSquare: string;
     hoveredSquare: string;
+    clickedPieceSquare: string;
     customPieces?: ChessBoardProps['customPieces'];
     renderPiece: (p: {
       pieceSan: PieceSan;
@@ -63,6 +64,8 @@ const chessrouletteTheme: Theme = {
     lastMoveToSquare: 'rgba(234, 183, 255, .5)',
     lastMoveFromSquare: 'rgba(234, 183, 255, .5)',
     hoveredSquare: 'rgba(204, 183, 255, .9)',
+    // clickedPieceSquare: 'rgba(204, 183, 255, .9)',
+    clickedPieceSquare: 'rgba(0, 163, 255, .7)',
     renderPiece: renderRCHPiece,
     customPieces: toDictIndexedBy(
       objectKeys(MahaPieces),
@@ -82,6 +85,7 @@ const outpostTheme: Theme = {
     lastMoveToSquare: 'rgba(95, 15, 15, .6)',
     lastMoveFromSquare: 'rgba(95, 15, 15, .6)',
     hoveredSquare: 'rgba(134, 583, 255, .5)',
+    clickedPieceSquare: 'rgba(134, 583, 255, .5)',
     renderPiece: renderRCHPiece,
   },
 };

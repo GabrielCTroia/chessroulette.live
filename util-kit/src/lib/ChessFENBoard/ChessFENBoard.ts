@@ -169,15 +169,15 @@ export class ChessFENBoard {
     const detailedPiece = fenBoardPieceSymbolToDetailedChessPiece(piece);
 
     const sanPiece =
-      detailedPiece.piece === 'p'
+      detailedPiece.type === 'p'
         ? ''
-        : detailedPiece.piece.toLocaleUpperCase();
+        : detailedPiece.type.toLocaleUpperCase();
     const sanCaptured = invoke(() => {
       if (!captured) {
         return '';
       }
 
-      if (detailedPiece.piece === 'p') {
+      if (detailedPiece.type === 'p') {
         return `${from[0]}x`;
       }
 
@@ -217,7 +217,7 @@ export class ChessFENBoard {
          * See this https://www.chess.com/terms/fen-chess#halfmove-clock
          */
         halfMoves:
-          captured || detailedPiece.piece === 'p'
+          captured || detailedPiece.type === 'p'
             ? 0
             : prevFenState.halfMoves + 1,
 
@@ -233,7 +233,7 @@ export class ChessFENBoard {
 
     return {
       color: detailedPiece.color,
-      piece: detailedPiece.piece,
+      piece: detailedPiece.type,
       captured,
       san,
       to,
@@ -424,10 +424,6 @@ export class ChessFENBoard {
 
     // Throw for now
     if (nextFenStateResult.err) {
-      // console.error(nextFenStateResult.val);
-      // console.log({ fen, fenStateNotation });
-      // console.trace('where?');
-
       throw nextFenStateResult.val;
     }
 

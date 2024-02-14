@@ -104,17 +104,16 @@ export const fenBoardToChessBoard = (fenBoard: FENBoard): ChessBoard =>
     return {
       square: matrixIndexToSquare(index),
       color: p.color,
-      type: p.piece,
+      type: p.type,
     };
   });
 
 export const fenBoardPieceSymbolToDetailedChessPiece = (
   p: FenBoardPieceSymbol
-) =>
-  ({
-    piece: p.toLowerCase() as PieceSymbol,
-    color: isUpperCase(p) ? 'w' : 'b',
-  } as const);
+): Piece => ({
+  type: p.toLowerCase() as PieceSymbol,
+  color: isUpperCase(p) ? 'w' : 'b',
+});
 
 const isUpperCase = (s: string) => s === s.toUpperCase();
 
@@ -130,7 +129,7 @@ export const chessBoardToFenBoard = (chessBoard: ChessBoard): FENBoard =>
 export const fenBoardPieceSymbolToPieceSymbol = (
   p: FenBoardPieceSymbol
 ): PieceSymbol => {
-  const { color, piece } = fenBoardPieceSymbolToDetailedChessPiece(p);
+  const { color, type: piece } = fenBoardPieceSymbolToDetailedChessPiece(p);
 
   return `${color}${piece.toUpperCase()}` as PieceSymbol;
 };
@@ -152,11 +151,12 @@ export const pieceSanToPiece = (p: PieceSan): Piece => {
   return { color, type };
 };
 
+export const pieceToPieceSan = (p: Piece): PieceSan =>
+  `${p.color[0]}${p.type.toLocaleUpperCase()}}` as PieceSan;
+
 export const detailedPieceToPieceSymbol = () => {};
 
-export const isPromotableMove = (m: ChessMove, pieceSan: PieceSan) => {
-  const piece = pieceSanToPiece(pieceSan);
-
+export const isPromotableMove = (m: ChessMove, piece: Piece) => {
   return (
     piece.type === 'p' && // is pawn
     ((piece.color === 'w' && m.to[1] === '8') || // when white is on the 8th rank

@@ -273,10 +273,11 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                         inCheckSquares={inCheckSquaresMap}
                         onMove={(payload) => {
                           dispatch({ type: 'dropPiece', payload });
+
+                          // TODO: This can be returned from a more internal component
                           return true;
                         }}
                         onArrowsChange={(payload) => {
-                          // console.log('on arrow change?');
                           dispatch({ type: 'arrowChange', payload });
                         }}
                         arrowsMap={activityState.arrows}
