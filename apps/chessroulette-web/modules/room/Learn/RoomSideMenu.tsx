@@ -3,20 +3,20 @@
 import { ClipboardCopyButton } from 'apps/chessroulette-web/components/ClipboardCopyButton';
 import { PaperAirplaneIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { useMemo, useState } from 'react';
-import { getRandomInt } from '@xmatter/util-kit';
 import { useUrl } from 'nextjs-current-url';
 import { useLearnActivitySettings } from './useLearnActivitySettings';
 import { Button } from 'apps/chessroulette-web/components/Button';
 import { Icon } from 'apps/chessroulette-web/components/Icon';
 import { useRouter, usePathname } from 'next/navigation';
 import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
+import { generateUserId } from 'apps/chessroulette-web/util';
 
 export const RoomSideMenu = () => {
   const router = useRouter();
   const pathName = usePathname();
 
   const url = useUrl();
-  const [nextUserId, setNextUserId] = useState(getRandomInt(0, 99999));
+  const [nextUserId, setNextUserId] = useState(generateUserId());
   const inviteUrl = useMemo(() => {
     if (!url) {
       return '';
@@ -43,7 +43,7 @@ export const RoomSideMenu = () => {
             // copiedlLabel="Invitation Copied"
             className="bg-green-700 hover:bg-green-600 active:bg-green-700"
             onCopied={() => {
-              setNextUserId(getRandomInt(0, 9999));
+              setNextUserId(generateUserId());
             }}
             type="custom"
             size="sm"

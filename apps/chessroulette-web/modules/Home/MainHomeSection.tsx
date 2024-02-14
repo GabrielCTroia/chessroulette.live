@@ -6,7 +6,7 @@ import { useMovexResourceType } from 'movex-react';
 import { initialRoomState } from '../room/movex/reducer';
 import { useRouter } from 'next/navigation';
 import { toRidAsObj } from 'movex';
-import { getRandomInt } from 'apps/chessroulette-web/util';
+import { generateUserId, getRandomInt } from 'apps/chessroulette-web/util';
 import { initialLearnActivityState } from '../room/activity/reducer';
 import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
 import { Session } from 'next-auth';
@@ -42,8 +42,7 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
                     activity: 'learn',
                     instructor: true,
                     userId:
-                      updateableSearchParams.get('userId') ||
-                      String(getRandomInt(1, 9999)),
+                      updateableSearchParams.get('userId') || generateUserId(),
                   })
                 );
               });
@@ -67,8 +66,7 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
                     instructor: true,
                     theme: 'op',
                     userId:
-                      updateableSearchParams.get('userId') ||
-                      String(getRandomInt(1, 9999)),
+                      updateableSearchParams.get('userId') || generateUserId(),
                   })
                 );
               });
@@ -95,8 +93,7 @@ export const MainHomeSection: React.FC<Props> = ({ session }) => {
                     instructor: true,
                     theme: 'kids',
                     userId:
-                      updateableSearchParams.get('userId') ||
-                      String(getRandomInt(1, 9999)),
+                      updateableSearchParams.get('userId') || generateUserId(),
                   })
                 );
               });

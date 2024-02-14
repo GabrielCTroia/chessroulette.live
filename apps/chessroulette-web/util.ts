@@ -24,3 +24,5 @@ export const getRandomStr = (N: number = 6) =>
       return _alphabet.charAt(Math.floor(Math.random() * _alphabet.length));
     })
     .join('');
+
+export const generateUserId = () => getRandomStr(5);

@@ -10,9 +10,8 @@ import {
   toResourceIdentifierObj,
   toResourceIdentifierStr,
 } from 'movex-core-util';
-
 import { useUpdateableSearchParams } from 'apps/chessroulette-web/hooks/useSearchParams';
-import { getRandomInt } from 'apps/chessroulette-web/util';
+import { generateUserId } from 'apps/chessroulette-web/util';
 import { links } from './links';
 
 type Props = {
@@ -49,8 +48,7 @@ export const JoinOrCreateRoom: React.FC<Props> = ({ activity, id }: Props) => {
               ...updateableSearchParams.toObject(),
               id: toResourceIdentifierObj(r.rid).resourceId,
               activity: 'learn',
-              userId:
-                updateableSearchParams.get('userId') || getRandomInt(0, 999),
+              userId: updateableSearchParams.get('userId') || generateUserId(),
             })
           );
         });
