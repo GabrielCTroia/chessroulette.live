@@ -195,6 +195,13 @@ export const DesktopRoomLayout: React.FC<DesktopRoomLayoutProps> = ({
 
   return (
     <div className={`w-full h-full flex flex-col ${className}`}>
+      {/* <div className='fixed p-4' style={{
+        top: 10,
+        left: 10,
+        background: 'rgba(0, 0, 0, .8)',
+      }}>
+        {JSON.stringify(containerDimensions, null, 2)}
+      </div> */}
       {/* <div style={{ height: props.topHeight }}>{renderedTop}</div> */}
       <div
         className={'flex flex-col items-end'}
