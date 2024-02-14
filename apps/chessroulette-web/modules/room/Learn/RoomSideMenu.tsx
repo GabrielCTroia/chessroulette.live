@@ -49,7 +49,7 @@ export const RoomSideMenu = () => {
             tooltip="Invite Student"
           />
           <IconButton
-            tooltip="Edit Lesson"
+            tooltip="Edit Board"
             onClick={() => {
               const nextSearchParams = searchParams.set((prev) => ({
                 ...prev,
