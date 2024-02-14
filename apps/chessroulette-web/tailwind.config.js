@@ -16,7 +16,8 @@ module.exports = {
   safelist: [
     {
       pattern: /bg-*-.+/,
-    }
+      variants: ['focus', 'hover', 'active'],
+    },
   ],
   //   aspectRatio: {
   //     auto: 'auto',

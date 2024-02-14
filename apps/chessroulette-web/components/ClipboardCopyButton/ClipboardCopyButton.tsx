@@ -1,31 +1,34 @@
 import React, { useState } from 'react';
-import { Button, ButtonProps } from '../Button';
+import { Button, ButtonProps, IconButton } from '../Button';
 import { noop } from '@xmatter/util-kit';
-// import { Button, ButtonProps } from '../Button';
-// import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-// import { faCheck } from '@fortawesome/free-solid-svg-icons';
-// import { faCopy } from '@fortawesome/free-regular-svg-icons';
-// import { seconds } from 'src/lib/time';
-// import { noop } from 'src/lib/util';
-// import { createUseStyles } from 'src/lib/jss';
-// import { useColorTheme } from 'src/theme/hooks/useColorTheme';
 
-type Props = Omit<ButtonProps, 'onClick'> & {
+type BaseProps = Omit<ButtonProps, 'onClick'> & {
   value: string;
-  // copiedlLabel?: string;
   onCopied?: () => void;
-  render: (copied: boolean) => React.ReactNode;
 };
+
+type Props =
+  | (BaseProps & {
+      buttonComponentType?: 'Button';
+      render: (copied: boolean) => React.ReactNode;
+      onCopiedIcon?: undefined;
+    })
+  | (BaseProps & {
+      buttonComponentType: 'IconButton';
+      icon: NonNullable<BaseProps['icon']>;
+      onCopiedIcon?: BaseProps['icon'];
+      render?: undefined;
+    });
 
 export const ClipboardCopyButton: React.FC<Props> = ({
   value,
-  // copiedlLabel = 'Copied',
   onCopied = noop,
-  render,
+  buttonComponentType = 'Button',
+  icon,
+  onCopiedIcon = icon,
   ...buttonProps
 }) => {
   const [copied, setCopied] = useState(false);
-  // const { theme } = useColorTheme();
 
   const copy = async () => {
     try {
@@ -41,33 +44,19 @@ export const ClipboardCopyButton: React.FC<Props> = ({
     } catch (e) {}
   };
 
+  if (buttonComponentType === 'IconButton') {
+    return (
+      <IconButton
+        onClick={copy}
+        icon={copied ? onCopiedIcon! : icon!}
+        {...buttonProps}
+      />
+    );
+  }
+
   return (
-    <Button
-      onClick={copy}
-      // icon={() => (
-      //   <FontAwesomeIcon
-      //     icon={copied ? faCheck : faCopy}
-      //     className={cls.icon}
-      //     style={
-      //       buttonProps.clear
-      //         ? {
-      //             color:
-      //               theme.colors.neutralDarkest,
-      //           }
-      //         : undefined
-      //     }
-      //   />
-      // )}
-      {...buttonProps}
-    >
-      {render(copied)}
-      {/* {copied ? copiedlLabel : buttonProps.children} */}
+    <Button onClick={copy} {...buttonProps}>
+      {buttonProps.render?.(copied)}
     </Button>
   );
 };
-
-// const useStyles = createUseStyles((theme) => ({
-//   icon: {
-//     color: theme.button.icon.color,
-//   },
-// }));
