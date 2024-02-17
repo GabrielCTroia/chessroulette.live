@@ -55,11 +55,14 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
 
   const [editMode, setEditMode] = useState<{
     isActive: boolean;
-    state: Pick<ChapterState, 'fen' | 'arrowsMap' | 'circlesMap'>;
+    state: Pick<ChapterState, 'fen' | 'arrowsMap' | 'circlesMap'> & {
+      orientation: ChessColor;
+    };
   }>({
     isActive: isEditParamsSet,
     state: {
       fen: ChessFENBoard.STARTING_FEN,
+      orientation: playingColor,
     },
   });
 
@@ -196,8 +199,6 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                 ? swapColor(activityState.boardOrientation)
                 : activityState.boardOrientation;
 
-              // console.log('playing color', playingColor);
-
               return (
                 <div className="flex border-slate-900">
                   {editMode.isActive ? (
@@ -205,10 +206,8 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                       fen={editMode.state.fen}
                       sizePx={desktopLayout.main.width.val}
                       onUpdated={updateEditedFen}
-                      boardOrientation={playingColor}
+                      boardOrientation={editMode.state.orientation}
                       onArrowsChange={(arrowsMap) => {
-                        // console.log('on arrow change?');
-                        // dispatch({ type: 'arrowChange', payload });
                         setEditMode((prev) => ({
                           ...prev,
                           state: {
@@ -251,19 +250,22 @@ export default ({ playingColor = 'white', iceServers, ...props }: Props) => {
                           },
                         }));
                       }}
-                      // onFlipBoard={() => {
-                      // setEditMode((prev) => ({
-                      //   ...prev,
-                      //   orientation: swapColor(prev.orientation),
-                      // }));
-                      // dispatch({
-                      //   type: 'changeBoardOrientation',
-                      //   payload:
-                      //     activityState.boardOrientation === 'black'
-                      //       ? 'white'
-                      //       : 'black',
-                      // });
-                      // }}
+                      onFlipBoard={() => {
+                        setEditMode((prev) => ({
+                          ...prev,
+                          state: {
+                            ...prev.state,
+                            orientation: swapColor(prev.state.orientation),
+                          }
+                        }));
+                        // dispatch({
+                        //   type: 'changeBoardOrientation',
+                        //   payload:
+                        //     activityState.boardOrientation === 'black'
+                        //       ? 'white'
+                        //       : 'black',
+                        // });
+                      }}
                     />
                   ) : (
                     <>

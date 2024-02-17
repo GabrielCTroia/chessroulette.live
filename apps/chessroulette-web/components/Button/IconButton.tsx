@@ -8,11 +8,12 @@ export type IconButtonProps = Ensure<Omit<ButtonProps, 'children'>, 'icon'>;
 export const IconButton: React.FC<IconButtonProps> = ({
   icon,
   iconKind,
+  size = 'md',
   ...props
 }) => {
   return (
-    <Button {...props}>
-      <Icon name={icon} kind={iconKind} className={props.size ? buttonIconClasses[props.size] : ''} />
+    <Button {...props} size={size}>
+      <Icon name={icon} kind={iconKind} className={buttonIconClasses[size]} />
     </Button>
   );
 };

@@ -205,6 +205,8 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
 
     // If there is an existent Pending Move ('from' set), but no to set
     if (!pendingMove?.to) {
+      // setPromoMove(undefined);
+
       // Return early if the from and to square are the same
       if (square === pendingMove.from) {
         setPendingMove(undefined);
@@ -249,6 +251,8 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
 
     if (isPromoMove) {
       setPromoMove({ from, to });
+    } else {
+      setPromoMove(undefined);
     }
 
     return isPromoMove;
@@ -330,6 +334,8 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
     boardTheme,
     pendingMove?.from,
   ]);
+
+  console.log('promoMove?.to', promoMove?.to);
 
   return (
     <div

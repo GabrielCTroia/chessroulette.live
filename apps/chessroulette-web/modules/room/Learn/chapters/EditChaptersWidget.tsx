@@ -47,8 +47,7 @@ export const EditChaptersWidget = ({
           <div className="flex-1" />
           <Button
             size="sm"
-            // type="clear"
-            type="custom"
+            type="clear"
             onClick={onExitEditMode}
           >
             Leave

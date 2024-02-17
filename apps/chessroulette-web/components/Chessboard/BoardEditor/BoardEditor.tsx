@@ -21,6 +21,7 @@ import { useBoardTheme } from '../useBoardTheme';
 import { getSquareSize } from './util';
 import { DropContainer } from './DropContainer';
 import { DraggableItem } from './DraggableItem';
+import { IconButton } from '../../Button';
 
 export type BoardEditorProps = Pick<
   ChessboardContainerProps,
@@ -144,7 +145,7 @@ export const BoardEditor = ({
 
   return (
     <div
-      className="flex flex-col sjustify-between items-center justify-center gap-2 sbg-slate-700 rounded-xl borders border-slate-700"
+      className="flex flex-col sjustify-between items-center justify-center gap-2 sbg-slate-700 rounded-xl bsg-red-100"
       style={{ height: sizePx }}
     >
       <DndProvider backend={HTML5Backend}>
@@ -152,7 +153,7 @@ export const BoardEditor = ({
           {extraPiecesLayout.top}
         </div>
         <div
-          className="flex flex-cosl sjustify-between justify-center gap-2"
+          className="flex flex-cosl sjustify-between justify-center"
           style={{
             width: sizePx,
             // height: sizePx,
@@ -233,37 +234,43 @@ export const BoardEditor = ({
           </DropContainer>
 
           <div className="flex flex-col">
-            {/* <div className="flex flex-1 flex-col gap-3">
-              <Icon
-                name="ArrowsUpDownIcon"
-                className="h-5 w-5 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
-                title="Flip Board"
-                kind='outline'
+            <div className="flex flex-1 flex-col gap-2">
+              <IconButton
+                icon="ArrowsUpDownIcon"
+                type="clear"
+                tooltip="Flip Board"
+                tooltipPositon="right"
+                iconKind="outline"
+                size="sm"
                 onClick={onFlipBoard}
               />
-              <Icon
-                name="TrashIcon"
-                kind='outline'
-                className="h-5 w-5 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
-                title="Clear Board"
+              <IconButton
+                icon="TrashIcon"
+                iconKind="outline"
+                type="clear"
+                tooltip="Clear Board"
+                tooltipPositon="right"
+                size="sm"
                 onClick={() => {
                   onUpdated('4k3/8/8/8/8/8/8/4K3 w - - 0 1');
 
                   resetArrowsAndCircles();
                 }}
               />
-              <Icon
-                name='ArrowPathIcon'
-                kind="outline"
-                className="h-5 w-5 hover:bg-slate-300 hover:cursor-pointer hover:text-black rounded-lg"
-                title="Starting Position"
+              <IconButton
+                icon="ArrowPathIcon"
+                iconKind="outline"
+                type="clear"
+                tooltip="Starting Position"
+                tooltipPositon="right"
+                size="sm"
                 onClick={() => {
                   onUpdated(ChessFENBoard.STARTING_FEN);
 
                   resetArrowsAndCircles();
                 }}
               />
-            </div> */}
+            </div>
 
             <div className="flex-1" />
           </div>
