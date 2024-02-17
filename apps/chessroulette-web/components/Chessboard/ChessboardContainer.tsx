@@ -222,12 +222,13 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
         return;
       }
 
-      if (onPromotionCheck(pendingMove.from, square, pendingMove.piece)) {
+      if (
+        isPromotableMove(
+          { from: pendingMove.from, to: square },
+          pendingMove.piece
+        )
+      ) {
         // Set the Promotion Move
-        // setPendingMove({
-        //   ...pendingMove,
-        //   to: square,
-        // });
         setPromoMove({
           ...pendingMove,
           to: square,
@@ -249,11 +250,7 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
   const onPromotionCheck = (from: Square, to: Square, piece: Piece) => {
     const isPromoMove = isPromotableMove({ from, to }, piece);
 
-    if (isPromoMove) {
-      setPromoMove({ from, to });
-    } else {
-      setPromoMove(undefined);
-    }
+    setPromoMove(isPromoMove ? { from, to } : undefined);
 
     return isPromoMove;
   };
