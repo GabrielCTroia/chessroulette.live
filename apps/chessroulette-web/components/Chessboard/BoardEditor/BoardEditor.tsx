@@ -21,16 +21,9 @@ import { useBoardTheme } from '../useBoardTheme';
 import { getSquareSize } from './util';
 import { DropContainer } from './DropContainer';
 import { DraggableItem } from './DraggableItem';
-import {
-  ArrowsUpDownIcon,
-  TrashIcon,
-  ArrowPathIcon,
-} from '@heroicons/react/16/solid';
-import { Icon } from '../../Icon';
 
-type Props = Pick<
+export type BoardEditorProps = Pick<
   ChessboardContainerProps,
-  | 'sizePx'
   | 'boardOrientation'
   | 'arrowsMap'
   | 'onArrowsChange'
@@ -41,6 +34,7 @@ type Props = Pick<
   fen: ChessFEN;
   onUpdated: (fen: ChessFEN) => void;
   onFlipBoard?: () => void;
+  sizePx: number;
 };
 
 const whitePieces: PieceSan[] = ['wP', 'wB', 'wN', 'wQ', 'wR'];
@@ -52,7 +46,7 @@ export const BoardEditor = ({
   onUpdated = noop,
   onFlipBoard = noop,
   ...props
-}: Props) => {
+}: BoardEditorProps) => {
   const fenBoard = useInstance<ChessFENBoard>(new ChessFENBoard(fen));
   // const [editedFen, setEditedFen] = useState(fenBoard.fen);
   const [draggingPieces, setDraggingPieces] = useState<
