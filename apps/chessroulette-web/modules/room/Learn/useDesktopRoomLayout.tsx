@@ -50,9 +50,10 @@ export const useDesktopRoomLayout = (
         ...normalizeCssContainerDimension(state.side),
         asString: renderCssDimension(state.side),
       },
+      container: containerDimensions,
       updated: containerDimensions.updated,
     }),
-    [state, containerDimensions.updated]
+    [state, containerDimensions]
   );
 };
 

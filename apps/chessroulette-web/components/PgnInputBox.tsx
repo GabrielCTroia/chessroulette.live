@@ -6,7 +6,7 @@ import { DragAndDrop } from './DragAndDrop';
 import { Err, Ok, Result } from 'ts-results';
 import useDebouncedEffect from 'use-debounced-effect';
 
-type Props = {
+export type PgnInputBoxProps = {
   onChange: (type: 'FEN' | 'PGN', s: string) => void;
   value?: string;
   isInvalid?: boolean;
@@ -29,7 +29,7 @@ const isValidFenOrPGN = (input: string): Result<'FEN' | 'PGN', void> => {
   return Err.EMPTY;
 };
 
-export const PgnInputBox: React.FC<Props> = ({
+export const PgnInputBox: React.FC<PgnInputBoxProps> = ({
   value = '',
   compact = false,
   ...props

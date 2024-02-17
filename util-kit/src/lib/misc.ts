@@ -74,3 +74,6 @@ export const isOneOf = <T extends string | number, List extends T[]>(
 
 export const isObject = (m: unknown): m is object =>
   m !== null && typeof m === 'object';
+
+export const max = (a: number, b: number) => (a > b ? a : b);
+export const min = (a: number, b: number) => (a < b ? a : b);

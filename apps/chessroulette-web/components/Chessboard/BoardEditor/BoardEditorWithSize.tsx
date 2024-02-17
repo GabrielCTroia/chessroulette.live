@@ -1,3 +1,4 @@
+import { min } from '@xmatter/util-kit';
 import { ContainerWithDimensions } from '../../ContainerWithDimensions';
 import { BoardEditor, BoardEditorProps } from './BoardEditor';
 
@@ -13,7 +14,7 @@ export const BoardEditorWithSize = ({ sizePx, ...props }: Props) => {
   return (
     <ContainerWithDimensions
       className="w-full h-full"
-      render={(d) => <BoardEditor {...props} sizePx={d.width} />}
+      render={(d) => <BoardEditor {...props} sizePx={min(d.height, d.width)} />}
     />
   );
 };

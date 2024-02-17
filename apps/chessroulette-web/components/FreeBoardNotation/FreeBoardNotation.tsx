@@ -3,7 +3,7 @@ import { List, ListProps } from './components/List';
 import { useKeysToRefocusHistory } from './hooks';
 import { FBHHistory, FreeBoardHistory } from '@xmatter/util-kit';
 
-export type GameHistoryProps = {
+export type FreeBoardNotationProps = {
   history: FBHHistory;
   focusedIndex: ListProps['focusedIndex'];
   onRefocus: ListProps['onRefocus'];
@@ -19,7 +19,7 @@ export type GameHistoryProps = {
  * @param param0
  * @returns
  */
-export const FreeBoardNotation: React.FC<GameHistoryProps> = ({
+export const FreeBoardNotation: React.FC<FreeBoardNotationProps> = ({
   history = [],
   emptyContent = 'Wow, so empty!',
   focusedIndex = FreeBoardHistory.getStartingIndex(),

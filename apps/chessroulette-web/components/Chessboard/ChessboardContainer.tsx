@@ -332,11 +332,13 @@ export const ChessboardContainer: React.FC<ChessboardContainerProps> = ({
     pendingMove?.from,
   ]);
 
-  console.log('promoMove?.to', promoMove?.to);
-
   return (
     <div
       className={`relative overflow-hidden rounded-lg ${containerClassName}`}
+      style={{
+        width: props.sizePx,
+        height: props.sizePx,
+      }}
     >
       <Chessboard
         id="Chessboard" // TODO: should this be unique per instance?

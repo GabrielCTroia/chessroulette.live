@@ -4,7 +4,7 @@ import { ResourceIdentifier } from 'movex-core-util';
 import { IceServerRecord } from 'apps/chessroulette-web/providers/PeerToPeerProvider/type';
 import { config } from 'apps/chessroulette-web/config';
 import { authOptions } from 'apps/chessroulette-web/services/auth';
-import LearnActivity from 'apps/chessroulette-web/modules/room/Learn/LearnActivity';
+import { LearnActivity } from 'apps/chessroulette-web/modules/room/Learn/LearnActivity';
 import RoomTemplate from 'apps/chessroulette-web/templates/RoomTemplate';
 import { serverConfig } from 'apps/chessroulette-web/config/config.server';
 
@@ -59,7 +59,6 @@ export default async function Page({
 
   return (
     <RoomTemplate themeName={searchParams.theme} session={session}>
-      {/* in [rid] page */}
       <LearnActivity rid={rid} iceServers={iceServers} />
     </RoomTemplate>
   );

@@ -10,11 +10,11 @@ export type Props = {
   boardFen: ChessFEN;
   chaptersMap: Record<Chapter['id'], Chapter>;
   className?: string;
-  onUseChapter: (id: Chapter['id']) => void;
+  // onUseChapter: (id: Chapter['id']) => void;
 };
 
 export const ChaptersTab = ({
-  onUseChapter = noop,
+  // onUseChapter = noop,
   chaptersMap,
   className,
 }: Props) => {
@@ -32,7 +32,7 @@ export const ChaptersTab = ({
           <ChapterItem
             key={chapter.id}
             chapter={chapter}
-            onUse={() => onUseChapter(chapter.id)}
+            // onUse={() => onUseChapter(chapter.id)}
           />
         ))}
       </div>
